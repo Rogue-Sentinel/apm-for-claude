@@ -298,6 +298,8 @@ Several layers, because no single rule is enough:
    `tools/build_fleet_db.py`. Approving the plan approves exactly those, and the hooks read the approved
    plan's allowlist. Anything **not** named in an approved plan stays blocked, and the manager must ask the
    user for that specific action. This keeps plan approval as the single touchpoint without opening a general hole.
+   The user approves in chat, and the manager records it as a 10-minute, one-off allowance for that exact
+   command (or path).
 4. **Deletion is planned, never a side effect.** It happens as a tracked git change. An unplanned deletion
    is flagged and reverted in review.
 5. **Workers build in isolated worktrees**, so a misbehaving worker damages only its own copy.
