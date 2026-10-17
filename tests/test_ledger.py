@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -114,3 +115,33 @@ def test_append_log_records_utc_iso() -> None:
     append_log(ledger, None, "global", now)
     assert ledger["log"][0] == {"at": "2026-01-02T03:04:05+00:00", "issue": 4, "event": "started"}
     assert ledger["log"][1]["issue"] is None
+
+
+def _write(path: Path, data: object) -> Path:
+    path.write_text(json.dumps(data), encoding="utf-8")
+    return path
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"issues": {"1": 5}},
+        {"issues": {"1": {"status": "building", "allowlist": "x"}}},
+        {"issues": {"1": {"status": "building", "tasks": {}}}},
+        {"issues": {"1": {"status": "building", "questions": None}}},
+        {"issues": {}, "log": {}},
+        {"issues": []},
+        [],
+    ],
+)
+def test_malformed_ledger_shapes_raise(tmp_path: Path, data: object) -> None:
+    with pytest.raises(LedgerError):
+        load_ledger(_write(tmp_path / "ledger.json", data))
+
+
+def test_missing_issue_lists_are_defaulted(tmp_path: Path) -> None:
+    path = _write(tmp_path / "ledger.json", {"issues": {"1": {"status": "building"}}})
+    ledger = load_ledger(path)
+    issue = ledger["issues"]["1"]
+    assert issue["tasks"] == [] and issue["questions"] == [] and issue["allowlist"] == []
+    assert active_allowlist(ledger) == []

@@ -23,17 +23,32 @@ def empty_ledger() -> dict[str, Any]:
     return {"issues": {}, "log": []}
 
 
+def _normalize_issue(key: str, issue: Any) -> None:
+    if not isinstance(issue, dict):
+        raise LedgerError(f"issue {key} is not an object")
+    for name in ("tasks", "allowlist", "questions"):
+        if not isinstance(issue.setdefault(name, []), list):
+            raise LedgerError(f"issue {key} field {name!r} is not a list")
+
+
+def _validate(ledger: Any, path: Path) -> dict[str, Any]:
+    if not isinstance(ledger, dict) or not isinstance(ledger.get("issues"), dict):
+        raise LedgerError(f"ledger {path} has no 'issues' mapping")
+    if not isinstance(ledger.setdefault("log", []), list):
+        raise LedgerError(f"ledger {path} 'log' is not a list")
+    for key, issue in ledger["issues"].items():
+        _normalize_issue(key, issue)
+    return ledger
+
+
 def load_ledger(path: Path) -> dict[str, Any]:
     if not path.exists():
         return empty_ledger()
     try:
-        ledger = json.loads(path.read_text(encoding="utf-8"))
+        raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as err:
         raise LedgerError(f"cannot read ledger {path}: {err}") from err
-    if not isinstance(ledger, dict) or not isinstance(ledger.get("issues"), dict):
-        raise LedgerError(f"ledger {path} has no 'issues' mapping")
-    ledger.setdefault("log", [])
-    return ledger
+    return _validate(raw, path)
 
 
 def save_ledger(path: Path, ledger: dict[str, Any]) -> None:
