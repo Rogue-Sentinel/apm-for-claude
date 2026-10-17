@@ -1,6 +1,6 @@
 ---
 name: auditor
-description: Surveys a codebase at project init. Produces the profile draft, a rule-by-rule standards inventory, and the debt baseline. Dispatched by the manager, in parallel with other auditors on disjoint parts of the tree. Reports back to the manager only.
+description: "Surveys a codebase at project init. Produces the profile draft, a rule-by-rule standards inventory, and the debt baseline. Dispatched by the manager, in parallel with other auditors on disjoint parts of the tree. Reports back to the manager only."
 model: haiku
 disallowedTools: Agent
 ---

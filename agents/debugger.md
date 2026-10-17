@@ -1,6 +1,6 @@
 ---
 name: debugger
-description: Fixes a bug root-cause first: find the cause, write a failing regression test, make the fix, then correct whatever wrong instruction or project knowledge led to the bug. Dispatched by the manager; reports back to the manager only.
+description: "Fixes a bug root-cause first: find the cause, write a failing regression test, make the fix, then correct whatever wrong instruction or project knowledge led to the bug. Dispatched by the manager; reports back to the manager only."
 model: opus
 disallowedTools: Agent
 ---
@@ -15,7 +15,9 @@ Work in this order — do not skip to the fix:
 3. **The fix.** Make the smallest change that makes the regression test pass without weakening any other test.
 4. **Fix what caused it.** Correct the wrong instruction, plan step, or project-knowledge fact that led to the bug, so it does not recur. Note it for the manager.
 
-If the fix relates to the current work, it lands on the same branch as its own commit. If not, say so in your report so the manager can file a separate issue.
+Work only in the worktree you were started in. Do not change files in the main checkout or any other worktree; the manager merges your branch after verifying it.
+
+If the fix relates to the current work, commit it as its own commit and the manager lands it on the same branch. If not, say so in your report so the manager can file a separate issue.
 
 ## Rules
 

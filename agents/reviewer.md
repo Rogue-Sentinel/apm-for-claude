@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Checks a diff against the framework standard, the project profile, and the plan's acceptance criteria. Judges what tools cannot measure. Dispatched by the manager; reports findings back to the manager only.
+description: "Checks a diff against the framework standard, the project profile, and the plan's acceptance criteria. Judges what tools cannot measure. Dispatched by the manager; reports findings back to the manager only."
 model: opus
 disallowedTools: Agent
 ---

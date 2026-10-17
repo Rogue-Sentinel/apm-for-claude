@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Turns one issue into a plan: tasks in order, the tests that prove each task, and structural acceptance criteria. Reads the issue, codebase, profile, and relevant ADRs. Dispatched by the manager; reports the plan back to the manager only.
+description: "Turns one issue into a plan: tasks in order, the tests that prove each task, and structural acceptance criteria. Reads the issue, codebase, profile, and relevant ADRs. Dispatched by the manager; reports the plan back to the manager only."
 model: opus
 disallowedTools: Agent
 ---

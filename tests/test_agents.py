@@ -67,6 +67,40 @@ def test_worker_report_format_lists_every_item(name):
     _, body = parse(AGENTS / f"{name}.md")
     marker = "## Report format"
     assert marker in body, f"{name} missing {marker}"
-    section = body[body.index(marker):]
+    section = body[body.index(marker):].split("\n## ", 1)[0]
     for item in REPORT_ITEMS:
         assert item in section, f"{name} report format missing '{item}'"
+
+
+def frontmatter_lines(path: Path) -> list[str]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return lines[1:lines.index("---", 1)]
+
+
+@pytest.mark.parametrize("name", ALL_AGENTS)
+def test_frontmatter_unquoted_values_hold_no_colon_space(name):
+    for line in frontmatter_lines(AGENTS / f"{name}.md"):
+        value = line.partition(":")[2].strip()
+        if value[:1] in ('"', "'"):
+            assert value[-1] == value[0] and len(value) > 1, f"{name}: unterminated {line}"
+        else:
+            assert ": " not in value, f"{name}: unquoted value holds ': ' in {line}"
+
+
+@pytest.mark.parametrize("name", ALL_AGENTS)
+def test_description_is_quoted(name):
+    fields, _ = parse(AGENTS / f"{name}.md")
+    assert fields["description"][:1] == '"' and fields["description"][-1:] == '"'
+
+
+def test_manager_isolates_workers_and_marks_tasks_running():
+    _, body = parse(AGENTS / "manager.md")
+    assert 'isolation: "worktree"' in body
+    assert "--status running --worker" in body
+    assert "attempts" in body
+
+
+@pytest.mark.parametrize("name", ("implementer", "debugger"))
+def test_builders_work_only_in_their_worktree(name):
+    _, body = parse(AGENTS / f"{name}.md")
+    assert "only in the worktree you were started in" in body

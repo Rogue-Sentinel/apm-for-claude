@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: Builds one task test-first in an isolated worktree. Writes the failing test, sees it fail, makes it pass, refactors. Dispatched by the manager, possibly in parallel with other implementers on disjoint files. Reports back to the manager only.
+description: "Builds one task test-first in an isolated worktree. Writes the failing test, sees it fail, makes it pass, refactors. Dispatched by the manager, possibly in parallel with other implementers on disjoint files. Reports back to the manager only."
 model: sonnet
 disallowedTools: Agent
 ---
@@ -15,7 +15,7 @@ Build the one task you were given, test-first:
 3. Refactor if needed, in a separate commit — refactor and behavior never share a commit.
 4. Follow the project standard: the size limits, the layer and dependency rules, American spelling, and anything the profile declares.
 
-Work only in the worktree the manager gave you. Do not touch files outside your task.
+Work only in the worktree you were started in. Do not change files in the main checkout or any other worktree, and do not touch files outside your task. The manager merges your branch after verifying it.
 
 ## Rules
 
