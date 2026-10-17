@@ -242,9 +242,10 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
   - `@dataclass(frozen=True) class MetricsConfig: include: tuple[str, ...] = (); exclude: tuple[str, ...] = DEFAULT_EXCLUDES; builtin: bool = True`.
     An empty `include` means every file with a known language.
   - `@dataclass(frozen=True) class DebtSource: name: str; command: str; numbers: Mapping[str, str]` (metric name to regex with one group)
-  - `@dataclass(frozen=True) class Standard: limits: Limits; metrics: MetricsConfig; sources: tuple[DebtSource, ...]`
+  - `@dataclass(frozen=True) class Standard: limits: Limits; metrics: MetricsConfig; sources: tuple[DebtSource, ...]; adr_dir: str = "docs/adr/"; review_patterns: Mapping[str, tuple[str, ...]] = {}`
+    (`adr_dir` and `review_patterns` are named by the `adr` and `branch-review` skills. *Added after the Task 7 review.*)
   - `load_standard(profile: Profile | None) -> Standard`. It reads `profile.extra["standard"]`
-    (`limits`, `metrics`, `debt_sources`), uses the defaults when there's no profile or no key, and raises
+    (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`), uses the defaults when there's no profile or no key, and raises
     `ProfileError` for a non-positive limit, a non-string glob, a source without a name or command, or a
     regex that doesn't compile or doesn't have exactly one group. A profile's `metrics.exclude` replaces the
     defaults, and a profile may add to them with `metrics.extra_exclude`.
@@ -393,7 +394,10 @@ every named source file in full before writing, and carries over every rule, che
 worked example in its own words, language-agnostic, with pseudo-code examples. Coverage (Task 13) checks
 each source item against the headings named below, so **every heading listed is required, exactly as
 written.** More sections are welcome. Each skill opens with when it applies and its core rule, and closes
-with common mistakes. Each `references/` file is linked from its `SKILL.md`.
+with common mistakes. Each `references/` file is linked from its `SKILL.md`. *Made exact by Task 7's
+harness:* the first `##` is `## When this applies`, the second is `## The core rule`, and the last is
+`## Common mistakes`. Every file in a skill directory is linked from its `SKILL.md`. A refactoring done
+under the boy scout rule still goes in its own commit.
 
 ### Task 7: Skill tests, and the code-level Clean Code skills
 
