@@ -128,3 +128,77 @@ def test_measure_plain_counts_file_only():
     assert metric.lines == 4
     assert metric.functions == () and metric.classes == ()
     assert metric.functions_measured is False
+
+
+def test_multiline_template_literal_counts_every_line_it_spans():
+    stripped = strip_code("x = `a\n{\nb`;\n", _lang("a.js"))
+    assert "{" not in stripped
+    assert count_logic(stripped) == 3
+
+
+def test_multiline_kotlin_block_counts_every_line_it_spans():
+    stripped = strip_code('x = """a\n{\nb"""\n', _lang("a.kt"))
+    assert "{" not in stripped
+    assert count_logic(stripped) == 3
+
+
+def test_raw_quotes_are_declared_for_go_kotlin_scala_and_csharp():
+    assert "`" in _lang("a.go").raw_quotes
+    for name in ("a.kt", "a.scala", "a.cs"):
+        assert '"""' in _lang(name).raw_quotes
+    assert not _lang("a.js").raw_quotes and not _lang("a.java").raw_quotes
+    assert not _lang("a.swift").raw_quotes and not _lang("a.dart").raw_quotes
+
+
+def test_go_raw_string_ending_in_backslash_keeps_the_next_function():
+    text = "s := `C:\\`\nfunc f() {\n}\n"
+    stripped = strip_code(text, _lang("a.go"))
+    assert "func f() {" in stripped
+    assert count_logic(stripped) == 2
+
+
+def test_kotlin_raw_string_has_no_escapes():
+    stripped = strip_code('s = """a\\"""\nfun f() {\n}\n', _lang("a.kt"))
+    assert "fun f() {" in stripped
+
+
+def test_escapes_still_work_in_a_js_template_literal():
+    assert strip_code("s = `a\\`{`;", _lang("a.js")) == "s = ``;"
+
+
+def test_count_logic_splits_on_newline_only():
+    assert count_logic("a\u2028b\n\x0c\nc") == 2
+
+
+def test_lone_carriage_return_becomes_a_newline():
+    stripped = strip_code("a();\rb();\r", _lang("a.c"))
+    assert stripped == "a();\nb();\n"
+
+
+def test_apostrophe_in_a_line_comment_does_not_open_a_literal():
+    stripped = strip_code("a(); // don't {\nb() {\n", _lang("a.c"))
+    assert "b() {" in stripped and "don" not in stripped
+
+
+def test_block_comment_opener_inside_a_string_is_not_a_comment():
+    stripped = strip_code('s = "/*"; f() {\n', _lang("a.c"))
+    assert stripped == 's = ""; f() {\n'
+
+
+def test_escaped_backslash_before_closing_quote_ends_the_literal():
+    assert strip_code('s = "a\\\\"; {', _lang("a.c")) == 's = ""; {'
+
+
+def test_indented_hash_pragma_is_a_preprocessor_line():
+    stripped = strip_code("  # pragma once\nint a;\n", _lang("a.c"))
+    assert "pragma" not in stripped and count_logic(stripped) == 1
+
+
+def test_unterminated_literal_falls_back_to_a_plain_quote():
+    assert strip_code('x = "abc\ny {', _lang("a.c")) == 'x = "abc\ny {'
+
+
+def test_unterminated_block_comment_runs_to_the_end_of_the_file():
+    stripped = strip_code("a();\n/* open\n{ b", _lang("a.c"))
+    assert stripped.count("\n") == 2
+    assert "{" not in stripped and count_logic(stripped) == 1
