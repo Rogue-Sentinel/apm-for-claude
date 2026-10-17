@@ -55,9 +55,9 @@ def state_dir(git_repo: Path) -> Path:
     return git_repo / ".apm" / "state"
 
 
-def test_write_in_state_dir_is_denied_for_worker_and_asked_for_main(state_dir: Path) -> None:
+def test_write_in_state_dir_is_denied_for_worker_and_main(state_dir: Path) -> None:
     assert _run(state_dir, "rm x", agent_id="w1") == "deny"
-    assert _run(state_dir, "rm x") == "ask"
+    assert _run(state_dir, "rm x") == "deny"
 
 
 def test_read_in_state_dir_is_allowed(state_dir: Path) -> None:

@@ -1,5 +1,6 @@
 import json
 import subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -201,3 +202,28 @@ def test_brief_without_state_worktree_says_state_unavailable(git_repo: Path, mon
     assert apm_cli.main(["brief"]) == 2
     state = find_project(git_repo).state_dir
     assert capsys.readouterr().out.strip() == f"State unavailable: state is not set up at {state}; run 'apm setup'"
+
+
+def test_approve_records_a_ten_minute_one_off_approval(repo: Path) -> None:
+    before = _commits(repo)
+    assert apm_cli.main(["approve", "--command", "rm -rf build", "--reason", "user said yes"]) == 0
+    ledger = _ledger(repo)
+    entry = ledger["approvals"][0]
+    assert (entry["command"], entry["reason"]) == ("rm -rf build", "user said yes") and "path" not in entry
+    left = datetime.fromisoformat(entry["expires_at"]) - datetime.now(timezone.utc)
+    assert timedelta(minutes=9) < left <= timedelta(minutes=10)
+    assert ledger["log"][-1]["event"] == "approve command rm -rf build"
+    assert ledger["log"][-1]["issue"] is None
+    assert _commits(repo) == before + 1
+
+
+def test_approve_path_entry(repo: Path) -> None:
+    assert apm_cli.main(["approve", "--path", "data/*.db", "--reason", "regenerate"]) == 0
+    assert _ledger(repo)["approvals"][0]["path"] == "data/*.db"
+
+
+@pytest.mark.parametrize("flags", [[], ["--path", "a", "--command", "b"]])
+def test_approve_requires_exactly_one_of_path_or_command(repo: Path, flags: list[str], capsys) -> None:
+    assert apm_cli.main(["approve", *flags, "--reason", "why"]) == 2
+    assert "error" in capsys.readouterr().err
+    assert apm_cli.main(["approve", "--command", "x"]) == 2

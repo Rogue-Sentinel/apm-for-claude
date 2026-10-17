@@ -50,7 +50,9 @@ temporary repos and subprocess calls.
 - Hooks do **nothing** in a repo without `.apm/profile.json` (the plugin is installed for every project).
 - Hooks **fail closed** in an initialized project: an internal error denies the call, with the error as the reason.
 - Violations are **denied** inside a worker (`agent_id` present) and **asked** in the main session (the user
-  approves that specific action in Claude Code's permission prompt).
+  approves that specific action in Claude Code's permission prompt). *Changed after the live check: the main session is
+  denied too (auto mode skips ask). The user approves in chat, recorded with `apm approve` as a 10-minute
+  allowance for that exact command.*
 
 ## Review Focus
 1. **Windows and Git-Bash path forms** (`C:\x`, `C:/x`, `/c/x`, relative with `..`, mixed case drive letters)

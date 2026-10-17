@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -8,9 +8,11 @@ from apm.ledger import (
     LedgerError,
     active_allowlist,
     add_allow,
+    add_approval,
     add_question,
     append_log,
     empty_ledger,
+    live_approvals,
     load_ledger,
     resolve_question,
     save_ledger,
@@ -39,7 +41,7 @@ def test_save_then_load_round_trips(tmp_path: Path) -> None:
     path = tmp_path / "sub" / "ledger.json"
     save_ledger(path, ledger)
     assert load_ledger(path) == ledger
-    assert path.read_text(encoding="utf-8").startswith('{\n  "issues"')
+    assert path.read_text(encoding="utf-8").startswith('{\n  "approvals": [],\n  "issues"')
 
 
 def test_upsert_issue_defaults_and_merge() -> None:
@@ -130,6 +132,7 @@ def _write(path: Path, data: object) -> Path:
         {"issues": {"1": {"status": "building", "tasks": {}}}},
         {"issues": {"1": {"status": "building", "questions": None}}},
         {"issues": {}, "log": {}},
+        {"issues": {}, "approvals": {}},
         {"issues": []},
         [],
     ],
@@ -157,3 +160,38 @@ def test_existing_issue_status_kept_when_not_passed() -> None:
     upsert_issue(ledger, 4, status="building")
     upsert_issue(ledger, 4, title="Renamed")
     assert ledger["issues"]["4"]["status"] == "building"
+
+
+NOW = datetime(2026, 10, 17, 12, 0, 0, tzinfo=timezone.utc)
+
+
+def test_missing_approvals_default_to_empty(tmp_path: Path) -> None:
+    ledger = load_ledger(_write(tmp_path / "ledger.json", {"issues": {}}))
+    assert ledger["approvals"] == []
+    assert empty_ledger()["approvals"] == []
+
+
+def test_add_approval_expires_in_ten_minutes() -> None:
+    ledger = empty_ledger()
+    entry = add_approval(ledger, path=None, command="rm -rf build", reason="user said yes", now=NOW)
+    assert entry == {"command": "rm -rf build", "reason": "user said yes", "expires_at": "2026-10-17T12:10:00+00:00"}
+    add_approval(ledger, path="data/*.db", command=None, reason="r", now=NOW)
+    assert ledger["approvals"][1] == {"path": "data/*.db", "reason": "r", "expires_at": "2026-10-17T12:10:00+00:00"}
+
+
+def test_add_approval_requires_exactly_one_kind() -> None:
+    for path, command in ((None, None), ("a", "b")):
+        with pytest.raises(LedgerError):
+            add_approval(empty_ledger(), path=path, command=command, reason="r", now=NOW)
+
+
+def test_live_approvals_drop_expired_and_malformed() -> None:
+    ledger = empty_ledger()
+    live = add_approval(ledger, path=None, command="make clean", reason="r", now=NOW)
+    add_approval(ledger, path="x", command=None, reason="r", now=NOW - timedelta(minutes=11))
+    ledger["approvals"] += [
+        "junk", {"command": 5, "expires_at": live["expires_at"]}, {"command": "a"},
+        {"command": "b", "expires_at": "not a time"}, {"path": "y", "expires_at": "2026-10-17T12:05:00"},
+    ]
+    assert live_approvals(ledger, NOW) == [live, ledger["approvals"][-1]]
+    assert live_approvals(ledger, NOW + timedelta(minutes=10)) == []

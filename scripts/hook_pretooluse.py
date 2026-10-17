@@ -1,4 +1,4 @@
-"""PreToolUse hook: ask or deny tool calls that break the project's guard rules."""
+"""PreToolUse hook: deny tool calls that break the project's guard rules."""
 from __future__ import annotations
 
 import json
@@ -6,12 +6,13 @@ import os
 import sys
 import tempfile
 from collections.abc import Mapping
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from apm.guard import Decision, decide, to_hook_output  # noqa: E402
-from apm.ledger import LedgerError, active_allowlist, load_ledger  # noqa: E402
+from apm.ledger import LedgerError, active_allowlist, live_approvals, load_ledger  # noqa: E402
 from apm.paths import Project, find_project  # noqa: E402
 from apm.profile import load_profile  # noqa: E402
 
@@ -35,17 +36,20 @@ def _start_dir(event: dict | None, environ: Mapping[str, str]) -> Path:
     return Path(environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
 
 
-def _allowlist(project: Project) -> list[dict]:
+def _rules(project: Project) -> tuple[list[dict], list[dict]]:
+    """The active plan allowlist and the live one-off approvals; none when the ledger is unreadable."""
     try:
-        return active_allowlist(load_ledger(project.ledger_path))
+        ledger = load_ledger(project.ledger_path)
     except LedgerError:
-        return []
+        return [], []
+    return active_allowlist(ledger), live_approvals(ledger, datetime.now(timezone.utc))
 
 
 def _guard(event: dict, project: Project) -> tuple[int, str]:
     profile = load_profile(project.profile_path)
     temp_roots = [Path(tempfile.gettempdir())]
-    decision = decide(event, project, profile, _allowlist(project), temp_roots, os.name == "nt")
+    allowlist, approvals = _rules(project)
+    decision = decide(event, project, profile, allowlist, temp_roots, os.name == "nt", approvals)
     output = to_hook_output(decision)
     return 0, json.dumps(output) if output else ""
 

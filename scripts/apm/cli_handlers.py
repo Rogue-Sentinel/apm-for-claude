@@ -20,7 +20,7 @@ def _given(args: argparse.Namespace, names: tuple[str, ...]) -> dict[str, Any]:
     return {n: getattr(args, n) for n in names if getattr(args, n) is not None}
 
 
-def _mutate(project: Project, number: int, apply: Callable[[dict], str]) -> None:
+def _mutate(project: Project, number: int | None, apply: Callable[[dict], str]) -> None:
     ledger = lg.load_ledger(project.ledger_path)
     event = apply(ledger)
     lg.append_log(ledger, number, event, datetime.now(timezone.utc))
@@ -68,6 +68,16 @@ def allow(project: Project, args: argparse.Namespace) -> None:
     _mutate(project, args.number, apply)
 
 
+def approve(project: Project, args: argparse.Namespace) -> None:
+    def apply(ledger: dict) -> str:
+        now = datetime.now(timezone.utc)
+        lg.add_approval(ledger, path=args.path, command=args.command, reason=args.reason, now=now)
+        kind, value = ("path", args.path) if args.path else ("command", args.command)
+        return f"approve {kind} {value}"
+
+    _mutate(project, None, apply)
+
+
 def question(project: Project, args: argparse.Namespace) -> None:
     def apply(ledger: dict) -> str:
         index = lg.add_question(ledger, args.number, args.text, args.blocks)
@@ -91,6 +101,6 @@ def setup(project: Project, args: argparse.Namespace) -> None:
 
 
 HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
-    "brief": brief, "issue": issue, "task": task, "allow": allow,
+    "brief": brief, "issue": issue, "task": task, "allow": allow, "approve": approve,
     "question": question, "resolve": resolve, "setup": setup,
 }

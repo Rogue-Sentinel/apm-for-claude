@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, timezone
+from collections.abc import Mapping
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,7 @@ ISSUE_STATUSES = (
 )
 TASK_STATUSES = ("pending", "running", "done", "failed", "blocked")
 ALLOWLIST_STATUSES = ("building", "integrating")
+APPROVAL_LIFETIME = timedelta(minutes=10)
 
 
 class LedgerError(Exception):
@@ -20,7 +22,7 @@ class LedgerError(Exception):
 
 
 def empty_ledger() -> dict[str, Any]:
-    return {"issues": {}, "log": []}
+    return {"issues": {}, "log": [], "approvals": []}
 
 
 def _normalize_issue(key: str, issue: Any) -> None:
@@ -34,8 +36,9 @@ def _normalize_issue(key: str, issue: Any) -> None:
 def _validate(ledger: Any, path: Path) -> dict[str, Any]:
     if not isinstance(ledger, dict) or not isinstance(ledger.get("issues"), dict):
         raise LedgerError(f"ledger {path} has no 'issues' mapping")
-    if not isinstance(ledger.setdefault("log", []), list):
-        raise LedgerError(f"ledger {path} 'log' is not a list")
+    for name in ("log", "approvals"):
+        if not isinstance(ledger.setdefault(name, []), list):
+            raise LedgerError(f"ledger {path} {name!r} is not a list")
     for key, issue in ledger["issues"].items():
         _normalize_issue(key, issue)
     return ledger
@@ -105,6 +108,19 @@ def add_allow(
     _issue(ledger, number)["allowlist"].append(entry)
 
 
+def add_approval(
+    ledger: dict[str, Any], *, path: str | None, command: str | None, reason: str, now: datetime
+) -> dict[str, Any]:
+    """Record a one-off approval of an exact command or a path glob, expiring after ten minutes."""
+    if (path is None) == (command is None):
+        raise LedgerError("an approval needs exactly one of path or command")
+    target = {"path": path} if path is not None else {"command": command}
+    expires = (now + APPROVAL_LIFETIME).astimezone(timezone.utc).isoformat()
+    entry = {**target, "reason": reason, "expires_at": expires}
+    ledger.setdefault("approvals", []).append(entry)
+    return entry
+
+
 def add_question(ledger: dict[str, Any], number: int, text: str, blocks: list[str]) -> int:
     questions = _issue(ledger, number)["questions"]
     questions.append({"text": text, "blocks": blocks, "answer": None, "resolved": False})
@@ -126,3 +142,22 @@ def append_log(ledger: dict[str, Any], number: int | None, event: str, now: date
 def active_allowlist(ledger: dict[str, Any]) -> list[dict[str, Any]]:
     live = (i for i in ledger["issues"].values() if i.get("status") in ALLOWLIST_STATUSES)
     return [entry for issue in live for entry in issue["allowlist"]]
+
+
+def _expiry(entry: Any) -> datetime | None:
+    """When a well-formed approval expires; None for a malformed one."""
+    if not isinstance(entry, Mapping) or not isinstance(entry.get("expires_at"), str):
+        return None
+    if not (isinstance(entry.get("command"), str) or isinstance(entry.get("path"), str)):
+        return None
+    try:
+        expires = datetime.fromisoformat(entry["expires_at"])
+    except ValueError:
+        return None
+    return expires if expires.tzinfo else expires.replace(tzinfo=timezone.utc)
+
+
+def live_approvals(ledger: dict[str, Any], now: datetime) -> list[dict[str, Any]]:
+    """The well-formed approvals that have not expired at `now`; the rest are ignored."""
+    entries = ledger.get("approvals") or []
+    return [entry for entry in entries if (expires := _expiry(entry)) is not None and expires > now]

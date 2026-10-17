@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import apm
@@ -41,10 +42,11 @@ def test_pretooluse_denies_worker_rm_rf(git_repo: Path) -> None:
     assert _decision(out)["permissionDecision"] == "deny"
 
 
-def test_pretooluse_asks_in_main_session(git_repo: Path) -> None:
+def test_pretooluse_denies_in_main_session_with_instructions(git_repo: Path) -> None:
     _init(git_repo)
     _, out = hook_pretooluse.run(_event(git_repo), {})
-    assert _decision(out)["permissionDecision"] == "ask"
+    assert _decision(out)["permissionDecision"] == "deny"
+    assert "Ask the user in chat" in _decision(out)["permissionDecisionReason"]
 
 
 def test_pretooluse_fails_closed_on_internal_error(git_repo: Path, monkeypatch) -> None:
@@ -91,7 +93,7 @@ def test_pretooluse_corrupt_ledger_is_empty_allowlist(git_repo: Path) -> None:
     state.mkdir(parents=True)
     (state / "ledger.json").write_text("garbage{", encoding="utf-8")
     _, out = hook_pretooluse.run(_event(git_repo, "touch dist/app.js"), {})
-    assert _decision(out)["permissionDecision"] == "ask"
+    assert _decision(out)["permissionDecision"] == "deny"
 
 
 def test_pretooluse_uses_ledger_allowlist(git_repo: Path) -> None:
@@ -101,6 +103,30 @@ def test_pretooluse_uses_ledger_allowlist(git_repo: Path) -> None:
     issue = {"status": "building", "allowlist": [{"command": "touch dist/app.js"}]}
     (state / "ledger.json").write_text(json.dumps({"issues": {"1": issue}, "log": []}), encoding="utf-8")
     assert hook_pretooluse.run(_event(git_repo, "touch dist/app.js"), {}) == (0, "")
+
+
+def _ledger_with_approval(repo: Path, expires_at: str) -> None:
+    state = repo / ".apm" / "state"
+    state.mkdir(parents=True)
+    approval = {"command": "rm -rf x", "reason": "user said yes", "expires_at": expires_at}
+    ledger = {"issues": {}, "log": [], "approvals": [approval]}
+    (state / "ledger.json").write_text(json.dumps(ledger), encoding="utf-8")
+
+
+def test_pretooluse_honors_an_unexpired_approval_in_the_main_session(git_repo: Path) -> None:
+    _init(git_repo)
+    _ledger_with_approval(git_repo, (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat())
+    assert hook_pretooluse.run(_event(git_repo), {}) == (0, "")
+    _, out = hook_pretooluse.run(_event(git_repo, agent_id="w1"), {})
+    assert _decision(out)["permissionDecision"] == "deny"
+
+
+def test_pretooluse_ignores_an_expired_approval(git_repo: Path) -> None:
+    _init(git_repo)
+    _ledger_with_approval(git_repo, (datetime.now(timezone.utc) - timedelta(seconds=1)).isoformat())
+    _, out = hook_pretooluse.run(_event(git_repo), {})
+    assert _decision(out)["permissionDecision"] == "deny"
+    assert "expires_at" in (git_repo / ".apm" / "state" / "ledger.json").read_text(encoding="utf-8")
 
 
 def test_session_start_silent_outside_project(git_repo: Path) -> None:

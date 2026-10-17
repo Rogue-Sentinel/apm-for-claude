@@ -85,3 +85,8 @@ def worktree_relative(target: Path) -> tuple[Path, str] | None:
         if (parent / ".git").exists():
             return parent, Path(target).relative_to(parent).as_posix()
     return None
+
+
+def cli_command(plugin_root: Path) -> str:
+    """The PATH-independent way to run the apm CLI from the Bash tool."""
+    return f'python "{plugin_root.as_posix()}/scripts/apm_cli.py"'

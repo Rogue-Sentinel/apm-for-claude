@@ -1,4 +1,4 @@
-"""The guard's decision: allow, ask, or deny a tool call."""
+"""The guard's decision: allow or deny a tool call."""
 from __future__ import annotations
 
 import re
@@ -7,9 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
+from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command, split_segments
 from .guard_paths import check_write, is_under
-from .paths import Project, to_native_path
+from .paths import Project, cli_command, to_native_path
 from .profile import Profile
 
 PREFIX = "APM guard: "
@@ -17,13 +18,19 @@ _FILE_KEYS = {"Write": "file_path", "Edit": "file_path", "NotebookEdit": "notebo
 _COMMAND_TOOLS = ("Bash", "PowerShell")
 # A worker never records state; the manager does. Matches `apm issue ...`, also by path.
 _APM_MUTATION = re.compile(
-    r"""["']?(?:[^\s"']*/)?apm["']?\s+(?:issue|task|allow|question|resolve|setup)(?![\w-])"""
+    r"""["']?(?:[^\s"']*/)?apm["']?\s+(?:issue|task|allow|question|resolve|setup|approve)(?![\w-])"""
+)
+_CLI = cli_command(Path(__file__).resolve().parents[2])
+_ASK_USER = (
+    ". Ask the user in chat; if they approve this exact action, record it with "
+    f'{_CLI} approve --command "<the exact command>" --reason "<why>" '
+    "(or --path <glob> for a file write), then retry."
 )
 
 
 @dataclass(frozen=True)
 class Decision:
-    kind: Literal["none", "ask", "deny"]
+    kind: Literal["none", "deny"]
     reason: str = ""
 
 
@@ -97,6 +104,17 @@ def _violation(
     return _file_violation(event, project, profile, globs, temp_roots, windows)
 
 
+def _exempt_command(event: Mapping[str, Any], commands: Sequence[str]) -> bool:
+    """True when the whole command, stripped, is exactly an approved one, or is a plain apm
+    CLI call from Bash (its arguments, such as the command being approved, are data)."""
+    command = (event.get("tool_input") or {}).get("command")
+    if event.get("tool_name") not in _COMMAND_TOOLS or not isinstance(command, str):
+        return False
+    if event.get("tool_name") == "Bash" and is_cli_call(command.strip()):
+        return True
+    return command.strip() in {approved.strip() for approved in commands}
+
+
 def decide(
     event: Mapping[str, Any],
     project: Project | None,
@@ -104,14 +122,20 @@ def decide(
     allowlist: Sequence[Any],
     temp_roots: Sequence[Path],
     windows: bool,
+    approvals: Sequence[Any] = (),
 ) -> Decision:
-    """Return none, ask (main session) or deny (worker) for a tool call."""
+    """Return none or deny for a tool call. Live one-off `approvals` count only in the main session."""
     if project is None or profile is None:
         return Decision("none")
-    reason = _violation(event, project, profile, allowlist, temp_roots, windows)
+    worker = bool(event.get("agent_id"))
+    globs, commands = ([], []) if worker else _split_allowlist(approvals)
+    if not worker and _exempt_command(event, commands):
+        return Decision("none")
+    rules = [*allowlist, *({"path": glob} for glob in globs)]
+    reason = _violation(event, project, profile, rules, temp_roots, windows)
     if reason is None:
         return Decision("none")
-    return Decision("deny" if event.get("agent_id") else "ask", PREFIX + reason)
+    return Decision("deny", PREFIX + reason + ("" if worker else _ASK_USER))
 
 
 def to_hook_output(decision: Decision) -> dict | None:

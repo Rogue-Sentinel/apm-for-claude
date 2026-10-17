@@ -117,3 +117,17 @@ def test_workers_do_not_change_apm_state(name):
     assert "Never run `apm` commands that change state" in body
     for verb in ("issue", "task", "allow", "question", "resolve", "setup"):
         assert f"`apm {verb}`" in body, f"{name} does not name apm {verb}"
+
+
+def _section(body: str, heading: str) -> str:
+    return body[body.index(heading):].split("\n## ", 1)[0]
+
+
+def test_manager_safety_asks_in_chat_and_records_one_off_approvals():
+    _, body = parse(AGENTS / "manager.md")
+    safety = _section(body, "## Safety")
+    assert "A guard denial is a stop" in safety
+    assert "Ask the user in chat" in safety and "approve" in safety
+    assert "Never approve on your own judgment" in safety
+    assert "never covers a different command" in safety
+    assert "permission prompt" not in body

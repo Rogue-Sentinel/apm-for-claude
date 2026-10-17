@@ -32,6 +32,14 @@ def _allow(sub) -> None:
     parser.add_argument("--reason", required=True)
 
 
+def _approve(sub) -> None:
+    parser = sub.add_parser("approve", help="record the user's one-off approval, good for 10 minutes")
+    target = parser.add_mutually_exclusive_group(required=True)
+    target.add_argument("--command", metavar="CMD", help="the exact command the user approved")
+    target.add_argument("--path", metavar="GLOB", help="the path the user approved writing")
+    parser.add_argument("--reason", required=True)
+
+
 def _questions(sub) -> None:
     ask = sub.add_parser("question", help="record a question for the user")
     ask.add_argument("number", type=int)
@@ -51,5 +59,6 @@ def build_parser() -> argparse.ArgumentParser:
     _issue(sub)
     _task(sub)
     _allow(sub)
+    _approve(sub)
     _questions(sub)
     return parser
