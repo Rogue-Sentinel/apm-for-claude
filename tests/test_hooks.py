@@ -147,6 +147,21 @@ def test_session_start_includes_briefing(git_repo: Path, monkeypatch) -> None:
     assert "mismatch" not in context.lower()
 
 
+def test_session_start_names_the_cli_by_absolute_path(git_repo: Path) -> None:
+    _init(git_repo)
+    _, out = hook_session_start.run(json.dumps({"cwd": str(git_repo)}), {})
+    lines = _decision(out)["additionalContext"].splitlines()
+    assert f'APM CLI: python "{ROOT.as_posix()}/scripts/apm_cli.py"' in lines
+    assert "\\" not in next(line for line in lines if line.startswith("APM CLI: "))
+
+
+def test_session_start_names_the_cli_even_on_a_profile_error(git_repo: Path) -> None:
+    (git_repo / ".apm").mkdir()
+    (git_repo / ".apm" / "profile.json").write_text("{nope", encoding="utf-8")
+    _, out = hook_session_start.run(json.dumps({"cwd": str(git_repo)}), {})
+    assert "APM CLI: python " in _decision(out)["additionalContext"]
+
+
 def test_session_start_reports_version_mismatch(git_repo: Path) -> None:
     _init(git_repo, version="0.0.9")
     _, out = hook_session_start.run(json.dumps({"cwd": str(git_repo)}), {})

@@ -271,3 +271,31 @@ def test_record_exemption_is_bash_only_and_main_session_only(git_repo: Path) -> 
     command = RECORDS[0]
     assert _decide(_command(git_repo, command, "PowerShell"), git_repo).kind == "deny"
     assert _decide(_command(git_repo, command, agent_id="a1"), git_repo).kind == "deny"
+
+
+CLI_MUTATIONS = [
+    'python "C:/Users/me/.claude/plugins/cache/rogue-sentinel/apm/0.1.0/scripts/apm_cli.py" issue 1 --status merged',
+    "python3 /c/plugins/apm/scripts/apm_cli.py task 1 t1 --status done",
+    r"python 'C:\plugins\apm\scripts\apm_cli.py' allow 1 --path x --reason r",
+    'py -3 "C:/my plugins/apm/scripts/apm_cli.py" approve --command x --reason r',
+    "echo hi && python scripts/apm_cli.py setup",
+    "python apm_cli.py question 1 --text Why",
+    'cd /x; python.exe "./scripts/apm_cli.py" resolve 1 0 --answer yes',
+    '"C:/Python313/python.exe" "C:/x/scripts/apm_cli.py" "issue" 1',
+    r'C:\plugins\apm\bin\apm approve --command x --reason r',
+]
+
+
+@pytest.mark.parametrize("command", CLI_MUTATIONS)
+def test_worker_may_not_change_apm_state_through_apm_cli_py(git_repo: Path, command: str) -> None:
+    decision = _decide(_command(git_repo, command, agent_id="a1"), git_repo)
+    assert decision.kind == "deny" and "APM state" in decision.reason
+
+
+@pytest.mark.parametrize(
+    "command",
+    ['python "C:/x/scripts/apm_cli.py" brief', "python scripts/apm_cli.py --help", "cat scripts/apm_cli.py",
+     "python tools/my_apm_cli.py issue 1", "python scripts/apm_cli.py issues"],
+)
+def test_worker_may_read_apm_state_through_apm_cli_py(git_repo: Path, command: str) -> None:
+    assert _decide(_command(git_repo, command, agent_id="a1"), git_repo).kind == "none"

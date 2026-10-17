@@ -16,9 +16,12 @@ from .profile import Profile
 PREFIX = "APM guard: "
 _FILE_KEYS = {"Write": "file_path", "Edit": "file_path", "NotebookEdit": "notebook_path"}
 _COMMAND_TOOLS = ("Bash", "PowerShell")
-# A worker never records state; the manager does. Matches `apm issue ...`, also by path.
+# A worker never records state; the manager does. Matches `apm issue ...` at the start of a
+# segment, also by path, and `python ".../scripts/apm_cli.py" issue ...` anywhere in it.
+_MUTATIONS = r"""["']?(?:issue|task|allow|question|resolve|setup|approve)(?![\w-])"""
 _APM_MUTATION = re.compile(
-    r"""["']?(?:[^\s"']*/)?apm["']?\s+(?:issue|task|allow|question|resolve|setup|approve)(?![\w-])"""
+    r"""^["']?(?:[^\s"']*[/\\])?apm["']?\s+""" + _MUTATIONS
+    + r"""|(?<![\w.-])apm_cli\.py["']?\s+""" + _MUTATIONS
 )
 _CLI = cli_command(Path(__file__).resolve().parents[2])
 _ASK_USER = (
@@ -66,7 +69,7 @@ def _worker_state_change(command: str, event: Mapping[str, Any]) -> str | None:
     if not event.get("agent_id"):
         return None
     for segment in split_segments(command):
-        if _APM_MUTATION.match(segment):
+        if _APM_MUTATION.search(segment):
             return f"workers do not change APM state; report to the manager instead: {segment}"
     return None
 

@@ -1,4 +1,5 @@
 """The plugin agent definitions carry the right frontmatter and body."""
+import re
 from pathlib import Path
 
 import pytest
@@ -106,9 +107,27 @@ def test_builders_work_only_in_their_worktree(name):
     assert "only in the worktree you were started in" in body
 
 
-def test_manager_runs_apm_with_the_bash_tool():
+CLI_SUBCOMMANDS = ("brief", "setup", "issue", "task", "allow", "approve", "question", "resolve")
+
+
+def test_manager_runs_the_cli_from_session_context_with_the_bash_tool():
     _, body = parse(AGENTS / "manager.md")
-    assert "Run every `apm` command with the Bash tool" in body
+    assert "the APM CLI command from your SessionStart context (shown as `<CLI>` below)" in body
+    assert "with the Bash tool" in body
+    assert "Never call bare `apm`" in body
+    assert 'python "<plugin root>/scripts/apm_cli.py"' in body
+    assert "~/.claude/plugins/cache/rogue-sentinel/apm/<version>/" in body
+
+
+@pytest.mark.parametrize("verb", CLI_SUBCOMMANDS)
+def test_manager_documents_each_cli_subcommand(verb):
+    _, body = parse(AGENTS / "manager.md")
+    assert f"`<CLI> {verb}" in body, f"manager does not document {verb}"
+
+
+def test_manager_never_shows_a_bare_apm_command():
+    _, body = parse(AGENTS / "manager.md")
+    assert not re.search(r"`apm [a-z]", body), re.search(r"`apm [a-z].*", body)
 
 
 @pytest.mark.parametrize("name", WORKERS)
