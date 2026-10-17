@@ -154,3 +154,34 @@ def test_bin_apm_is_executable_in_git() -> None:
         ["git", "ls-files", "-s", "bin/apm"], cwd=ROOT, capture_output=True, text=True, check=True
     )
     assert done.stdout.startswith("100755")
+
+
+def test_new_issue_without_status_shows_as_queued_in_brief(repo: Path, capsys) -> None:
+    apm_cli.main(["issue", "5", "--title", "Fresh idea"])
+    capsys.readouterr()
+    apm_cli.main(["brief"])
+    out = capsys.readouterr().out
+    assert "Queued" in out and "#5 Fresh idea" in out and "No work recorded" not in out
+
+
+def test_issue_update_without_status_keeps_status(repo: Path) -> None:
+    apm_cli.main(["issue", "5", "--status", "building"])
+    apm_cli.main(["issue", "5", "--title", "Renamed"])
+    assert _ledger(repo)["issues"]["5"]["status"] == "building"
+
+
+def test_brief_on_corrupt_ledger_prints_state_unavailable_and_exits_2(repo: Path, capsys) -> None:
+    (_state(repo) / "ledger.json").write_text("garbage{", encoding="utf-8")
+    assert apm_cli.main(["brief"]) == 2
+    assert capsys.readouterr().out.startswith("State unavailable: ")
+
+
+def test_gitattributes_pins_bin_apm_to_lf() -> None:
+    done = subprocess.run(
+        ["git", "check-attr", "eol", "bin/apm"], cwd=ROOT, capture_output=True, text=True, check=True
+    )
+    assert done.stdout.strip().endswith("eol: lf")
+    done = subprocess.run(
+        ["git", "check-attr", "eol", "tools/x.sh"], cwd=ROOT, capture_output=True, text=True, check=True
+    )
+    assert done.stdout.strip().endswith("eol: lf")

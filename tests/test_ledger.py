@@ -145,3 +145,15 @@ def test_missing_issue_lists_are_defaulted(tmp_path: Path) -> None:
     issue = ledger["issues"]["1"]
     assert issue["tasks"] == [] and issue["questions"] == [] and issue["allowlist"] == []
     assert active_allowlist(ledger) == []
+
+
+def test_new_issue_without_status_is_queued() -> None:
+    ledger = empty_ledger()
+    assert upsert_issue(ledger, 4, title="No status")["status"] == "queued"
+
+
+def test_existing_issue_status_kept_when_not_passed() -> None:
+    ledger = empty_ledger()
+    upsert_issue(ledger, 4, status="building")
+    upsert_issue(ledger, 4, title="Renamed")
+    assert ledger["issues"]["4"]["status"] == "building"

@@ -75,7 +75,7 @@ def _issue(ledger: dict[str, Any], number: int) -> dict[str, Any]:
 def upsert_issue(ledger: dict[str, Any], number: int, **fields: Any) -> dict[str, Any]:
     _check_status(fields, ISSUE_STATUSES, "issue")
     issue = ledger["issues"].setdefault(
-        str(number), {"tasks": [], "allowlist": [], "questions": []}
+        str(number), {"status": "queued", "tasks": [], "allowlist": [], "questions": []}
     )
     issue.update(fields)
     return issue

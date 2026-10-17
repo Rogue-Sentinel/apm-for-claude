@@ -27,8 +27,13 @@ def _mutate(project: Project, number: int, apply: Callable[[dict], str]) -> None
     commit_state(project, event)
 
 
-def brief(project: Project, args: argparse.Namespace) -> None:
-    print(render_briefing(lg.load_ledger(project.ledger_path), None))
+def brief(project: Project, args: argparse.Namespace) -> int:
+    try:
+        print(render_briefing(lg.load_ledger(project.ledger_path), None))
+    except lg.LedgerError as exc:
+        print(render_briefing(None, str(exc)))
+        return 2
+    return 0
 
 
 def issue(project: Project, args: argparse.Namespace) -> None:
@@ -79,7 +84,7 @@ def resolve(project: Project, args: argparse.Namespace) -> None:
     _mutate(project, args.number, apply)
 
 
-HANDLERS: dict[str, Callable[[Project, argparse.Namespace], None]] = {
+HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
     "brief": brief, "issue": issue, "task": task, "allow": allow,
     "question": question, "resolve": resolve,
 }

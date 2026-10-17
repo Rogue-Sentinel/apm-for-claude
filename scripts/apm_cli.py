@@ -28,23 +28,22 @@ def _project(command: str) -> Project:
     return project
 
 
-def _run(argv: list[str] | None) -> None:
+def _run(argv: list[str] | None) -> int:
     args = build_parser().parse_args(argv)
     handler = HANDLERS.get(args.subcommand)
     if handler is None:
         raise UsageError(f"'{args.subcommand}' is not available yet")
-    handler(_project(args.subcommand), args)
+    return handler(_project(args.subcommand), args) or 0
 
 
 def main(argv: list[str] | None = None) -> int:
     try:
-        _run(argv)
+        return _run(argv)
     except SystemExit as exc:
         return exc.code if isinstance(exc.code, int) else (0 if exc.code is None else 2)
     except (UsageError, LedgerError, ProfileError, subprocess.CalledProcessError, OSError) as exc:
         print(f"apm: {exc}", file=sys.stderr)
         return 2
-    return 0
 
 
 if __name__ == "__main__":
