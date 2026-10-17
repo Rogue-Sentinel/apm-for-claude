@@ -15,8 +15,16 @@ READ_ONLY_PREFIXES = (
     "git log", "git diff", "git show", "git status", "git blame", "sqlite3 -readonly ",
 )
 _SPLIT = re.compile(r"&&|\|\||;|\||\r?\n|(?<![<>&])&(?![&>])")
-_NO_EXEMPT = ("$(", "`")
-_GIT = r"(?<![\w-])git\s+(?:(?:-[cC]|--git-dir|--work-tree)\s+\S+\s+|--?\S+\s+)*"
+_NO_EXEMPT = ("$(", "`", "<(", ">(")
+# The options git takes before its subcommand. The alternatives are disjoint (a
+# value-taking option never matches the generic one, and a value is either quoted
+# or not), so a long run of options cannot backtrack exponentially.
+_GIT_OPTION = r"(?:-[cC]|--git-dir|--work-tree)"
+_GIT_VALUE = r"""(?:"[^"]*"|'[^']*'|[^\s"']\S*)"""
+_GIT = (
+    r"(?<![\w-])git(?:\.exe)?\s+(?:" + _GIT_OPTION + r"(?:=|\s+)" + _GIT_VALUE + r"\s+"
+    r"|(?!" + _GIT_OPTION + r"(?:[=\s]|$))-\S+\s+)*"
+)
 _END = r"(?=\s|$)"
 _PS_DELETE = r"(?<![\w-])(?:Remove-Item|ri|rmdir|rd|del|erase)(?![\w-])"
 _CMD_DELETE = r"(?<![\w-])(?:rmdir|rd|del|erase)(?![\w-])"
@@ -31,7 +39,12 @@ DESTRUCTIVE: tuple[tuple[re.Pattern[str], str], ...] = (
     _p(_GIT + r"clean(?![\w-])", "git clean"),
     _p(_GIT + r"reset\b.*\s--hard\b", "git reset --hard"),
     _p(_GIT + r"push\b.*(?:\s-[a-z]*f[a-z]*" + _END + r"|\s--force|\s\+\S)", "forced git push"),
+    _p(_GIT + r"push\b.*(?:\s-[a-z]*d[a-z]*" + _END + r"|\s--delete|\s--mirror|\s:\S)", "git push deleting refs"),
     _p(_GIT + r"branch\b.*\s-[a-z]*(?-i:D)[a-z]*" + _END, "git branch -D"),
+    _p(
+        _GIT + r"branch\b(?=.*\s(?:--delete|-[a-z]*d[a-z]*)" + _END + r").*\s(?:--force|-[a-z]*f[a-z]*)" + _END,
+        "git branch force delete",
+    ),
     _p(_GIT + r"worktree\s+remove\b", "git worktree remove"),
     _p(_GIT + r"checkout\s+(?:\S+\s+)*\." + _END, "git checkout discarding changes"),
     _p(_GIT + r"restore\s+(?:\S+\s+)*\." + _END, "git restore discarding changes"),
@@ -40,8 +53,10 @@ DESTRUCTIVE: tuple[tuple[re.Pattern[str], str], ...] = (
     _p(r"(?<![\w-])find\b.*\s-exec(?:dir)?\s+(?:\S*/)?rm\b", "find -exec rm"),
     _p(r"\bdrop\s+(?:table|database|schema)\b", "SQL drop"),
     _p(r"\btruncate\s+table\b", "SQL truncate"),
+    _p(r"(?<![\w-])dropdb(?![\w-])", "dropdb"),
+    _p(r"(?<![\w-])xargs(?![\w-]).*(?<![\w-])(?:rm|del|erase|Remove-Item)(?![\w-])", "xargs delete"),
     _p(_PS_DELETE + r".*\s-r[a-z]*(?=[\s:]|$)", "recursive PowerShell delete"),
-    _p(_CMD_DELETE + r".*\s/s\b", "recursive cmd delete"),
+    _p(_CMD_DELETE + r".*\s//?s\b", "recursive cmd delete"),
 )
 
 
@@ -62,8 +77,10 @@ def split_segments(command: str) -> list[str]:
 
 
 def destructive_reason(segment: str) -> str | None:
+    """Match the raw segment, then the segment with its quotes removed (`rm "-rf" x`)."""
+    unquoted = segment.replace('"', "").replace("'", "")
     for pattern, label in DESTRUCTIVE:
-        if pattern.search(segment):
+        if pattern.search(segment) or pattern.search(unquoted):
             return f"destructive command ({label}): {segment}"
     return None
 
@@ -116,6 +133,11 @@ def _token_hits(token: str, globs: Sequence[str], cwd: Path | None, root: Path |
 def _is_read_only(segment: str) -> bool:
     lowered = segment.lower()
     return lowered.startswith(READ_ONLY_PREFIXES) and ">" not in segment
+
+
+def all_read_only(command: str) -> bool:
+    """True when every segment of `command` only reads."""
+    return all(_is_read_only(segment) for segment in split_segments(command))
 
 
 def protected_reason(

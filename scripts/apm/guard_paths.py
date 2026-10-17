@@ -36,14 +36,14 @@ def _real(path: Path | str) -> str:
     return os.path.normcase(os.path.realpath(str(path)))
 
 
-def _is_under(path: Path | str, root: Path | str) -> bool:
+def is_under(path: Path | str, root: Path | str) -> bool:
     base = _real(root)
     return _real(path) == base or _real(path).startswith(base.rstrip(os.sep) + os.sep)
 
 
 def _in_scope(target: Path, project: Project, temp_roots: Sequence[Path]) -> bool:
     roots = [project.main_root, project.worktree_root, *temp_roots]
-    return any(_is_under(target, root) for root in roots)
+    return any(is_under(target, root) for root in roots)
 
 
 def _protected(relative: str, globs: Sequence[str], allowed_globs: Sequence[str]) -> str | None:
@@ -60,7 +60,7 @@ def check_write(
     temp_roots: Sequence[Path],
 ) -> str | None:
     """Return why writing `target` is blocked, or None when it may proceed."""
-    if _is_under(target, project.state_dir):
+    if is_under(target, project.state_dir):
         return f"{target} is inside the APM state directory"
     if not _in_scope(target, project, temp_roots):
         return f"{target} is outside the project"

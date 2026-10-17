@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 from apm.guard import Decision, decide, to_hook_output
 from apm.paths import Project
 from apm.profile import Profile
@@ -104,3 +106,61 @@ def test_command_globs_expand_against_the_event_cwd(git_repo: Path) -> None:
     assert _decide(event, git_repo).kind == "ask"
     elsewhere = _file_event(git_repo, "Bash", "command", "rm *.db", cwd=git_repo)
     assert _decide(elsewhere, git_repo).kind == "none"
+
+
+def _command(cwd: Path, command: str, tool: str = "Bash", **extra: object) -> dict:
+    return {"tool_name": tool, "cwd": str(cwd), "tool_input": {"command": command}, **extra}
+
+
+def _state(repo: Path) -> Path:
+    state = repo / ".apm" / "state"
+    state.mkdir(parents=True)
+    return state
+
+
+@pytest.mark.parametrize("tool", ["Bash", "PowerShell"])
+def test_writing_command_in_state_dir_is_a_violation(git_repo: Path, tool: str) -> None:
+    state = _state(git_repo)
+    assert _decide(_command(state, "rm x", tool, agent_id="a1"), git_repo).kind == "deny"
+    assert _decide(_command(state, "rm x", tool), git_repo).kind == "ask"
+    assert _decide(_command(state / "sub", "touch y", tool), git_repo).kind == "ask"
+
+
+@pytest.mark.parametrize("command", ["cat ledger.json", "git status && git log --oneline | grep x", "ls"])
+def test_read_only_command_in_state_dir_is_allowed(git_repo: Path, command: str) -> None:
+    state = _state(git_repo)
+    assert _decide(_command(state, command, agent_id="a1"), git_repo).kind == "none"
+
+
+def test_allowlist_does_not_exempt_state_dir_writes(git_repo: Path) -> None:
+    state = _state(git_repo)
+    allow = [{"command": "touch", "reason": "r"}]
+    assert _decide(_command(state, "touch x", agent_id="a1"), git_repo, allow).kind == "deny"
+
+
+APM_MUTATIONS = [
+    "apm issue 1 --status merged",
+    "apm task 1 t1 --status done",
+    "apm allow 1 --path dist/** --reason r",
+    "apm question 1 --text Why",
+    "apm resolve 1 0 --answer yes",
+    "apm setup",
+    "echo hi && apm task 1 t1 --status done",
+    '"/c/plugins/apm/bin/apm" issue 2 --title x',
+]
+
+
+@pytest.mark.parametrize("command", APM_MUTATIONS)
+def test_worker_may_not_change_apm_state(git_repo: Path, command: str) -> None:
+    decision = _decide(_command(git_repo, command, agent_id="a1"), git_repo)
+    assert decision.kind == "deny" and "APM state" in decision.reason
+
+
+@pytest.mark.parametrize("command", APM_MUTATIONS)
+def test_main_session_may_change_apm_state(git_repo: Path, command: str) -> None:
+    assert _decide(_command(git_repo, command), git_repo).kind == "none"
+
+
+@pytest.mark.parametrize("command", ["apm brief", "echo apm issue", "apmx issue 1", "apm issues"])
+def test_worker_may_read_apm_state(git_repo: Path, command: str) -> None:
+    assert _decide(_command(git_repo, command, agent_id="a1"), git_repo).kind == "none"
