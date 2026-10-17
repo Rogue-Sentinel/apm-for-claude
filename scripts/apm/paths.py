@@ -37,7 +37,7 @@ class Project:
 def _git(cwd: Path, *args: str) -> str | None:
     try:
         done = subprocess.run(
-            ["git", *args], cwd=cwd, capture_output=True, text=True, check=False
+            ["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=False
         )
     except (OSError, ValueError):
         return None

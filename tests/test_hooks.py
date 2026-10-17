@@ -6,6 +6,7 @@ from pathlib import Path
 import apm
 import hook_pretooluse
 import hook_session_start
+from conftest import run_git
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -168,3 +169,41 @@ def test_hook_script_end_to_end(git_repo: Path) -> None:
         capture_output=True, text=True, encoding="utf-8", check=True,
     )
     assert _decision(done.stdout)["permissionDecision"] == "deny"
+
+
+def test_session_start_survives_briefing_crash(git_repo: Path, monkeypatch) -> None:
+    _init(git_repo)
+
+    def boom(ledger, error):
+        raise RuntimeError("kaboom")
+
+    monkeypatch.setattr(hook_session_start, "render_briefing", boom)
+    code, out = hook_session_start.run(json.dumps({"cwd": str(git_repo)}), {})
+    assert code == 0 and "Briefing unavailable: kaboom" in _decision(out)["additionalContext"]
+
+
+def test_pretooluse_script_reads_stdin_as_utf8(tmp_path: Path) -> None:
+    repo = tmp_path / "répö-日本"
+    repo.mkdir()
+    run_git(repo, "init", "-b", "main")
+    _init(repo)
+    payload = _event(repo, agent_id="w1")
+    raw = json.dumps(json.loads(payload), ensure_ascii=False).encode("utf-8")
+    done = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "hook_pretooluse.py")],
+        input=raw, capture_output=True, check=True,
+    )
+    assert _decision(done.stdout.decode("utf-8"))["permissionDecision"] == "deny"
+
+
+def test_session_start_script_reads_stdin_as_utf8(tmp_path: Path) -> None:
+    repo = tmp_path / "répö-日本"
+    repo.mkdir()
+    run_git(repo, "init", "-b", "main")
+    _init(repo, version="0.0.9")
+    raw = json.dumps({"cwd": str(repo)}, ensure_ascii=False).encode("utf-8")
+    done = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "hook_session_start.py")],
+        input=raw, capture_output=True, check=True,
+    )
+    assert "0.0.9" in _decision(done.stdout.decode("utf-8"))["additionalContext"]

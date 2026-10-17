@@ -25,11 +25,18 @@ def _cwd(stdin: str) -> Path | None:
     return Path(cwd) if isinstance(cwd, str) and cwd else None
 
 
-def _briefing(project: Project) -> str:
+def _render(project: Project) -> str:
     try:
         return render_briefing(load_ledger(project.ledger_path), None)
     except LedgerError as exc:
         return render_briefing(None, str(exc))
+
+
+def _briefing(project: Project) -> str:
+    try:
+        return _render(project)
+    except Exception as exc:  # a broken briefing must never crash session start
+        return f"Briefing unavailable: {exc}"
 
 
 def _version_line(version: str) -> str:
@@ -56,6 +63,6 @@ def run(stdin: str, environ: Mapping[str, str]) -> tuple[int, str]:
 
 
 if __name__ == "__main__":
-    code, out = run(sys.stdin.read(), os.environ)
+    code, out = run(sys.stdin.buffer.read().decode("utf-8", "replace"), os.environ)
     sys.stdout.write(out)
     sys.exit(code)

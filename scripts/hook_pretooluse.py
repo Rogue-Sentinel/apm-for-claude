@@ -64,6 +64,6 @@ def run(stdin: str, environ: Mapping[str, str]) -> tuple[int, str]:
 
 
 if __name__ == "__main__":
-    code, out = run(sys.stdin.read(), os.environ)
+    code, out = run(sys.stdin.buffer.read().decode("utf-8", "replace"), os.environ)
     sys.stdout.write(out)
     sys.exit(code)
