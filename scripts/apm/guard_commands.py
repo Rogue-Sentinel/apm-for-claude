@@ -52,7 +52,7 @@ _PIPED_DELETE = re.compile(
     re.IGNORECASE,
 )
 _GLOB_CHARS = frozenset("*?[")
-_GLOB_LIMIT = 10000
+_GLOB_LIMIT = 2000
 
 
 def split_segments(command: str) -> list[str]:
@@ -87,10 +87,15 @@ def _candidates(token: str) -> Iterator[str]:
             yield "/".join(parts[i:])
 
 
-def _glob_hits(token: str, cwd: Path, root: Path) -> Iterator[str]:
-    """Yield the root-relative POSIX path of each file a shell glob would expand to."""
-    found = glob.glob(token, root_dir=cwd, recursive=True)
-    for match in itertools.islice(found, _GLOB_LIMIT):
+def _glob_matches(token: str, cwd: Path) -> list[str]:
+    """Expand a shell glob lazily; one match past the cap marks an over-large result."""
+    found = glob.iglob(token, root_dir=cwd, recursive=True)
+    return list(itertools.islice(found, _GLOB_LIMIT + 1))
+
+
+def _relative_hits(matches: list[str], cwd: Path, root: Path) -> Iterator[str]:
+    """Yield the root-relative POSIX path of each match."""
+    for match in matches:
         try:
             yield (cwd / match).resolve().relative_to(root.resolve()).as_posix()
         except (ValueError, OSError):
@@ -102,7 +107,10 @@ def _token_hits(token: str, globs: Sequence[str], cwd: Path | None, root: Path |
         return True
     if cwd is None or not _GLOB_CHARS & set(token):
         return False
-    return any(matches_any(globs, hit) for hit in _glob_hits(token, cwd, root or cwd))
+    matches = _glob_matches(token, cwd)
+    if len(matches) > _GLOB_LIMIT:
+        return True  # cannot prove a huge expansion is safe, so fail closed
+    return any(matches_any(globs, hit) for hit in _relative_hits(matches, cwd, root or cwd))
 
 
 def _is_read_only(segment: str) -> bool:

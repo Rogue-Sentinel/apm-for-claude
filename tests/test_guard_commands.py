@@ -180,3 +180,17 @@ def test_shell_glob_without_cwd_is_unchanged(tmp_path: Path) -> None:
 
 def test_shell_glob_that_matches_nothing_is_allowed(tmp_path: Path) -> None:
     assert check_command("rm data/*", GLOBS, [], cwd=tmp_path, root=tmp_path) is None
+
+
+def test_glob_expansion_past_the_cap_fails_closed(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr("apm.guard_commands._GLOB_LIMIT", 5)
+    (tmp_path / "deep").mkdir()
+    for i in range(8):
+        (tmp_path / "deep" / f"f{i}.txt").write_text("x")
+    assert check_command("rm **", GLOBS, [], cwd=tmp_path, root=tmp_path) is not None
+
+
+def test_glob_expansion_within_the_cap_still_allows(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr("apm.guard_commands._GLOB_LIMIT", 5)
+    _tree(tmp_path)
+    assert check_command("rm build/*.o", GLOBS, [], cwd=tmp_path, root=tmp_path) is None
