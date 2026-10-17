@@ -9,6 +9,7 @@ from typing import Any
 from apm import ledger as lg
 from apm.briefing import render_briefing
 from apm.paths import Project
+from apm.setup import setup_project
 from apm.state_store import commit_state
 
 ISSUE_FIELDS = ("title", "kind", "lane", "status", "branch", "plan")
@@ -84,7 +85,12 @@ def resolve(project: Project, args: argparse.Namespace) -> None:
     _mutate(project, args.number, apply)
 
 
+def setup(project: Project, args: argparse.Namespace) -> None:
+    for path in setup_project(project):
+        print(path)
+
+
 HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
     "brief": brief, "issue": issue, "task": task, "allow": allow,
-    "question": question, "resolve": resolve,
+    "question": question, "resolve": resolve, "setup": setup,
 }

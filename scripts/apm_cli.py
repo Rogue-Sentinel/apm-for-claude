@@ -12,10 +12,18 @@ from apm.cli_parser import build_parser  # noqa: E402
 from apm.ledger import LedgerError  # noqa: E402
 from apm.paths import Project, find_project  # noqa: E402
 from apm.profile import ProfileError, load_profile  # noqa: E402
+from apm.setup import SetupError  # noqa: E402
 
 
 class UsageError(Exception):
     """The command cannot run here; the message is one line for the user."""
+
+
+def _repo() -> Project:
+    project = find_project(Path.cwd())
+    if project is None:
+        raise UsageError("not inside a git repository")
+    return project
 
 
 def _project(command: str) -> Project:
@@ -33,7 +41,8 @@ def _run(argv: list[str] | None) -> int:
     handler = HANDLERS.get(args.subcommand)
     if handler is None:
         raise UsageError(f"'{args.subcommand}' is not available yet")
-    return handler(_project(args.subcommand), args) or 0
+    project = _repo() if args.subcommand == "setup" else _project(args.subcommand)
+    return handler(project, args) or 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -41,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         return _run(argv)
     except SystemExit as exc:
         return exc.code if isinstance(exc.code, int) else (0 if exc.code is None else 2)
-    except (UsageError, LedgerError, ProfileError, subprocess.CalledProcessError, OSError) as exc:
+    except (UsageError, LedgerError, ProfileError, SetupError, subprocess.CalledProcessError, OSError) as exc:
         print(f"apm: {exc}", file=sys.stderr)
         return 2
 
