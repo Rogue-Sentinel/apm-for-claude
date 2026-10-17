@@ -32,7 +32,8 @@ Use this as you are about to leave a file you changed. Pick **one or two** items
 ## Safety rules
 
 1. **Scope:** improve only files you are already changing.
-2. **Size:** one or two improvements per file, per commit.
+2. **Size:** one or two improvements per file, in a commit of their own, never in the commit that
+   changes behavior.
 3. **Risk:** zero change in behavior. If in doubt, skip it.
 4. **Tests:** run the suite after every improvement.
 5. **Time:** anything over five minutes is a separate task, and a refactoring with its own commit.

@@ -14,6 +14,11 @@ Every file you touch leaves cleaner than you found it, and no change makes the d
 - You are about to add lines to a function or file that is already over a limit.
 - You are naming something, or a name in the code you are reading made you stop and think.
 - A function you are writing is doing more than one thing.
+- A reviewer made a "while you're here" suggestion, or you have just finished a feature and are
+  deciding what small improvement to leave behind.
+- You are working in a codebase with accumulated debt.
+- A reader has to read the implementation to understand a name, or a name caused confusion in
+  review.
 
 ## The core rule
 
@@ -24,11 +29,11 @@ rules are invoked, not remembered: when a trigger below fires, load the skill it
 
 ## The limits
 
-| What | Limit | Kind |
-|------|-------|------|
-| A function | at most **15 lines of logic** | gated limit |
-| A file | at most **200 lines of logic** | gated limit |
-| A type with **7 or more public methods** | needs a stated reason in review | review flag |
+| What | Limit | Where the number comes from | When it is exceeded |
+|------|-------|-----------------------------|---------------------|
+| A function | at most **15 lines of logic** | the extract-method rule and the long-method smell | it is debt, and any growth, or a new one, fails the ratchet |
+| A file | at most **200 lines of logic** | the branch-review scorecard | it is debt, and any growth, or a new one, fails the ratchet |
+| A type with **7 or more public methods** | needs a stated reason in review | the large-class smell | it is a review flag: the reason is written down where a reviewer sees it |
 
 - The limits are framework defaults. A project overrides them in its profile under
   `standard.limits` (`function`, `file`, `public_methods`), and chooses which files are measured
@@ -47,9 +52,9 @@ rules are invoked, not remembered: when a trigger below fires, load the skill it
 counts of over-limit functions and files, each one as `path:line name -- N lines`, the wide types,
 and any file whose functions could not be measured, with the reason. It works in any git
 repository, uses the profile's `standard` when there is one and the defaults otherwise, and always
-exits 0 (the ratchet is the gate, not the report). The manager runs it and quotes the numbers in a
-brief; a worker runs it only where its own agent instructions allow. Before you edit a function,
-know its number.
+exits 0 (the ratchet is the gate, not the report). Workers may run `apm metrics` and
+`apm debt check`: both only read. **Only the manager runs `apm debt baseline`**; a worker never
+does, and the guard denies it. Before you edit a function, know its number.
 
 ## Counting lines of logic
 
@@ -84,7 +89,9 @@ function total(order) {          // signature: not counted
 }                                 // lone bracket: not counted
 ```
 
-**The tool is a heuristic.** `apm metrics` is a scanner, not a compiler. It does not expand macros,
+**The tool is a heuristic.** `apm metrics` is a scanner, not a compiler. It counts both arms of a
+conditional-compilation block (each branch between `#if`, `#else` and `#endif`), because it cannot
+know which one builds; only the directive lines themselves are dropped. It does not expand macros,
 and a constructor whose initializer list itself uses braces can be misread. Where it disagrees with
 a hand count, the fix is a failing fixture for the tool first; a project that needs exactness
 declares its own checker in `standard.debt_sources`.
@@ -102,7 +109,8 @@ already over its limit.
   pure move (the same function, the same size, in another file) is not new debt.
 - `apm debt baseline` re-records the numbers; it only ever tightens on its own. Recording a worse
   baseline takes `--accept` with a reason, and only after the user has approved that specific
-  worsening. Workers never write the baseline or the profile.
+  worsening. Only the manager runs `apm debt baseline`; workers never write the baseline or the
+  profile.
 - Debt in code your work touches is paid down in that work, through extract-before-you-add tasks.
   Debt elsewhere becomes a ranked issue for the user to schedule, not a detour.
 
@@ -119,11 +127,12 @@ files unrelated to your task.
    block that could be extracted, a comment that is redundant or out of date, dead code, an unused
    import.
 3. **Apply one improvement** (two at most). It is small, low risk, and takes under five minutes.
-   It may share the commit or have its own, but it stays small.
-4. **Verify.** Run the tests. The improvement must not change behavior; if it does, it is not
-   cleanup, it is a refactoring with its own process and its own commit.
-5. **Say so if it is not obvious.** Add a line to the commit message: "Also: renamed the
-   ambiguous `d` to `elapsedDays`."
+4. **Verify.** Run the tests. The improvement must not change behavior; if it does, it is not a
+   cleanup at all, and it goes back out until it can be done as a proper refactoring.
+5. **Commit it on its own.** A boy scout improvement (a rename, an extraction, deleting dead code)
+   is a refactoring, and **refactoring and behavior never share a commit**: there is no exception
+   for small ones. Commit it before or after the behavior change, never inside it, with a message
+   that says what it is: "Rename the ambiguous `d` to `elapsedDays`."
 
 Signs the rule is not being followed: small quality issues that survive for months because "it's
 not my task"; quality that slowly degrades; files people avoid because they are messy; review
@@ -229,9 +238,11 @@ These hold in every language; a project adds its own in its profile.
 - **Adding "just one line"** to a function that is already over. That is growing debt; extract first.
 - **Raising a limit in the profile** to make a number pass. It is reported as a loosened limit and
   fails the ratchet.
+- **Folding a cleanup into the behavior commit**, however small. It gets its own commit.
 - **Too many cleanups in one pass.** One or two per file; anything bigger is its own task.
 - **Cleaning files you did not need to touch.** Scope creep, and noise in the review.
-- **A cleanup that changes behavior.** Then it is a refactoring and gets its own commit and process.
+- **A cleanup that changes behavior.** Then it is not a cleanup: back it out, and make the behavior
+  change test-first in its own commit if it is wanted at all.
 - **Skipping the tests** after a cleanup because it "obviously" changed nothing.
 - **Using the boy scout rule** to justify a large refactoring inside a feature change.
 - **Names that are too long** (`theListOfAllActiveUserEmailAddresses`): specific, not exhaustive.

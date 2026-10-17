@@ -12,11 +12,11 @@ that hold nothing else.
 
 - A function or file you need to change is already over its limit.
 - The change you are about to make touches existing debt.
-- A function is longer than 10 to 15 lines of logic, mixes levels of abstraction, or has a comment
-  explaining what its next block does.
+- A function is at or near the function limit (default 15 lines of logic), mixes levels of
+  abstraction, or has a comment explaining what its next block does.
 - A name is unclear, misleading or out of date.
 - A switch or if-else chain branches on a type, status or kind, especially the same chain in
-  several places.
+  several places, or business rules that vary by type are tangled together in one function.
 - A file needs splitting.
 
 ## The core rule
@@ -61,8 +61,9 @@ unreviewable, because the reader can no longer tell which lines changed meaning.
   bug test-first in its own commit.
 - A test that must change for a refactoring to pass means the refactoring changed behavior, or the
   test was coupled to structure. Stop and decide which; do not edit the test to fit.
-- A cleanup under the boy scout rule is small enough to ride along; anything larger is a refactoring
-  and gets its own commit.
+- **There is no exception for small changes.** A boy scout cleanup that is a refactoring (a rename,
+  an extraction, deleting dead code) goes in its own commit too, before or after the behavior
+  change, never inside it.
 
 ## Logic does not move sideways
 
@@ -220,7 +221,8 @@ A file over the limit is split by responsibility, as a pure move, in its own com
 - **Adding to an over-limit file "for now"**, planning to split later. Later never comes; that is
   how a file reaches 2,617 lines.
 - **Dropping a structural constraint silently** because it was inconvenient. Ask.
-- **A refactoring commit that also fixes a bug** or changes behavior.
+- **A refactoring commit that also fixes a bug** or changes behavior, or a "tiny" rename folded
+  into a feature commit.
 - **Moving logic sideways** into the new file instead of into tested logic.
 - **Extracted functions that still need many parameters.** Decompose further.
 - **Naming after the mechanism** (`loopOverItems`) instead of the purpose (`calculateTotal`).

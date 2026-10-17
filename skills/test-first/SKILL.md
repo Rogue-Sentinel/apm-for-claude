@@ -15,7 +15,10 @@ tests green.
 - a bug fix;
 - a refactoring (the tests that pin the behavior come first);
 - any change in behavior;
-- writing, changing, structuring or reviewing a test.
+- improving the testability of existing code (pin what it does with tests, then restructure);
+- code that is being written, or already exists, without tests;
+- writing, changing, structuring or reviewing a test, including its arrange-act-assert (or
+  given-when-then) shape.
 
 The only exceptions are throwaway prototypes, generated code and configuration files, and only the
 user grants one: a worker asks the manager, and the manager asks the user. Thinking "skip it just
@@ -124,7 +127,8 @@ The decision criteria, checklist and typical mistakes of each phase are in
 
 ## Arrange, act, assert
 
-Every test tells a story in three acts, kept visibly apart:
+Every test tells a story in three acts, kept visibly apart. The same shape is also called
+**given, when, then**: given the context, when the action happens, then the outcome holds.
 
 1. **Arrange** the context: the objects, data and dependencies this behavior needs, and nothing
    else. Descriptive names that say why each value is there.
@@ -132,7 +136,32 @@ Every test tells a story in three acts, kept visibly apart:
 3. **Assert** the outcome: one logical assertion. Several checks are fine only when they verify the
    same behavior from different angles.
 
+Before, an unstructured test: setup, actions and checks interleaved, two behaviors in one, and a
+name that says nothing:
+
 ```
+test "user":
+    db.insert(name: "Alice", role: "admin")
+    u = service.getUser("Alice")
+    expect(u).toExist()
+    expect(u.role).toBe("admin")
+    service.promote(u)
+    expect(u.role).toBe("superadmin")
+```
+
+After, two tests, each with one behavior and visible phases:
+
+```
+test "getUser returns the user with their assigned role":
+    // arrange
+    db.insert(name: "Alice", role: "admin")
+
+    // act
+    user = service.getUser("Alice")
+
+    // assert
+    expect(user.role).toBe("admin")
+
 test "promote raises an admin to superadmin":
     // arrange
     user = createUser(role: "admin")
