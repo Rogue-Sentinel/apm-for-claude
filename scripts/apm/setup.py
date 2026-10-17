@@ -8,7 +8,7 @@ from typing import Any
 from apm import VERSION
 from apm.paths import Project
 from apm.profile import Profile, load_profile, write_profile
-from apm.state_store import init_state
+from apm.state_store import commit_state, init_state
 
 MANAGER_AGENT = "apm:manager"
 SUPERPOWERS_ID = "superpowers@claude-plugins-official"
@@ -16,6 +16,7 @@ SETTINGS_PATH = ".claude/settings.json"
 PROFILE_PATH = ".apm/profile.json"
 GITIGNORE_PATH = ".gitignore"
 STATE_IGNORE = ".apm/state/"
+MIRROR_NAME = "profile.json"
 
 
 class SetupError(Exception):
@@ -56,7 +57,7 @@ def _load_settings(path: Path, text: str | None) -> dict[str, Any]:
 
 
 def _setup_settings(project: Project, max_workers: int) -> bool:
-    path = project.main_root / SETTINGS_PATH
+    path = project.worktree_root / SETTINGS_PATH
     old = _read_text(path)
     merged = merge_settings(_load_settings(path, old), max_workers)
     new = json.dumps(merged, indent=2, sort_keys=True) + "\n"
@@ -67,12 +68,29 @@ def _setup_settings(project: Project, max_workers: int) -> bool:
 
 
 def _existing_profile(project: Project) -> Profile | None:
-    path = project.main_root / PROFILE_PATH
-    return load_profile(path) if path.exists() else None
+    return load_profile(project.profile_path) if project.is_initialized else None
+
+
+def _setup_profile(project: Project, profile: Profile) -> bool:
+    path = project.worktree_root / PROFILE_PATH
+    if path.exists():
+        return False
+    write_profile(path, profile)
+    return True
+
+
+def _mirror_profile(project: Project) -> None:
+    """Commit this checkout's profile on the state branch, so every worktree finds it."""
+    text = (project.worktree_root / PROFILE_PATH).read_text(encoding="utf-8")
+    mirror = project.state_dir / MIRROR_NAME
+    if _read_text(mirror) == text:
+        return
+    _write_text(mirror, text)
+    commit_state(project, "Mirror the APM profile")
 
 
 def _setup_gitignore(project: Project) -> bool:
-    path = project.main_root / GITIGNORE_PATH
+    path = project.worktree_root / GITIGNORE_PATH
     old = _read_text(path) or ""
     if STATE_IGNORE in old.splitlines():
         return False
@@ -85,10 +103,10 @@ def setup_project(project: Project) -> list[str]:
     existing = _existing_profile(project)
     profile = existing or Profile(framework_version=VERSION)
     changed = [SETTINGS_PATH] if _setup_settings(project, profile.max_workers) else []
-    if existing is None:
-        write_profile(project.main_root / PROFILE_PATH, profile)
+    if _setup_profile(project, profile):
         changed.append(PROFILE_PATH)
     if _setup_gitignore(project):
         changed.append(GITIGNORE_PATH)
     init_state(project)
+    _mirror_profile(project)
     return changed

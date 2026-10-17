@@ -1,5 +1,6 @@
 import copy
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -9,6 +10,7 @@ from apm import VERSION
 from apm.paths import find_project
 from apm.profile import load_profile
 from apm.setup import MANAGER_AGENT, SUPERPOWERS_ID, SetupError, merge_settings, setup_project
+from conftest import run_git
 
 
 def _settings(repo: Path) -> dict:
@@ -115,3 +117,55 @@ def test_bad_settings_leave_no_other_files_behind(git_repo: Path) -> None:
         setup_project(find_project(git_repo))
     assert not (git_repo / ".apm" / "profile.json").exists()
     assert not (git_repo / ".gitignore").exists()
+
+
+def _git_out(cwd: Path, *args: str) -> str:
+    done = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True)
+    return done.stdout
+
+
+SETUP_FILES = (".claude/settings.json", ".apm/profile.json", ".gitignore")
+
+
+def test_setup_from_a_linked_worktree_writes_into_that_worktree(git_repo: Path) -> None:
+    run_git(git_repo, "worktree", "add", "../wt", "-b", "wt")
+    wt = git_repo.parent / "wt"
+    assert sorted(setup_project(find_project(wt))) == sorted(SETUP_FILES)
+    for name in SETUP_FILES:
+        assert (wt / name).is_file(), name
+        assert not (git_repo / name).exists(), name
+    assert (git_repo / ".apm" / "state" / ".git").exists()
+
+
+def test_setup_mirrors_the_profile_on_the_state_branch(git_repo: Path) -> None:
+    project = find_project(git_repo)
+    setup_project(project)
+    mirror = project.state_dir / "profile.json"
+    assert mirror.read_text(encoding="utf-8") == (git_repo / ".apm" / "profile.json").read_text(encoding="utf-8")
+    assert _git_out(project.state_dir, "ls-files", "profile.json").strip() == "profile.json"
+    assert _git_out(project.state_dir, "status", "--porcelain") == ""
+
+
+def test_mirror_makes_every_worktree_initialized_before_the_profile_merges(git_repo: Path) -> None:
+    run_git(git_repo, "worktree", "add", "../wt", "-b", "wt")
+    setup_project(find_project(git_repo.parent / "wt"))
+    run_git(git_repo, "worktree", "add", "../other", "-b", "other")
+    other = find_project(git_repo.parent / "other")
+    assert other.is_initialized and other.profile_path == other.state_dir / "profile.json"
+
+
+def test_setup_twice_adds_no_state_commit(git_repo: Path) -> None:
+    project = find_project(git_repo)
+    setup_project(project)
+    before = _git_out(project.state_dir, "rev-parse", "HEAD")
+    setup_project(project)
+    assert _git_out(project.state_dir, "rev-parse", "HEAD") == before
+
+
+def test_setup_mirrors_an_existing_profile_verbatim(git_repo: Path) -> None:
+    (git_repo / ".apm").mkdir()
+    text = '{"framework_version": "0.0.9", "protected_paths": ["data/*.db"]}'
+    (git_repo / ".apm" / "profile.json").write_text(text, encoding="utf-8")
+    project = find_project(git_repo)
+    setup_project(project)
+    assert (project.state_dir / "profile.json").read_text(encoding="utf-8") == text

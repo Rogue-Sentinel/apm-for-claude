@@ -207,3 +207,12 @@ def test_session_start_script_reads_stdin_as_utf8(tmp_path: Path) -> None:
         input=raw, capture_output=True, check=True,
     )
     assert "0.0.9" in _decision(done.stdout.decode("utf-8"))["additionalContext"]
+
+
+def test_session_start_without_state_worktree_says_state_unavailable(git_repo: Path) -> None:
+    _init(git_repo)
+    _, out = hook_session_start.run(json.dumps({"cwd": str(git_repo)}), {})
+    context = _decision(out)["additionalContext"]
+    state = git_repo.resolve() / ".apm" / "state"
+    assert f"State unavailable: state is not set up at {state}; run 'apm setup'" in context
+    assert "No work recorded yet." not in context

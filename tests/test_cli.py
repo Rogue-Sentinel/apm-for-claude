@@ -192,3 +192,12 @@ def test_runs_from_a_linked_worktree_without_its_own_profile(repo: Path, monkeyp
     monkeypatch.chdir(repo.parent / "wt")
     assert apm_cli.main(["issue", "1", "--title", "From a worktree"]) == 0
     assert "From a worktree" in _ledger(repo)["issues"]["1"]["title"]
+
+
+def test_brief_without_state_worktree_says_state_unavailable(git_repo: Path, monkeypatch, capsys) -> None:
+    (git_repo / ".apm").mkdir()
+    (git_repo / ".apm" / "profile.json").write_text('{"framework_version": "0.1.0"}', encoding="utf-8")
+    monkeypatch.chdir(git_repo)
+    assert apm_cli.main(["brief"]) == 2
+    state = find_project(git_repo).state_dir
+    assert capsys.readouterr().out.strip() == f"State unavailable: state is not set up at {state}; run 'apm setup'"

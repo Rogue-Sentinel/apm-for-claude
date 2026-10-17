@@ -10,7 +10,7 @@ from apm import ledger as lg
 from apm.briefing import render_briefing
 from apm.paths import Project
 from apm.setup import setup_project
-from apm.state_store import commit_state
+from apm.state_store import commit_state, load_state
 
 ISSUE_FIELDS = ("title", "kind", "lane", "status", "branch", "plan")
 TASK_FIELDS = ("title", "status", "worker", "model", "evidence")
@@ -30,7 +30,7 @@ def _mutate(project: Project, number: int, apply: Callable[[dict], str]) -> None
 
 def brief(project: Project, args: argparse.Namespace) -> int:
     try:
-        print(render_briefing(lg.load_ledger(project.ledger_path), None))
+        print(render_briefing(load_state(project), None))
     except lg.LedgerError as exc:
         print(render_briefing(None, str(exc)))
         return 2

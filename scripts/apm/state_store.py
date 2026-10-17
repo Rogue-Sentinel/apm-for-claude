@@ -4,7 +4,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from apm.ledger import empty_ledger, save_ledger
+from apm.ledger import LedgerError, empty_ledger, load_ledger, save_ledger
 from apm.paths import Project
 
 STATE_BRANCH = "apm/state"
@@ -56,6 +56,13 @@ def init_state(project: Project) -> None:
         _git(["worktree", "add", state, "-b", STATE_BRANCH, f"origin/{STATE_BRANCH}"], root)
     else:
         _create_orphan(project)
+
+
+def load_state(project: Project) -> dict:
+    """The ledger; LedgerError when the state worktree is missing, so no one reads it as empty."""
+    if not (project.state_dir / ".git").exists():
+        raise LedgerError(f"state is not set up at {project.state_dir}; run 'apm setup'")
+    return load_ledger(project.ledger_path)
 
 
 def _push(cwd: Path) -> bool:

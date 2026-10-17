@@ -11,9 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import apm  # noqa: E402
 from apm.briefing import render_briefing  # noqa: E402
-from apm.ledger import LedgerError, load_ledger  # noqa: E402
+from apm.ledger import LedgerError  # noqa: E402
 from apm.paths import Project, find_project  # noqa: E402
 from apm.profile import ProfileError, load_profile  # noqa: E402
+from apm.state_store import load_state  # noqa: E402
 
 
 def _cwd(stdin: str) -> Path | None:
@@ -27,7 +28,7 @@ def _cwd(stdin: str) -> Path | None:
 
 def _render(project: Project) -> str:
     try:
-        return render_briefing(load_ledger(project.ledger_path), None)
+        return render_briefing(load_state(project), None)
     except LedgerError as exc:
         return render_briefing(None, str(exc))
 
