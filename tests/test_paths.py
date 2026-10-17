@@ -45,3 +45,40 @@ def test_to_native_path_posix():
 def test_worktree_relative(git_repo):
     target = git_repo / "data" / "fleet.db"
     assert worktree_relative(target) == (git_repo, "data/fleet.db")
+
+
+def _profile(path: Path) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('{"framework_version": "0.1.0"}', encoding="utf-8")
+    return path
+
+
+def _linked(git_repo: Path) -> Path:
+    run_git(git_repo, "worktree", "add", ".claude/worktrees/agent-1", "-b", "agent-1")
+    return git_repo / ".claude" / "worktrees" / "agent-1"
+
+
+def test_profile_falls_back_to_the_main_root(git_repo):
+    main = _profile(git_repo.resolve() / ".apm" / "profile.json")
+    p = find_project(_linked(git_repo))
+    assert p.profile_path == main and p.is_initialized
+
+
+def test_profile_falls_back_to_the_state_mirror(git_repo):
+    mirror = _profile(git_repo.resolve() / ".apm" / "state" / "profile.json")
+    p = find_project(_linked(git_repo))
+    assert p.profile_path == mirror and p.is_initialized
+
+
+def test_worktree_profile_wins(git_repo):
+    _profile(git_repo / ".apm" / "profile.json")
+    _profile(git_repo / ".apm" / "state" / "profile.json")
+    wt = _linked(git_repo)
+    own = _profile(wt.resolve() / ".apm" / "profile.json")
+    assert find_project(wt).profile_path == own
+
+
+def test_main_profile_wins_over_the_mirror(git_repo):
+    main = _profile(git_repo.resolve() / ".apm" / "profile.json")
+    _profile(git_repo / ".apm" / "state" / "profile.json")
+    assert find_project(git_repo).profile_path == main

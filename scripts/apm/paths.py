@@ -19,7 +19,14 @@ class Project:
 
     @property
     def profile_path(self) -> Path:
-        return self.worktree_root / ".apm" / "profile.json"
+        """The first profile that exists: this checkout's, the main checkout's, then the
+        mirror on the state branch. With none, this checkout's (and not initialized)."""
+        candidates = (
+            self.worktree_root / ".apm" / "profile.json",
+            self.main_root / ".apm" / "profile.json",
+            self.state_dir / "profile.json",
+        )
+        return next((path for path in candidates if path.exists()), candidates[0])
 
     @property
     def state_dir(self) -> Path:

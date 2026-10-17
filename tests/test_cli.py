@@ -185,3 +185,10 @@ def test_gitattributes_pins_bin_apm_to_lf() -> None:
         ["git", "check-attr", "eol", "tools/x.sh"], cwd=ROOT, capture_output=True, text=True, check=True
     )
     assert done.stdout.strip().endswith("eol: lf")
+
+
+def test_runs_from_a_linked_worktree_without_its_own_profile(repo: Path, monkeypatch, capsys) -> None:
+    subprocess.run(["git", "worktree", "add", "../wt", "-b", "wt"], cwd=repo, check=True, capture_output=True)
+    monkeypatch.chdir(repo.parent / "wt")
+    assert apm_cli.main(["issue", "1", "--title", "From a worktree"]) == 0
+    assert "From a worktree" in _ledger(repo)["issues"]["1"]["title"]
