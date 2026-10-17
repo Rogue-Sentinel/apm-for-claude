@@ -153,12 +153,13 @@ def test_hooks_json_points_at_existing_scripts() -> None:
     pre = config["hooks"]["PreToolUse"][0]
     assert pre["matcher"] == "Bash|PowerShell|Write|Edit|NotebookEdit"
     commands = [h["command"] for group in config["hooks"].values() for e in group for h in e["hooks"]]
-    assert 'python "${CLAUDE_PLUGIN_ROOT}/scripts/hook_pretooluse.py"' in commands
-    assert 'python "${CLAUDE_PLUGIN_ROOT}/scripts/hook_session_start.py"' in commands
+    assert 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/run.sh" pretooluse' in commands
+    assert 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/run.sh" session_start' in commands
     assert "matcher" not in config["hooks"]["SessionStart"][0]
     for command in commands:
-        relative = command.split("${CLAUDE_PLUGIN_ROOT}/")[1].rstrip('"')
+        relative, _, hook = command.split("${CLAUDE_PLUGIN_ROOT}/")[1].partition('" ')
         assert (ROOT / relative).is_file()
+        assert (ROOT / "scripts" / f"hook_{hook}.py").is_file()
 
 
 def test_hook_script_end_to_end(git_repo: Path) -> None:
