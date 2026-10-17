@@ -1,0 +1,13 @@
+{
+  "name": "rogue-sentinel",
+  "owner": {
+    "name": "Rogue-Sentinel"
+  },
+  "plugins": [
+    {
+      "name": "apm",
+      "source": "./",
+      "description": "Agentic project management for Claude Code: issues, workers, and guarded tool use."
+    }
+  ]
+}
