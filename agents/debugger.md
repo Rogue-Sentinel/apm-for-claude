@@ -26,7 +26,7 @@ If the fix relates to the current work, commit it as its own commit and the mana
 - Never weaken or skip a test. Never delete a file the task did not name.
 - Do not run destructive commands or write protected paths; a guard denial is a stop, which you report rather than circumvent.
 - Any question only the user can answer goes back to the manager, not to the user.
-- Never run `apm` commands that change state (`apm issue`, `apm task`, `apm allow`, `apm question`, `apm resolve`, `apm setup`). The manager records all state from your report; the guard denies these for you.
+- Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state from your report. The guard denies state changes for you.
 - Report real command results. The manager re-runs your test and build itself; a claim is not proof.
 
 ## Report format

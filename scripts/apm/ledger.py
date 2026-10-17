@@ -15,6 +15,7 @@ ISSUE_STATUSES = (
 TASK_STATUSES = ("pending", "running", "done", "failed", "blocked")
 ALLOWLIST_STATUSES = ("building", "integrating")
 APPROVAL_LIFETIME = timedelta(minutes=10)
+CLOCK_SKEW = timedelta(minutes=1)
 
 
 class LedgerError(Exception):
@@ -109,14 +110,14 @@ def add_allow(
 
 
 def add_approval(
-    ledger: dict[str, Any], *, path: str | None, command: str | None, reason: str, now: datetime
+    ledger: dict[str, Any], *, path: str | None, command: str | None, reason: str, now: datetime, cwd: str
 ) -> dict[str, Any]:
-    """Record a one-off approval of an exact command or a path glob, expiring after ten minutes."""
+    """Record a one-off approval of an exact command (run from `cwd`) or a path glob, for ten minutes."""
     if (path is None) == (command is None):
         raise LedgerError("an approval needs exactly one of path or command")
     target = {"path": path} if path is not None else {"command": command}
     expires = (now + APPROVAL_LIFETIME).astimezone(timezone.utc).isoformat()
-    entry = {**target, "reason": reason, "expires_at": expires}
+    entry = {**target, "reason": reason, "cwd": cwd, "expires_at": expires}
     ledger.setdefault("approvals", []).append(entry)
     return entry
 
@@ -144,11 +145,18 @@ def active_allowlist(ledger: dict[str, Any]) -> list[dict[str, Any]]:
     return [entry for issue in live for entry in issue["allowlist"]]
 
 
+def _well_formed(entry: Any) -> bool:
+    """One of a str path or a str command (which also needs a str cwd), never both keys."""
+    if not isinstance(entry, Mapping) or ("path" in entry and "command" in entry):
+        return False
+    if isinstance(entry.get("command"), str):
+        return isinstance(entry.get("cwd"), str)
+    return isinstance(entry.get("path"), str)
+
+
 def _expiry(entry: Any) -> datetime | None:
     """When a well-formed approval expires; None for a malformed one."""
-    if not isinstance(entry, Mapping) or not isinstance(entry.get("expires_at"), str):
-        return None
-    if not (isinstance(entry.get("command"), str) or isinstance(entry.get("path"), str)):
+    if not _well_formed(entry) or not isinstance(entry.get("expires_at"), str):
         return None
     try:
         expires = datetime.fromisoformat(entry["expires_at"])
@@ -158,6 +166,8 @@ def _expiry(entry: Any) -> datetime | None:
 
 
 def live_approvals(ledger: dict[str, Any], now: datetime) -> list[dict[str, Any]]:
-    """The well-formed approvals that have not expired at `now`; the rest are ignored."""
+    """The well-formed approvals live at `now`: not expired, and not set to expire later than a fresh
+    approval could (ten minutes plus a minute of clock skew). The rest are ignored."""
+    latest = now + APPROVAL_LIFETIME + CLOCK_SKEW
     entries = ledger.get("approvals") or []
-    return [entry for entry in entries if (expires := _expiry(entry)) is not None and expires > now]
+    return [entry for entry in entries if (expires := _expiry(entry)) is not None and now < expires <= latest]

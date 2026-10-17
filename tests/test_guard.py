@@ -8,6 +8,7 @@ from apm.paths import Project
 from apm.profile import Profile
 
 WINDOWS = sys.platform == "win32"
+PLUGIN_CLI = (Path(__file__).resolve().parent.parent / "scripts" / "apm_cli.py").as_posix()
 BUILD = "python tools/build_fleet_db.py --out data/fleet.db"
 
 
@@ -40,6 +41,7 @@ def test_main_session_violation_is_denied_with_instructions(git_repo: Path) -> N
     assert decision.reason.startswith("APM guard: ")
     assert "Ask the user in chat" in decision.reason and " approve --command " in decision.reason
     assert '/scripts/apm_cli.py" approve' in decision.reason and "\n" not in decision.reason
+    assert '--command "<the exact full command>"' in decision.reason
 
 
 def test_worker_reason_has_no_approval_instructions(git_repo: Path) -> None:
@@ -154,7 +156,7 @@ APM_MUTATIONS = [
     "apm question 1 --text Why",
     "apm resolve 1 0 --answer yes",
     "apm setup",
-    "apm approve --command 'rm -rf build' --reason r",
+    "apm approve --command 'make' --reason r",
     "echo hi && apm task 1 t1 --status done",
     '"/c/plugins/apm/bin/apm" issue 2 --title x',
 ]
@@ -179,12 +181,12 @@ def test_worker_may_read_apm_state(git_repo: Path, command: str) -> None:
 LATER = "2999-01-01T00:00:00+00:00"
 
 
-def _approval(**target: str) -> dict:
-    return {**target, "reason": "user said yes", "expires_at": LATER}
+def _approval(cwd: Path | str | None = None, **target: str) -> dict:
+    return {**target, "reason": "user said yes", "cwd": str(cwd), "expires_at": LATER}
 
 
 def test_command_approval_lets_exactly_that_command_through(git_repo: Path) -> None:
-    approvals = [_approval(command=BUILD)]
+    approvals = [_approval(git_repo, command=BUILD)]
     assert _decide(_event(git_repo), git_repo, approvals=approvals).kind == "none"
     padded = _command(git_repo, f"  {BUILD}\n")
     assert _decide(padded, git_repo, approvals=approvals).kind == "none"
@@ -205,26 +207,53 @@ def test_command_approval_lets_exactly_that_command_through(git_repo: Path) -> N
     ],
 )
 def test_near_identical_command_is_still_denied(git_repo: Path, approved: str, command: str) -> None:
-    approvals = [_approval(command=approved)]
+    approvals = [_approval(git_repo, command=approved)]
     assert _decide(_command(git_repo, command), git_repo, approvals=approvals).kind == "deny"
 
 
+def test_command_approval_applies_only_in_the_recorded_cwd(git_repo: Path) -> None:
+    approvals = [_approval(git_repo, command="rm -rf build")]
+    assert _decide(_command(git_repo, "rm -rf build"), git_repo, approvals=approvals).kind == "none"
+    (git_repo / "sub").mkdir()
+    assert _decide(_command(git_repo / "sub", "rm -rf build"), git_repo, approvals=approvals).kind == "deny"
+    assert _decide(_command(git_repo.parent, "rm -rf build"), git_repo, approvals=approvals).kind == "deny"
+
+
+def test_command_approval_cwd_compares_normalized(git_repo: Path) -> None:
+    recorded = git_repo.as_posix().upper() if WINDOWS else git_repo.as_posix() + "/"
+    approvals = [_approval(recorded, command="rm -rf build")]
+    assert _decide(_command(git_repo, "rm -rf build"), git_repo, approvals=approvals).kind == "none"
+
+
+def test_command_approval_without_a_cwd_is_ignored(git_repo: Path) -> None:
+    approvals = [{"command": "rm -rf build", "reason": "r", "expires_at": LATER}]
+    assert _decide(_command(git_repo, "rm -rf build"), git_repo, approvals=approvals).kind == "deny"
+
+
+def test_command_approval_does_not_override_the_state_dir_rule(git_repo: Path) -> None:
+    state = _state(git_repo)
+    approvals = [_approval(state, command="rm -rf build")]
+    assert _decide(_command(state, "rm -rf build"), git_repo, approvals=approvals).kind == "deny"
+    approvals = [_approval(state, command="touch x")]
+    assert _decide(_command(state, "touch x"), git_repo, approvals=approvals).kind == "deny"
+
+
 def test_command_approval_does_not_help_a_worker(git_repo: Path) -> None:
-    approvals = [_approval(command=BUILD)]
+    approvals = [_approval(git_repo, command=BUILD)]
     assert _decide(_event(git_repo, agent_id="a1"), git_repo, approvals=approvals).kind == "deny"
 
 
 def test_path_approval_allows_a_protected_write_in_the_main_session_only(git_repo: Path) -> None:
-    approvals = [_approval(path="data/*.db")]
+    approvals = [_approval(git_repo, path="data/*.db")]
     event = _file_event(git_repo, "Write", "file_path", "data/fleet.db")
     assert _decide(event, git_repo, approvals=approvals).kind == "none"
     assert _decide({**event, "agent_id": "a1"}, git_repo, approvals=approvals).kind == "deny"
     other = _file_event(git_repo, "Write", "file_path", "data/other.db")
-    assert _decide(other, git_repo, approvals=[_approval(path="data/fleet.db")]).kind == "deny"
+    assert _decide(other, git_repo, approvals=[_approval(git_repo, path="data/fleet.db")]).kind == "deny"
 
 
 def test_path_approval_does_not_cover_a_command(git_repo: Path) -> None:
-    approvals = [_approval(path="data/*.db"), _approval(path=BUILD)]
+    approvals = [_approval(git_repo, path="data/*.db"), _approval(git_repo, path=BUILD)]
     assert _decide(_event(git_repo), git_repo, approvals=approvals).kind == "deny"
 
 
@@ -233,13 +262,14 @@ def test_malformed_approvals_are_ignored(git_repo: Path) -> None:
     assert _decide(_event(git_repo), git_repo, approvals=approvals).kind == "deny"
 
 
-CLI = 'python "/c/Users/me/.claude/plugins/cache/rogue-sentinel/apm/0.1.0/scripts/apm_cli.py"'
+CLI = f'python "{PLUGIN_CLI}"'
 RECORDS = [
     f'{CLI} approve --command "rm -rf build" --reason "user said yes"',
     f"{CLI} approve --path 'data/*.db' --reason 'regenerate the fleet db'",
     f'{CLI} task 1 t1 --status done --evidence "rm -rf build; git reset --hard | ok"',
-    'apm allow 1 --command "git clean -fdx" --reason "plan step 3"',
-    'python3 C:/plugins/apm/scripts/apm_cli.py approve --command "touch data/fleet.db" --reason r',
+    f'{CLI} allow 1 --command "git clean -fdx" --reason "plan step 3"',
+    f"python3 '{PLUGIN_CLI}' approve --command 'touch data/fleet.db' --reason r",
+    f'py "{PLUGIN_CLI.replace("/scripts/", "/scripts/../scripts/")}" approve --command "rm -rf build" --reason r',
 ]
 
 
@@ -261,6 +291,10 @@ def test_main_session_may_record_any_action_as_data(git_repo: Path, command: str
         'echo apm approve --command "rm -rf build"',
         'python tools/apm_cli.py.bak approve --command "rm -rf build" --reason r',
         'rm -rf build # apm approve',
+        'python "/c/other/plugin/scripts/apm_cli.py" approve --command "rm -rf build" --reason r',
+        f'python "{PLUGIN_CLI.replace("/scripts/", "/tools/")}" approve --command "rm -rf build" --reason r',
+        '/tmp/apm approve --command "rm -rf build" --reason r',
+        'apm allow 1 --command "git clean -fdx" --reason "plan step 3"',
     ],
 )
 def test_record_exemption_needs_a_single_plain_cli_call(git_repo: Path, command: str) -> None:
@@ -283,6 +317,10 @@ CLI_MUTATIONS = [
     'cd /x; python.exe "./scripts/apm_cli.py" resolve 1 0 --answer yes',
     '"C:/Python313/python.exe" "C:/x/scripts/apm_cli.py" "issue" 1',
     r'C:\plugins\apm\bin\apm approve --command x --reason r',
+    "python scripts/APM_CLI.PY issue 1 --title x",
+    'python "C:/x/Scripts/Apm_Cli.py" approve --command x --reason r',
+    "python scripts/apm_cli.py -- task 1 t1 --status done",
+    "apm -- issue 1 --title x",
 ]
 
 

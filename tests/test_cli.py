@@ -7,6 +7,7 @@ import pytest
 
 import apm_cli
 from apm.cli_parser import build_parser
+from apm.guard_paths import same_path
 from apm.paths import find_project
 from apm.state_store import init_state
 
@@ -127,7 +128,8 @@ def test_missing_state_branch_exits_2(git_repo: Path, monkeypatch, capsys) -> No
     (git_repo / ".apm" / "profile.json").write_text('{"framework_version": "0.1.0"}', encoding="utf-8")
     monkeypatch.chdir(git_repo)
     assert apm_cli.main(["issue", "1", "--title", "A"]) == 2
-    assert "state" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "state" in err and f'run setup with the APM CLI: python "{ROOT.as_posix()}/scripts/apm_cli.py" setup' in err
 
 
 def test_argparse_exits_become_return_codes(capsys) -> None:
@@ -201,7 +203,8 @@ def test_brief_without_state_worktree_says_state_unavailable(git_repo: Path, mon
     monkeypatch.chdir(git_repo)
     assert apm_cli.main(["brief"]) == 2
     state = find_project(git_repo).state_dir
-    assert capsys.readouterr().out.strip() == f"State unavailable: state is not set up at {state}; run 'apm setup'"
+    expected = f"State unavailable: state is not set up at {state}; run setup with the APM CLI: python \"{ROOT.as_posix()}/scripts/apm_cli.py\" setup"
+    assert capsys.readouterr().out.strip() == expected
 
 
 def test_approve_records_a_ten_minute_one_off_approval(repo: Path) -> None:
@@ -210,6 +213,7 @@ def test_approve_records_a_ten_minute_one_off_approval(repo: Path) -> None:
     ledger = _ledger(repo)
     entry = ledger["approvals"][0]
     assert (entry["command"], entry["reason"]) == ("rm -rf build", "user said yes") and "path" not in entry
+    assert same_path(entry["cwd"], repo)
     left = datetime.fromisoformat(entry["expires_at"]) - datetime.now(timezone.utc)
     assert timedelta(minutes=9) < left <= timedelta(minutes=10)
     assert ledger["log"][-1]["event"] == "approve command rm -rf build"

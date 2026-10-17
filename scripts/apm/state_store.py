@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 from apm.ledger import LedgerError, empty_ledger, load_ledger, save_ledger
-from apm.paths import Project
+from apm.paths import SETUP_HINT, Project
 
 STATE_BRANCH = "apm/state"
 
@@ -61,7 +61,7 @@ def init_state(project: Project) -> None:
 def load_state(project: Project) -> dict:
     """The ledger; LedgerError when the state worktree is missing, so no one reads it as empty."""
     if not (project.state_dir / ".git").exists():
-        raise LedgerError(f"state is not set up at {project.state_dir}; run 'apm setup'")
+        raise LedgerError(f"state is not set up at {project.state_dir}; {SETUP_HINT}")
     return load_ledger(project.ledger_path)
 
 

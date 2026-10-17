@@ -133,9 +133,8 @@ def test_manager_never_shows_a_bare_apm_command():
 @pytest.mark.parametrize("name", WORKERS)
 def test_workers_do_not_change_apm_state(name):
     _, body = parse(AGENTS / f"{name}.md")
-    assert "Never run `apm` commands that change state" in body
-    for verb in ("issue", "task", "allow", "question", "resolve", "setup"):
-        assert f"`apm {verb}`" in body, f"{name} does not name apm {verb}"
+    assert "Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state" in body
+    assert "`apm issue`" not in body
 
 
 def _section(body: str, heading: str) -> str:
@@ -150,3 +149,16 @@ def test_manager_safety_asks_in_chat_and_records_one_off_approvals():
     assert "Never approve on your own judgment" in safety
     assert "never covers a different command" in safety
     assert "permission prompt" not in body
+
+
+def test_manager_has_an_exit_when_the_approve_call_is_denied():
+    _, body = parse(AGENTS / "manager.md")
+    safety = _section(body, "## Safety")
+    assert (
+        "If the approve call is itself denied, stop and ask the user to run the command themselves; "
+        "never rewrite a command to make it approvable." in safety
+    )
+    assert "the exact full command you will retry, not just the flagged segment" in safety
+    assert "lasts 10 minutes" in safety
+    assert "only in the directory it was recorded in" in safety
+    assert "reusable within that window" in safety

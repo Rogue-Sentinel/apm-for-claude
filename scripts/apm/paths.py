@@ -90,3 +90,7 @@ def worktree_relative(target: Path) -> tuple[Path, str] | None:
 def cli_command(plugin_root: Path) -> str:
     """The PATH-independent way to run the apm CLI from the Bash tool."""
     return f'python "{plugin_root.as_posix()}/scripts/apm_cli.py"'
+
+
+PLUGIN_ROOT = Path(__file__).resolve().parents[2]
+SETUP_HINT = f"run setup with the APM CLI: {cli_command(PLUGIN_ROOT)} setup"

@@ -24,7 +24,7 @@ Work only in the worktree you were started in. Do not change files in the main c
 - Never delete a file the task did not name. Deletion is a planned, tracked change, not a side effect.
 - Do not run destructive commands (`rm -rf`, `git reset --hard`, force-push, and the like) or write protected paths. The guard will deny them; treat a denial as a stop and report it rather than working around it.
 - A question only the user can answer, or a decision the plan did not settle, goes back to the manager in your report. You do not ask the user.
-- Never run `apm` commands that change state (`apm issue`, `apm task`, `apm allow`, `apm question`, `apm resolve`, `apm setup`). The manager records all state from your report; the guard denies these for you.
+- Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state from your report. The guard denies state changes for you.
 - Report the real results of the commands you ran. Do not claim a test passed that you did not see pass — the manager verifies everything itself.
 
 ## Report format

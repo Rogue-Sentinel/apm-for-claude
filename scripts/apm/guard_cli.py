@@ -1,8 +1,12 @@
-"""Recognize a single, plain call of the apm CLI, whose arguments are data to record."""
+"""Recognize a single, plain call of this plugin's own apm CLI, whose arguments are data to record."""
 from __future__ import annotations
 
 import re
 import shlex
+from pathlib import Path
+
+from .guard_paths import same_path
+from .paths import PLUGIN_ROOT, to_native_path
 
 SUBCOMMANDS = ("brief", "setup", "issue", "task", "allow", "question", "resolve", "approve")
 _INTERPRETER = re.compile(r"(?:python(?:3(?:\.\d+)?)?|py)(?:\.exe)?", re.IGNORECASE)
@@ -10,6 +14,7 @@ _INTERPRETER = re.compile(r"(?:python(?:3(?:\.\d+)?)?|py)(?:\.exe)?", re.IGNOREC
 _UNSAFE = ("\\", "$", "`", "\n", "\r")
 _QUOTED = re.compile(r""""[^"]*"|'[^']*'""")
 _OPERATORS = frozenset(";&|<>()#")
+_PLUGIN_CLI = PLUGIN_ROOT / "scripts" / "apm_cli.py"
 
 
 def _single_command(command: str) -> bool:
@@ -24,18 +29,17 @@ def _name(token: str) -> str:
     return token.rsplit("/", 1)[-1]
 
 
-def _arguments(tokens: list[str]) -> list[str] | None:
-    """The arguments after `apm` or `python .../apm_cli.py`, or None for any other program."""
-    if tokens and _name(tokens[0]) == "apm":
-        return tokens[1:]
-    if len(tokens) > 1 and _INTERPRETER.fullmatch(_name(tokens[0])) and _name(tokens[1]) == "apm_cli.py":
-        return tokens[2:]
-    return None
+def _arguments(tokens: list[str], cwd: Path, windows: bool) -> list[str] | None:
+    """The arguments after `python <this plugin>/scripts/apm_cli.py`, or None for any other program."""
+    if len(tokens) < 2 or not _INTERPRETER.fullmatch(_name(tokens[0])):
+        return None
+    script = to_native_path(tokens[1], cwd, windows)
+    return tokens[2:] if same_path(script, _PLUGIN_CLI) else None
 
 
-def is_cli_call(command: str) -> bool:
-    """True when `command` is exactly one apm CLI call with a known subcommand."""
+def is_cli_call(command: str, cwd: Path, windows: bool) -> bool:
+    """True when `command`, run in `cwd`, is exactly one call of this plugin's CLI with a known subcommand."""
     if not _single_command(command):
         return False
-    arguments = _arguments(shlex.split(command))
+    arguments = _arguments(shlex.split(command), cwd, windows)
     return bool(arguments) and arguments[0] in SUBCOMMANDS

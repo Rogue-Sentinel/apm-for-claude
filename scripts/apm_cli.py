@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from apm.cli_handlers import HANDLERS  # noqa: E402
 from apm.cli_parser import build_parser  # noqa: E402
 from apm.ledger import LedgerError  # noqa: E402
-from apm.paths import Project, find_project  # noqa: E402
+from apm.paths import SETUP_HINT, Project, find_project  # noqa: E402
 from apm.profile import ProfileError, load_profile  # noqa: E402
 from apm.setup import SetupError  # noqa: E402
 
@@ -32,7 +32,7 @@ def _project(command: str) -> Project:
         raise UsageError("not an initialized APM project (no .apm/profile.json)")
     load_profile(project.profile_path)
     if command != "brief" and not (project.state_dir / ".git").exists():
-        raise UsageError(f"state is not set up at {project.state_dir}; run 'apm setup'")
+        raise UsageError(f"state is not set up at {project.state_dir}; {SETUP_HINT}")
     return project
 
 

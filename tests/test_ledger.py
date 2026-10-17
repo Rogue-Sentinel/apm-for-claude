@@ -171,27 +171,62 @@ def test_missing_approvals_default_to_empty(tmp_path: Path) -> None:
     assert empty_ledger()["approvals"] == []
 
 
-def test_add_approval_expires_in_ten_minutes() -> None:
+CWD = "C:/work/repo"
+
+
+def test_add_approval_expires_in_ten_minutes_and_keeps_the_cwd() -> None:
     ledger = empty_ledger()
-    entry = add_approval(ledger, path=None, command="rm -rf build", reason="user said yes", now=NOW)
-    assert entry == {"command": "rm -rf build", "reason": "user said yes", "expires_at": "2026-10-17T12:10:00+00:00"}
-    add_approval(ledger, path="data/*.db", command=None, reason="r", now=NOW)
-    assert ledger["approvals"][1] == {"path": "data/*.db", "reason": "r", "expires_at": "2026-10-17T12:10:00+00:00"}
+    entry = add_approval(ledger, path=None, command="rm -rf build", reason="user said yes", now=NOW, cwd=CWD)
+    assert entry == {
+        "command": "rm -rf build", "reason": "user said yes", "cwd": CWD, "expires_at": "2026-10-17T12:10:00+00:00",
+    }
+    add_approval(ledger, path="data/*.db", command=None, reason="r", now=NOW, cwd=CWD)
+    assert ledger["approvals"][1] == {
+        "path": "data/*.db", "reason": "r", "cwd": CWD, "expires_at": "2026-10-17T12:10:00+00:00",
+    }
 
 
 def test_add_approval_requires_exactly_one_kind() -> None:
     for path, command in ((None, None), ("a", "b")):
         with pytest.raises(LedgerError):
-            add_approval(empty_ledger(), path=path, command=command, reason="r", now=NOW)
+            add_approval(empty_ledger(), path=path, command=command, reason="r", now=NOW, cwd=CWD)
+
+
+def _entry(**fields: object) -> dict:
+    return {"reason": "r", "cwd": CWD, "expires_at": "2026-10-17T12:05:00+00:00", **fields}
 
 
 def test_live_approvals_drop_expired_and_malformed() -> None:
     ledger = empty_ledger()
-    live = add_approval(ledger, path=None, command="make clean", reason="r", now=NOW)
-    add_approval(ledger, path="x", command=None, reason="r", now=NOW - timedelta(minutes=11))
+    live = add_approval(ledger, path=None, command="make clean", reason="r", now=NOW, cwd=CWD)
+    add_approval(ledger, path="x", command=None, reason="r", now=NOW - timedelta(minutes=11), cwd=CWD)
+    naive_path = {"path": "y", "expires_at": "2026-10-17T12:05:00"}
     ledger["approvals"] += [
-        "junk", {"command": 5, "expires_at": live["expires_at"]}, {"command": "a"},
-        {"command": "b", "expires_at": "not a time"}, {"path": "y", "expires_at": "2026-10-17T12:05:00"},
+        "junk", {"command": 5, "cwd": CWD, "expires_at": live["expires_at"]}, {"command": "a", "cwd": CWD},
+        _entry(command="b", expires_at="not a time"), naive_path,
     ]
-    assert live_approvals(ledger, NOW) == [live, ledger["approvals"][-1]]
+    assert live_approvals(ledger, NOW) == [live, naive_path]
     assert live_approvals(ledger, NOW + timedelta(minutes=10)) == []
+
+
+def test_live_approvals_need_a_cwd_for_a_command() -> None:
+    ledger = empty_ledger()
+    ledger["approvals"] += [_entry(command="make", cwd=None), {"command": "make", "expires_at": "2026-10-17T12:05:00Z"}]
+    assert live_approvals(ledger, NOW) == []
+
+
+def test_live_approvals_ignore_an_expiry_beyond_ten_minutes_plus_skew() -> None:
+    ledger = empty_ledger()
+    within = _entry(command="a", expires_at="2026-10-17T12:11:00+00:00")
+    beyond = _entry(command="b", expires_at="2026-10-17T12:11:01+00:00")
+    forever = _entry(path="c", expires_at="2999-01-01T00:00:00+00:00")
+    ledger["approvals"] += [within, beyond, forever]
+    assert live_approvals(ledger, NOW) == [within]
+
+
+@pytest.mark.parametrize("fields", [{"path": "x", "command": "y"}, {"path": "x", "command": None},
+                                    {"path": None, "command": "y"}])
+def test_live_approvals_ignore_an_entry_with_both_path_and_command(fields: dict) -> None:
+    ledger = empty_ledger()
+    ledger["approvals"].append(_entry(**fields))
+    assert live_approvals(ledger, NOW) == []

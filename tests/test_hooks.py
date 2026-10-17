@@ -108,7 +108,7 @@ def test_pretooluse_uses_ledger_allowlist(git_repo: Path) -> None:
 def _ledger_with_approval(repo: Path, expires_at: str) -> None:
     state = repo / ".apm" / "state"
     state.mkdir(parents=True)
-    approval = {"command": "rm -rf x", "reason": "user said yes", "expires_at": expires_at}
+    approval = {"command": "rm -rf x", "reason": "user said yes", "cwd": str(repo), "expires_at": expires_at}
     ledger = {"issues": {}, "log": [], "approvals": [approval]}
     (state / "ledger.json").write_text(json.dumps(ledger), encoding="utf-8")
 
@@ -256,5 +256,5 @@ def test_session_start_without_state_worktree_says_state_unavailable(git_repo: P
     _, out = hook_session_start.run(json.dumps({"cwd": str(git_repo)}), {})
     context = _decision(out)["additionalContext"]
     state = git_repo.resolve() / ".apm" / "state"
-    assert f"State unavailable: state is not set up at {state}; run 'apm setup'" in context
+    assert f"State unavailable: state is not set up at {state}; run setup with the APM CLI: python \"{ROOT.as_posix()}/scripts/apm_cli.py\" setup" in context
     assert "No work recorded yet." not in context

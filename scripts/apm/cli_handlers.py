@@ -2,13 +2,15 @@
 from __future__ import annotations
 
 import argparse
+import os
 from collections.abc import Callable
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from apm import ledger as lg
 from apm.briefing import render_briefing
-from apm.paths import Project
+from apm.paths import Project, to_native_path
 from apm.setup import setup_project
 from apm.state_store import commit_state, load_state
 
@@ -71,7 +73,8 @@ def allow(project: Project, args: argparse.Namespace) -> None:
 def approve(project: Project, args: argparse.Namespace) -> None:
     def apply(ledger: dict) -> str:
         now = datetime.now(timezone.utc)
-        lg.add_approval(ledger, path=args.path, command=args.command, reason=args.reason, now=now)
+        cwd = to_native_path(os.getcwd(), Path.cwd(), os.name == "nt").as_posix()
+        lg.add_approval(ledger, path=args.path, command=args.command, reason=args.reason, now=now, cwd=cwd)
         kind, value = ("path", args.path) if args.path else ("command", args.command)
         return f"approve {kind} {value}"
 

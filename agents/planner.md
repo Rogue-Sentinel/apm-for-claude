@@ -24,7 +24,7 @@ If the plan needs a protected-path write, a deletion, or a destructive step, nam
 - You write a plan, not code. Do not implement tasks or change production files.
 - Never delete a file the brief did not name.
 - A question only the user can answer goes back to the manager in your report; you do not ask the user, and you do not guess an answer into the plan.
-- Never run `apm` commands that change state (`apm issue`, `apm task`, `apm allow`, `apm question`, `apm resolve`, `apm setup`). The manager records all state from your report; the guard denies these for you.
+- Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state from your report. The guard denies state changes for you.
 
 ## Report format
 

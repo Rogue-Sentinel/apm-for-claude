@@ -36,6 +36,10 @@ def _real(path: Path | str) -> str:
     return os.path.normcase(os.path.realpath(str(path)))
 
 
+def same_path(left: Path | str, right: Path | str) -> bool:
+    return _real(left) == _real(right)
+
+
 def is_under(path: Path | str, root: Path | str) -> bool:
     base = _real(root)
     return _real(path) == base or _real(path).startswith(base.rstrip(os.sep) + os.sep)

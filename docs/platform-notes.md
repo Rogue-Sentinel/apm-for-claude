@@ -18,13 +18,19 @@ Run in a scratch repo set up with `apm setup` (plugin 0.1.0 installed at user sc
 | 9 | `apm` reachable by name | **FAIL** | The plugin's `bin/` is **not** on the Bash tool's PATH. `apm` resolved to an unrelated npm package (`agentic-pm`, `%APPDATA%/npm/apm`). |
 | 10 | `python` on the hook's PATH | PASS | Every guarded call got a JSON decision, and none got "the hook could not run". |
 
-### Open issues from the live check
-- **The `apm` CLI is not reachable as `apm`.** The doc claim that `bin/` is on the Bash PATH did not hold in
-  the desktop app. The name also collides with npm's `agentic-pm`. The manager needs a command that
-  doesn't depend on PATH.
-- **Auto mode skips the main session's `ask`.** In the user's usual mode, the manager can run a destructive
-  command without a prompt, which contradicts spec §9.2 ("only after the user approves that specific
-  action"). This needs a decision: deny in the main session too, or accept the caveat.
+### Issues from the live check
+- **Resolved: the `apm` CLI is not reachable as `apm`.** The doc claim that `bin/` is on the Bash PATH did
+  not hold in the desktop app. The name also collides with npm's `agentic-pm`. Fix: the SessionStart hook
+  adds an `APM CLI: python "<plugin root>/scripts/apm_cli.py"` line to the context, and the manager runs
+  that command (never bare `apm`) with the Bash tool.
+- **Resolved: auto mode skips the main session's `ask`.** In the user's usual mode, the manager could run a
+  destructive command without a prompt, which contradicted spec §9.2 ("only after the user approves that
+  specific action"). Fix: the guard now denies in the main session too. The manager asks the user in chat
+  and, on an explicit yes, records the exact full command (or a path glob) with the CLI's `approve`. The
+  approval lasts 10 minutes, and a command approval holds only in the directory it was recorded in.
+  **Caveat:** under auto mode nothing on the platform shows the user a prompt, so the user's consent to an
+  approval is enforced by the manager prompt, not by the guard. The guard enforces only that the action
+  matches an approval recorded in the last 10 minutes.
 - The spawn-depth env var was not exercised, because no worker role has the Agent tool.
 
 ## Verified from docs (2026-10-17)
