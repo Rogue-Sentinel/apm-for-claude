@@ -5,8 +5,10 @@ import pytest
 
 from skill_helpers import (
     CLOSING_HEADING,
+    CORE_RULE_HEADING,
     OPENING_HEADING,
     SKILLS_DIR,
+    british_spellings,
     frontmatter_lines,
     local_links,
     parse_skill,
@@ -20,10 +22,6 @@ BANNED_TERMS = (
     "TypeScript", "React", "tsconfig", "C++", "XPLM", "ImGui", "X-Plane", "VirtualAirline",
     "superpowers:",
 )
-BRITISH_SPELLINGS = (
-    "colour", "behaviour", "favour", "centre", "analyse", "organise", "recognise", "prioritise",
-    "initialise", "normalise", "catalogue", "judgement",
-)
 MIT_NOTICE = (
     "MIT License",
     "Permission is hereby granted, free of charge, to any person obtaining a copy",
@@ -36,6 +34,10 @@ def _term_pattern(term: str) -> re.Pattern[str]:
     before = r"(?<!\w)" if re.match(r"\w", term[0]) else ""
     after = r"(?!\w)" if re.match(r"\w", term[-1]) else ""
     return re.compile(before + re.escape(term) + after)
+
+
+def _is_by_language_reference(path) -> bool:
+    return path.parent.name == "references" and path.name.endswith("-by-language.md")
 
 
 def _markdown_files():
@@ -84,9 +86,10 @@ def test_body_opens_with_one_h1(name):
 
 
 @pytest.mark.parametrize("name", SKILLS)
-def test_opens_with_when_it_applies_and_closes_with_common_mistakes(name):
+def test_opens_with_when_it_applies_and_the_core_rule_and_closes_with_common_mistakes(name):
     level_two = _h2(parse_skill(name)[1])
-    assert level_two and level_two[0] == OPENING_HEADING, f"{name}: first ## is not {OPENING_HEADING}"
+    assert level_two[:1] == [OPENING_HEADING], f"{name}: first ## is not {OPENING_HEADING}"
+    assert level_two[1:2] == [CORE_RULE_HEADING], f"{name}: second ## is not {CORE_RULE_HEADING}"
     assert level_two[-1] == CLOSING_HEADING, f"{name}: last ## is not {CLOSING_HEADING}"
 
 
@@ -104,7 +107,7 @@ def test_no_banned_term_outside_by_language_references():
     patterns = [(term, _term_pattern(term)) for term in BANNED_TERMS]
     found = []
     for path in _markdown_files():
-        if path.name.endswith("-by-language.md"):
+        if _is_by_language_reference(path):
             continue
         text = path.read_text(encoding="utf-8")
         found += [f"{path.relative_to(SKILLS_DIR)}: {term}" for term, rx in patterns if rx.search(text)]
@@ -121,11 +124,11 @@ def test_every_relative_link_resolves():
 
 
 def test_no_british_spelling_under_skills():
-    rx = re.compile(r"\b(" + "|".join(BRITISH_SPELLINGS) + r")\b", re.IGNORECASE)
     found = []
     for path in skill_files():
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            found += [f"{path.relative_to(SKILLS_DIR)}:{number}: {word}" for word in rx.findall(line)]
+            where = f"{path.relative_to(SKILLS_DIR)}:{number}"
+            found += [f"{where}: {word}" for word in british_spellings(line)]
     assert not found, found
 
 

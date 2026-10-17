@@ -46,8 +46,16 @@ SMELL_CATALOG = {
     ),
     "## Dispensables": (
         "### Dead code", "### Speculative generality", "### Duplicate code", "### Lazy class",
+        "### Unnecessary comments",
     ),
 }
+
+
+def _subsections(headings: list[str], category: str) -> list[str]:
+    """The headings after `category` up to the next `##`."""
+    following = headings[headings.index(category) + 1:]
+    ends = [i for i, heading in enumerate(following) if heading.startswith("## ")]
+    return following[:ends[0]] if ends else following
 
 
 @pytest.mark.parametrize("name", sorted(REQUIRED))
@@ -66,9 +74,7 @@ def test_smell_catalog_keeps_every_category_and_smell():
     headings = sections(text)
     for category, smells in SMELL_CATALOG.items():
         assert category in headings, f"smell catalog lacks {category}"
-        start = headings.index(category)
-        following = headings[start + 1:]
-        own = following[:next((i for i, h in enumerate(following) if h.startswith("## ")), len(following))]
+        own = _subsections(headings, category)
         missing = [smell for smell in smells if smell not in own]
         assert not missing, f"{category} lacks {missing}"
 
