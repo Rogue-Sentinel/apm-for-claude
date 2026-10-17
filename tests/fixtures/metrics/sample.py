@@ -59,6 +59,7 @@ async def fetch(
     url,
     timeout=5,
 ):
+    """Fetch a page."""
     data = await os.get(url)
     return data
 
