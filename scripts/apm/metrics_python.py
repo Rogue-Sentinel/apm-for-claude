@@ -11,7 +11,7 @@ import ast
 import io
 import tokenize
 
-from apm.metrics_lang import is_logic_line, language_for, measure_plain
+from apm.metrics_lang import PYTHON, is_logic_line, measure_plain
 from apm.metrics_model import ClassMetric, FileMetric, FunctionMetric
 
 _LANGUAGE = "Python"
@@ -25,6 +25,8 @@ _SKIPPED = {
 }
 _FUNCTIONS = (ast.FunctionDef, ast.AsyncFunctionDef)
 _DOC_OWNERS = (ast.Module, ast.ClassDef, *_FUNCTIONS)
+# Stands in for a token that spans lines, so every line it covers still counts as code.
+_MULTILINE = "s"
 _Span = tuple[tuple[int, int], tuple[int, int]]
 
 
@@ -32,13 +34,14 @@ def measure_python(path: str, text: str) -> FileMetric:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     try:
         tree = ast.parse(text)
-    except (SyntaxError, ValueError) as error:
+    except (SyntaxError, ValueError) as error:  # ValueError: null bytes on older Pythons, defensive
         return _unparsed(path, text, error)
     logic = _logic_lines(text, _docstring_spans(tree, text))
     collector = _Collector(logic)
     collector.visit(tree)
     return FileMetric(
-        path, _LANGUAGE, len(logic), tuple(collector.functions), tuple(collector.classes), True
+        path, _LANGUAGE, len(logic), tuple(collector.functions), tuple(collector.classes),
+        functions_measured=True,
     )
 
 
@@ -47,7 +50,7 @@ def _unparsed(path: str, text: str, error: Exception) -> FileMetric:
     try:
         lines = len(_logic_lines(text))
     except (tokenize.TokenError, SyntaxError):
-        lines = measure_plain(path, text, language_for("x.py")).lines
+        lines = measure_plain(path, text, PYTHON).lines
     return FileMetric(path, _LANGUAGE, lines, note=note)
 
 
@@ -58,7 +61,7 @@ def _logic_lines(text: str, skip: list[_Span] | None = None) -> set[int]:
             continue
         multiline = token.start[0] != token.end[0]
         for row in range(token.start[0], token.end[0] + 1):
-            rows.setdefault(row, []).append("s" if multiline else token.string)
+            rows.setdefault(row, []).append(_MULTILINE if multiline else token.string)
     return {row for row, parts in rows.items() if is_logic_line("".join(parts))}
 
 

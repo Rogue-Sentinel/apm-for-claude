@@ -194,3 +194,9 @@ def test_file_that_tokenizes_but_does_not_parse_counts_its_tokens():
 
 def test_multiline_fstring_counts_every_line_it_spans():
     assert measure_python("a.py", 'x = f"""\n(\n)\n"""\n').lines == 4
+
+
+def test_python_language_constant_is_the_one_the_table_serves():
+    from apm.metrics_lang import PYTHON, language_for
+
+    assert language_for("a.py") is PYTHON
