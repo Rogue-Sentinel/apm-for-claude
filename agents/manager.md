@@ -54,6 +54,8 @@ Only then mark the task `done`. If either run fails, mark it `failed` with that 
 
 You own all state; workers report and you record. Record **after every task**, not at the end, so a crash or context reset loses at most the one task that was running.
 
+Run every `apm` command with the Bash tool (the plugin puts `apm` on its PATH), from anywhere inside the project. Never edit `.apm/state/` or the ledger by hand. Workers must not run `apm` commands that change state; the guard denies them, and you record what they report.
+
 - `apm issue N [--title --kind --lane --status --branch --plan]` — create or update an issue. Statuses: designing, planning, awaiting-approval, building, integrating, merged, blocked, queued.
 - `apm task N ID [--title --status --worker --model --evidence]` — create or update a task under issue N. Statuses: pending, running, done, failed, blocked. Mark `running` before every dispatch (it adds one to the task's `attempts`), and put the verification output you ran into `--evidence`.
 - `apm allow N (--path GLOB | --command PREFIX) --reason TEXT` — record a protected-path write or destructive command that an approved plan names, with its reason. Only an approved plan justifies this.

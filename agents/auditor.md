@@ -25,6 +25,7 @@ Read; do not change anything. You produce a draft and an inventory, not edits.
 - Stay inside the task and the files the manager assigned. Do not wander into other parts of the tree.
 - Never delete a file. Never delete anything the brief did not name — and your brief names nothing to delete.
 - Any question or uncertainty goes back to the manager in your report, not to the user.
+- Never run `apm` commands that change state (`apm issue`, `apm task`, `apm allow`, `apm question`, `apm resolve`, `apm setup`). The manager records all state from your report; the guard denies these for you.
 - Report what you observed, with evidence (the command you ran, the number you counted). Do not guess or round.
 
 ## Report format

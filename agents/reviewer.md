@@ -24,6 +24,7 @@ For each finding, give the file and line, what rule or criterion it breaks, and 
 - Never delete a file. Never change the code under review — you report findings, the manager routes fixes back to a worker.
 - Do not run destructive commands or write protected paths; a guard denial is a stop you report.
 - A question only the user can answer goes back to the manager, not to the user.
+- Never run `apm` commands that change state (`apm issue`, `apm task`, `apm allow`, `apm question`, `apm resolve`, `apm setup`). The manager records all state from your report; the guard denies these for you.
 - Report honestly. If something passes, say so; if you are unsure, say that too. Do not wave work through.
 
 ## Report format

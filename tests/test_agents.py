@@ -104,3 +104,16 @@ def test_manager_isolates_workers_and_marks_tasks_running():
 def test_builders_work_only_in_their_worktree(name):
     _, body = parse(AGENTS / f"{name}.md")
     assert "only in the worktree you were started in" in body
+
+
+def test_manager_runs_apm_with_the_bash_tool():
+    _, body = parse(AGENTS / "manager.md")
+    assert "Run every `apm` command with the Bash tool" in body
+
+
+@pytest.mark.parametrize("name", WORKERS)
+def test_workers_do_not_change_apm_state(name):
+    _, body = parse(AGENTS / f"{name}.md")
+    assert "Never run `apm` commands that change state" in body
+    for verb in ("issue", "task", "allow", "question", "resolve", "setup"):
+        assert f"`apm {verb}`" in body, f"{name} does not name apm {verb}"
