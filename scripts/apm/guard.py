@@ -61,7 +61,10 @@ def _violation(
     globs, prefixes = _split_allowlist(allowlist)
     command = (event.get("tool_input") or {}).get("command")
     if event.get("tool_name") in _COMMAND_TOOLS and isinstance(command, str):
-        return check_command(command, profile.protected_globs(), prefixes)
+        cwd = to_native_path(str(event.get("cwd") or "."), project.worktree_root, windows)
+        return check_command(
+            command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root
+        )
     return _file_violation(event, project, profile, globs, temp_roots, windows)
 
 

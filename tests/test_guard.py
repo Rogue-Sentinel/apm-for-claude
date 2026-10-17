@@ -95,3 +95,12 @@ def test_hook_output_shape() -> None:
         "permissionDecisionReason": "x",
     }
     assert to_hook_output(Decision("none")) is None
+
+
+def test_command_globs_expand_against_the_event_cwd(git_repo: Path) -> None:
+    (git_repo / "data").mkdir()
+    (git_repo / "data" / "fleet.db").write_text("x")
+    event = _file_event(git_repo, "Bash", "command", "rm *.db", cwd=git_repo / "data")
+    assert _decide(event, git_repo).kind == "ask"
+    elsewhere = _file_event(git_repo, "Bash", "command", "rm *.db", cwd=git_repo)
+    assert _decide(elsewhere, git_repo).kind == "none"

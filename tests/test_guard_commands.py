@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from apm.guard_commands import (
@@ -33,6 +35,14 @@ BLOCKED = [
     "rmdir /s /q build",
     "rd /s /q build",
     "del /s /q build",
+    'find . -name "*.db" -delete',
+    "find . -type f -exec rm {} +",
+    "find . -type f -execdir /bin/rm {} ;",
+    "Get-ChildItem build -Recurse | Remove-Item -Force",
+    "gci build -r | ri -Force",
+    "git checkout HEAD -- .",
+    "git restore --source HEAD .",
+    "git stash clear",
 ]
 ALLOWED = [
     "rm build/tmp.o",
@@ -44,6 +54,11 @@ ALLOWED = [
     "git commit -m 'clean up'",
     "rmdir build",
     "Remove-Item build/tmp.o",
+    "git checkout feat",
+    "git restore --staged file.txt",
+    "find . -name '*.o' -print",
+    "Get-ChildItem build -Recurse | Select-Object Name",
+    "git stash",
 ]
 
 
@@ -132,3 +147,36 @@ def test_allowed_prefix_does_not_exempt_command_substitution() -> None:
 def test_allowed_prefix_requires_a_word_boundary() -> None:
     command = "python tools/build_fleet_db.pyevil --out data/fleet.db"
     assert check_command(command, GLOBS, ["python tools/build_fleet_db.py"]) is not None
+
+
+def _tree(root: Path) -> None:
+    (root / "data").mkdir()
+    (root / "data" / "fleet.db").write_text("x")
+    (root / "build").mkdir()
+    (root / "build" / "x.o").write_text("x")
+
+
+def test_shell_glob_expanding_to_a_protected_file_is_blocked(tmp_path: Path) -> None:
+    _tree(tmp_path)
+    assert check_command("rm data/*", GLOBS, [], cwd=tmp_path, root=tmp_path) is not None
+    assert check_command("rm -f data/fleet.*", GLOBS, [], cwd=tmp_path, root=tmp_path) is not None
+
+
+def test_shell_glob_is_resolved_against_cwd(tmp_path: Path) -> None:
+    _tree(tmp_path)
+    cwd = tmp_path / "data"
+    assert check_command("rm *.db", GLOBS, [], cwd=cwd, root=tmp_path) is not None
+
+
+def test_shell_glob_over_unprotected_files_is_allowed(tmp_path: Path) -> None:
+    _tree(tmp_path)
+    assert check_command("rm build/*.o", GLOBS, [], cwd=tmp_path, root=tmp_path) is None
+
+
+def test_shell_glob_without_cwd_is_unchanged(tmp_path: Path) -> None:
+    _tree(tmp_path)
+    assert check_command("rm data/*", GLOBS, []) is None
+
+
+def test_shell_glob_that_matches_nothing_is_allowed(tmp_path: Path) -> None:
+    assert check_command("rm data/*", GLOBS, [], cwd=tmp_path, root=tmp_path) is None
