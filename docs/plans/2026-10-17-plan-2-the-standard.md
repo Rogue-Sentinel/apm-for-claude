@@ -117,7 +117,8 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
   - `@dataclass(frozen=True) class ClassMetric: name: str; line: int; public_methods: int`
   - `@dataclass(frozen=True) class FileMetric: path: str; language: str; lines: int; functions: tuple[FunctionMetric, ...] = (); classes: tuple[ClassMetric, ...] = (); functions_measured: bool = False; note: str = ""`
 - Produces (`metrics_lang.py`):
-  - `@dataclass(frozen=True) class Language: name: str; family: Literal["brace", "python", "plain"]; line_comments: tuple[str, ...]; block_comments: tuple[tuple[str, str], ...]; quotes: tuple[str, ...]; preprocessor: bool = False`
+  - `@dataclass(frozen=True) class Language: name: str; family: Literal["brace", "python", "plain"]; line_comments: tuple[str, ...]; block_comments: tuple[tuple[str, str], ...]; quotes: tuple[str, ...]; preprocessor: bool = False; raw_quotes: tuple[str, ...] = ()`
+    (`raw_quotes` have no escapes: the Go backtick, and `"""` in Kotlin, Scala and C#. *Added after the Task 1 review.*)
   - `language_for(path: str) -> Language | None`, by lower-cased extension. The brace family covers
     `.c .h .cc .cpp .cxx .hpp .hh .cs .java .js .jsx .mjs .cjs .ts .tsx .go .rs .swift .kt .kts .scala .php .dart .m`
     (`preprocessor=True` for C, C++, C# and Objective-C; a backtick quote for JS, TS and Go). Python is
@@ -125,7 +126,9 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
     Anything else gives `None`.
   - `strip_code(text: str, language: Language) -> str`: removes comments and the contents of string
     literals (the quotes stay), and preprocessor lines when `preprocessor`. **Every newline survives**, so
-    line numbers are unchanged. A `\` escape inside a literal is honored.
+    line numbers are unchanged. A `\` escape inside a literal is honored (except in a raw quote). **A literal
+    that spans lines is logic on every line it spans**, as in Python, so each spanned line keeps a placeholder
+    quote and no brace from inside it. Known limits are listed in the module docstring.
   - `is_logic_line(line: str) -> bool`: non-blank, and not made only of `{ } ( ) [ ] ; ,` and whitespace.
   - `count_logic(stripped: str) -> int`
   - `measure_plain(path: str, text: str, language: Language) -> FileMetric`: file lines only, with `functions_measured=False`.
