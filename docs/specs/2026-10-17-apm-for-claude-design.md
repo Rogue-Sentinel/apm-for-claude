@@ -112,8 +112,9 @@ These are fixed. The builder should not revisit them.
   trusts the commands it runs itself. A worker saying something passed doesn't count as proof.
 
 ### Platform constraint (important for the builder)
-Claude Code subagents cannot spawn subagents. **The manager must therefore be the main session**, not a
-subagent. The builder should find the most reliable way to make the main session *be* the manager in both
+**The manager must be the main session**, not a subagent, because it's the one the user talks to.
+(Claude Code does allow nested subagents, but the framework turns nesting off so workers can't spawn workers.
+That keeps the 3-worker cap meaningful. See Plan 1.) The builder should find the most reliable way to make the main session *be* the manager in both
 the CLI and the desktop app's Code tab. Candidates are a main-thread agent setting (`agent` in settings /
 `--agent`), an output style, or a `SessionStart` hook plus instructions. The user mainly works in the
 desktop app, where CLI flags aren't available.
