@@ -554,6 +554,12 @@ second is `## The core rule`, the last is `## Common mistakes`, and every refere
 - [ ] **Step 4: Run** `python -m pytest tests/test_skills*.py tests/test_coverage.py -q` and `python scripts/apm_cli.py coverage`. Expected: PASS, and `Gaps: 0`.
 - [ ] **Step 5: Commit** `"Make lean pacing the default: targeted tests, one gate, one final review"`.
 
+*Ruling during Task 11: `docs/adr/README.md` (the ADR index `apm:adr` requires) was added outside the file list
+and is kept. Two reference files still say "whole suite" (`skills/test-first/references/test-first-checklist.md`,
+`skills/code-review/references/reviewer-checklist.md`); they are swept in Task 12 as a same-shape edit.
+`test_skills_process.py` gained three tests (eight skills name `<CLI> gate`; no skill says "Review after every
+task"; the two worktree files carry the ancestor check). Cost if wrong: one extra file.*
+
 *Task 10 and Task 11 touch disjoint files and may run in parallel with each other and with Tasks 5 to 9.*
 
 ### Task 12: The agents run the workflows
