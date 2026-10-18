@@ -76,11 +76,11 @@
           "title": "Merge gate"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Review returned: 2 must-fix, 5 deferred; spec compliant; quality good.",
           "id": "1r",
           "model": "opus",
-          "status": "done",
+          "status": "running",
           "title": "Task 1 review",
           "worker": "reviewer"
         }
@@ -575,6 +575,11 @@
     {
       "at": "2026-10-18T20:36:29.207332+00:00",
       "event": "task 11/1 running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:37:58.400926+00:00",
+      "event": "task 11/1r running",
       "issue": 11
     }
   ]
