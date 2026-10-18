@@ -57,6 +57,7 @@ and `skills/worktrees/SKILL.md` repeat the approve instruction without the tool.
 ## Platform facts this plan relies on (2026-10-18)
 - Bash, double quotes: a backslash keeps its special meaning only before `$`, `` ` ``, `"`, `\` or a newline;
   elsewhere it is literal. Inside single quotes it is always literal. (Bash manual, "Double Quotes".)
+- *Amended after the Task 4 review: Git for Windows bash (MSYS, 5.2.26), the shell the Bash tool runs here, also ends a heredoc at a line that is the tag followed by a CR; Python's `$` does not. So a mask must never run past such a line: Task 4's mask is not applied to a command holding a CR (fails closed, as the CLI exemption does).*
 - Bash heredoc: with a quoted tag (`<<'EOF'` or `<<"EOF"`) the body is not expanded; the body ends at the first
   line that is exactly the tag (`<<-` strips leading tabs first).
 - Python `shlex.split` (posix): inside double quotes `\` escapes only `"` and `\`, so on the commands Task 2
@@ -464,3 +465,9 @@ Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task r
 - Task 3 review: pin the echo for the composed `_apm_write` reason, `_unreadable`, the piped-delete reason and a multi-line command (`reason.endswith(": " + command)`, one label).
 - Task 3 review (display): a multi-line command now gives a multi-line denial; accepted under Risks ("A long echo").
 - Task 3 review (found elsewhere): `test_guard_continuations.py:117`, `:149` and `test_guard_debt.py:65` assert only `".apm/" in reason`, which the echoed command satisfies by itself; tighten to `"workers do not write .apm/"` later.
+- Task 4 review: stale comments in `guard_data.py` ("nothing in such a command is masked", and the `mask_data` docstring); fixed in the Task 4 fix round with the must-fix, since they state the safety argument.
+- Task 4 review: pins with a `.md` target and code on the head line (`&& bash a.md`, `| tee notes.md | bash`, a `;` then a destructive command), a second destructive heredoc, an indented end tag then a destructive line, a missing end tag, reverse-order `>>` to `.apm/`.
+- Task 4 review: ADR 0005's cat rule omits `>>`, either order, leading blank lines, the PowerShell tool (harmless: `<<` does not parse there), and the CR rule.
+- Task 4 review: the quoted-tag grammar is written twice (lookahead and `_CAT_HERE`); a comment that they must stay identical would help.
+
+*Ruling during Task 4: must-fix 1 (a CR on the end-tag line lets the mask run past bash's end of the heredoc on Git Bash) is upheld as must-fix: it is a line-ending accident on the user's own platform, not a crafted input, and it loosens a verdict outside class (b). The same defect in the existing `git commit -F -` mask (found elsewhere, present at base) is fixed in the same round as its own commit, because it is the same file, the same cause and the same one-line fix, and it only tightens. Cost if wrong: commands holding a CR are scanned whole, which can deny a few more heredocs.*
