@@ -211,7 +211,7 @@
         "head": "240f91a4a5074c86f7832ce79dd1761a37302c88",
         "open": 0
       },
-      "status": "building",
+      "status": "integrating",
       "tasks": [
         {
           "attempts": 1,
@@ -1278,6 +1278,11 @@
     {
       "at": "2026-10-18T23:39:53.065067+00:00",
       "event": "review 14 0 open at 240f91a",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:39:55.350674+00:00",
+      "event": "issue 14 status integrating",
       "issue": 14
     }
   ]
