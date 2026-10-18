@@ -53,7 +53,7 @@
         "head": "1418ef467ec3ffaf992dd0e4d69838878a993a11",
         "open": 0
       },
-      "status": "building",
+      "status": "integrating",
       "tasks": [
         {
           "attempts": 1,
@@ -355,6 +355,11 @@
     {
       "at": "2026-10-18T20:01:18.571836+00:00",
       "event": "review 9 0 open at 1418ef4",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T20:01:20.807153+00:00",
+      "event": "issue 9 status integrating",
       "issue": 9
     }
   ]
