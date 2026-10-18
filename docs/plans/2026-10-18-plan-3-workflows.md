@@ -725,3 +725,4 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
 - Task 6: `apm github close` prints a by-hand hint when `gh issue close` fails (not in the brief);
   `--parent` is checked before `gh` is called.
 - Task 4: test_setup_gitignore_without_trailing_newline now also expects `.apm/tmp/` (on purpose). The guard denied a worker's heredoc whose text held `.apm/tmp` as a write to `.apm/` (a Plan 1 false positive; the worker used the Edit tool).
+- Task 8: the finish-first check passes when either the local branch or `origin/<name>` is merged into the base (`any`), so a merged local branch with `origin/<name>` ahead passes; `apply` takes `run` but does not use it; refusals print to stdout. The final review decides.
