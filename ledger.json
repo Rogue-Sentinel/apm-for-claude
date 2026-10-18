@@ -203,6 +203,17 @@
       "title": "The guard's message mask reads an unmatched -m quote inside a heredoc body and hides the code after it",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/15"
     },
+    "17": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "feature",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "Release apm 0.3.1 with the #9 and #11 fixes",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/17"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -855,6 +866,11 @@
       "at": "2026-10-18T21:26:23.481311+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/16",
       "issue": 11
+    },
+    {
+      "at": "2026-10-18T22:38:43.935907+00:00",
+      "event": "filed 17 https://github.com/Rogue-Sentinel/apm-for-claude/issues/17",
+      "issue": 17
     }
   ]
 }
