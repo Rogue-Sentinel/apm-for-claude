@@ -14,7 +14,12 @@
     },
     "11": {
       "allowlist": [],
-      "concerns": [],
+      "concerns": [
+        {
+          "at": "2026-10-18T19:36:23.388384+00:00",
+          "text": "More evidence for #11 during issue 9 Task 5: the Bash guard blocked a worker's Python edit script because its text contained the words 'apm debt baseline' (data, not a command)."
+        }
+      ],
       "decisions": [],
       "kind": "bug",
       "questions": [],
@@ -265,6 +270,11 @@
       "at": "2026-10-18T19:36:20.786752+00:00",
       "event": "task 9/5 done",
       "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:36:23.388413+00:00",
+      "event": "concern 11 More evidence for #11 during issue 9 Task 5: the Bash guard blocked a worker's Python edit script because its text contained the words 'apm debt baseline' (data, not a command).",
+      "issue": 11
     }
   ]
 }
