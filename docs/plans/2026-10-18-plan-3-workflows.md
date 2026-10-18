@@ -671,3 +671,10 @@ from the session's branch. Task 11 (which already edits both files) adds: a nati
 default branch, so the worker checks that the recorded BASE is an ancestor of HEAD, and if it is not,
 fast-forwards to the feature branch (`--ff-only`) and reports if that refuses. Task 13 records the platform fact
 in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
+
+## Deferred findings
+
+- Task 1: `workflow_config.py` copies `_known`, `_object` and `_text` (about 15 lines) from `standard_config.py`
+  rather than sharing them; sharing would touch a file outside the task. The final review decides.
+- Task 1: the worker added an unknown-key check (a typo such as `gate_timout` raises `ProfileError`), matching
+  `standard_config`; the brief did not ask for it. `lane_for([])` returns `None`. The final review decides.
