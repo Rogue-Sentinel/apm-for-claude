@@ -250,9 +250,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Final review (opus): 1 must-fix (M1, from deferred Task 1 S1): the glued-head heredoc pin names no protected path in its body, so Review Focus 4 is only nominal; add 'cat <<EOF>body.md / moved a.md->docs/b.md / EOF' (allowed). N1: record the *> fix round in the plan.",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         }
@@ -1215,6 +1216,11 @@
     {
       "at": "2026-10-18T23:30:58.867499+00:00",
       "event": "task 14/review running",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:36:58.465701+00:00",
+      "event": "task 14/review failed",
       "issue": 14
     }
   ]
