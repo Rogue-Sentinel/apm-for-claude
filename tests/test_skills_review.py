@@ -125,10 +125,10 @@ def test_duplication_counts_shared_modules_as_well_as_components():
 def test_branch_review_gathers_measured_and_project_evidence():
     _, body = parse_skill("branch-review")
     evidence = section(body, "## Gather evidence")
-    needles = ("`apm metrics`", "`apm debt check", "`standard.review_patterns`", "`standard.limits`")
+    needles = ("`<CLI> metrics`", "`<CLI> debt check", "`standard.review_patterns`", "`standard.limits`")
     for needle in needles:
         assert needle in evidence, needle
-    assert "`apm debt baseline`" in body
+    assert "`<CLI> debt baseline`" in body
 
 
 def test_report_keeps_the_old_new_and_previous_review_formats():
@@ -182,7 +182,7 @@ def test_credits_name_both_review_skills():
 def test_audit_measures_against_the_profile_limits():
     _, body = parse_skill("clean-code-audit")
     measure = section(body, "## Measure")
-    assert "`apm metrics`" in measure and "`standard.limits`" in measure
+    assert "`<CLI> metrics`" in measure and "`standard.limits`" in measure
     assert "20 lines" not in body
 
 

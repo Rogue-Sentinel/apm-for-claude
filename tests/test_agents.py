@@ -107,7 +107,10 @@ def test_builders_work_only_in_their_worktree(name):
     assert "only in the worktree you were started in" in body
 
 
-CLI_SUBCOMMANDS = ("brief", "setup", "issue", "task", "allow", "approve", "question", "resolve")
+CLI_SUBCOMMANDS = (
+    "brief", "setup", "issue", "task", "allow", "approve", "question", "resolve",
+    "metrics", "debt", "coverage",
+)
 
 
 def test_manager_runs_the_cli_from_session_context_with_the_bash_tool():
@@ -130,11 +133,33 @@ def test_manager_never_shows_a_bare_apm_command():
     assert not re.search(r"`apm [a-z]", body), re.search(r"`apm [a-z].*", body)
 
 
-@pytest.mark.parametrize("name", WORKERS)
+WORKERS_WITH_CLI = ("auditor", "implementer", "debugger", "reviewer")
+WORKER_CLI_RULE = (
+    "You may run only `<CLI> metrics`, `<CLI> debt check` and `<CLI> coverage`, and only with the "
+    "exact CLI command line the manager gives in your brief."
+)
+
+
+@pytest.mark.parametrize("name", WORKERS_WITH_CLI)
 def test_workers_do_not_change_apm_state(name):
     _, body = parse(AGENTS / f"{name}.md")
-    assert "Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state" in body
+    assert WORKER_CLI_RULE in body
+    assert "Never run a command that changes state" in body
+    assert "`<CLI> debt baseline`" in body
+    assert "the manager records state from your report" in body
     assert "`apm issue`" not in body
+
+
+def test_planner_never_runs_the_cli():
+    _, body = parse(AGENTS / "planner.md")
+    assert "Never run the APM CLI" in body
+    assert "the manager puts the `<CLI> metrics` numbers in your brief" in body
+
+
+@pytest.mark.parametrize("name", WORKERS)
+def test_workers_never_show_a_bare_apm_command(name):
+    _, body = parse(AGENTS / f"{name}.md")
+    assert not re.search(r"`apm [a-z]", body), re.search(r"`apm [a-z].*", body)
 
 
 def _section(body: str, heading: str) -> str:
@@ -162,3 +187,90 @@ def test_manager_has_an_exit_when_the_approve_call_is_denied():
     assert "lasts 10 minutes" in safety
     assert "only in the directory it was recorded in" in safety
     assert "reusable within that window" in safety
+
+
+SKILLS_DIR = AGENTS.parent / "skills"
+SKILL_NAMES = frozenset(path.parent.name for path in SKILLS_DIR.glob("*/SKILL.md"))
+_SKILL_REF = re.compile(r"apm:([a-z][a-z0-9-]*)")
+EXPECTED_SKILLS = {
+    "manager": (
+        "design-first", "writing-plans", "executing-plans", "parallel-dispatch", "worktrees",
+        "finishing-a-branch", "code-review", "session-diagnosis",
+    ),
+    "implementer": (
+        "test-first", "clean-code", "refactoring", "solid", "object-design", "clean-architecture",
+        "functional-core", "verification",
+    ),
+    "reviewer": ("branch-review", "code-smells", "clean-architecture"),
+    "auditor": ("clean-code-audit", "session-diagnosis"),
+    "planner": ("writing-plans", "adr"),
+    "debugger": ("systematic-debugging", "test-first"),
+}
+
+
+def _named(name: str) -> set[str]:
+    return set(_SKILL_REF.findall(parse(AGENTS / f"{name}.md")[1]))
+
+
+@pytest.mark.parametrize("name", ALL_AGENTS)
+def test_every_agent_names_its_skills_in_a_skills_section(name):
+    _, body = parse(AGENTS / f"{name}.md")
+    assert "\n## Skills\n" in body, f"{name} has no ## Skills"
+    skills = _section(body, "## Skills")
+    missing = [skill for skill in EXPECTED_SKILLS[name] if f"`apm:{skill}`" not in skills]
+    assert not missing, f"{name} does not name {missing}"
+
+
+def test_every_skill_is_named_by_an_agent():
+    named = set().union(*(_named(name) for name in ALL_AGENTS))
+    assert SKILL_NAMES and not SKILL_NAMES - named, sorted(SKILL_NAMES - named)
+
+
+def test_every_named_skill_or_agent_exists():
+    known = SKILL_NAMES | set(ALL_AGENTS)
+    unknown = [f"{name}: apm:{ref}" for name in ALL_AGENTS for ref in _named(name) - known]
+    assert not unknown, unknown
+
+
+def test_manager_says_skills_are_invoked_not_remembered():
+    _, body = parse(AGENTS / "manager.md")
+    assert "invoked, not remembered" in _section(body, "## Skills")
+
+
+def test_manager_debt_section_keeps_the_ratchet():
+    _, body = parse(AGENTS / "manager.md")
+    debt = _section(body, "## Debt")
+    for needle in (
+        "`<CLI> metrics`", "`<CLI> debt check`", "`<CLI> debt baseline`", "`--accept`",
+        "only after the user approves that specific worsening in chat",
+        "A failed debt check is a stop", "never merge past one", "two over-limit files",
+        "Tightening a limit needs no acceptance",
+    ):
+        assert needle in debt, needle
+
+
+def test_manager_puts_the_cli_line_in_every_brief():
+    _, body = parse(AGENTS / "manager.md")
+    dispatch = _section(body, "## Dispatching workers")
+    assert "Include the exact CLI command line in every brief" in dispatch
+
+
+def test_manager_follows_the_process_skills_until_the_workflows_ship():
+    _, body = parse(AGENTS / "manager.md")
+    role = _section(body, "## Your role")
+    assert "They are not yours to run yet" not in body
+    assert "`apm:design-first`" in role and "`apm:finishing-a-branch`" in role
+    assert "Do not invent an init or a merge-gate command" in role
+
+
+def test_reviewer_uses_the_debt_check_as_evidence():
+    _, body = parse(AGENTS / "reviewer.md")
+    assert "`<CLI> debt check`" in _section(body, "## Your job")
+
+
+def test_auditor_measures_and_has_an_analyst_mode():
+    _, body = parse(AGENTS / "auditor.md")
+    assert "`<CLI> metrics --json`" in body
+    analyst = _section(body, "## Analyst mode")
+    assert "`apm:session-diagnosis`" in analyst and "transcript" in analyst
+    assert "under **concerns**" in analyst

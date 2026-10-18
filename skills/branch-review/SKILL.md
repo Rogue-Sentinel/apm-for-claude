@@ -35,26 +35,26 @@ measure something, say so in the evidence instead of estimating it.
    branch. The base is the branch the work was cut from, which is the one you were given as the
    base. Only when none was given do you fall back to the project's main branch (`main` or
    `master`, unless the project says otherwise). Every command below uses that same `<base>`,
-   `apm debt check --base <base>` included.
+   `<CLI> debt check --base <base>` included. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 2. **Read the change.**
    - `git diff <base>...HEAD --stat` lists every changed file.
    - `git diff <base>...HEAD` shows the changes themselves.
    - Then read the changed files whole, not only their hunks: a diff without the context around it
      misleads.
-3. **Measure the sizes.** `apm metrics` lists every function and file over the profile's limits
+3. **Measure the sizes.** `<CLI> metrics` lists every function and file over the profile's limits
    (`standard.limits`: by default 15 lines of logic per function, 200 per file, and a wide-class
-   flag at 7 or more public methods), each as `path:line name -- N lines`. `apm metrics --json`
+   flag at 7 or more public methods), each as `path:line name -- N lines`. `<CLI> metrics --json`
    gives every number. Run it on the branch for the new side. For the old side, use the baseline recorded on
-   the base (`git show <base>:.apm/debt.json`), or `apm metrics` run in a separate checkout of the
+   the base (`git show <base>:.apm/debt.json`), or `<CLI> metrics` run in a separate checkout of the
    base. A worker asks the manager for that checkout; a review never creates or removes worktrees.
    Flag every changed file over the file limit.
-4. **Run the ratchet.** `apm debt check --base <base>` compares the current numbers with the
+4. **Run the ratchet.** `<CLI> debt check --base <base>` compares the current numbers with the
    recorded baseline. Exit 0 means no debt grew. Exit 1 means something got worse, and it prints
    each regression: a total that rose, an over-limit item that grew, a new over-limit item, a
    checker's number that rose, a loosened limit, or a baseline loosened against `<base>` with no
    new acceptance recorded. Exit 2 means there is no baseline, which is itself a finding. Workers
-   may run `apm metrics` and `apm debt check`, because both only read.
-   **Only the manager runs `apm debt baseline`**, and a review never does: a review reports the
+   may run `<CLI> metrics` and `<CLI> debt check`, because both only read.
+   **Only the manager runs `<CLI> debt baseline`**, and a review never does: a review reports the
    numbers and changes none of them.
 5. **Count the patterns for each dimension**, on both sides. `git grep -c -E '<pattern>' <base> --
    <pathspec>` counts on the base without a checkout, and the same command without `<base>` counts
@@ -141,7 +141,7 @@ How the code is divided into modules, files and types, and whether each has one 
 imports are checked against the profile's layer map when it declares one (see
 `apm:clean-architecture`).
 
-Look for: the over-limit files and functions from `apm metrics`; the largest files; how many
+Look for: the over-limit files and functions from `<CLI> metrics`; the largest files; how many
 exported units each file holds; imports that point the wrong way across a layer; decisions living in
 the entry points or the presentation layer instead of in tested logic.
 
@@ -285,8 +285,8 @@ written.
 How easy the project is to work on safely: the tooling that catches mistakes before a person does.
 
 Look for: a linter and a formatter, configured and passing; pre-commit hooks; import sorting rules;
-import path aliases; continuous integration that runs the tests, the linter, `apm metrics` and
-`apm debt check`; automatic fixing; consistent conventions; documentation for a newcomer.
+import path aliases; continuous integration that runs the tests, the linter, `<CLI> metrics` and
+`<CLI> debt check`; automatic fixing; consistent conventions; documentation for a newcomer.
 
 | Score | What it looks like |
 |-------|--------------------|
@@ -345,8 +345,8 @@ changed and where.
 ## [Old approach] vs [New approach]: review
 
 ### Measurements
-- apm metrics: functions over the limit N -> M, files over the limit N -> M, wide classes N -> M
-- apm debt check --base <base>: exit 0 / 1 (each regression) / 2 (no baseline)
+- <CLI> metrics: functions over the limit N -> M, files over the limit N -> M, wide classes N -> M
+- <CLI> debt check --base <base>: exit 0 / 1 (each regression) / 2 (no baseline)
 
 ### Scorecard
 
@@ -393,7 +393,7 @@ branch the bottom line reads "The old code was N/A (greenfield). The new code is
 - **Be honest and specific.** Back every score with file names, line counts or pattern counts.
 - **Do not inflate.** A 5/10 with a clear path to improve is more useful than a generous 7/10.
   Inflating a score to avoid a difficult conversation fails the reader who has to act on it.
-- **Never guess.** Use `git diff`, `git grep`, `apm metrics`, `apm debt check`, file listings and
+- **Never guess.** Use `git diff`, `git grep`, `<CLI> metrics`, `<CLI> debt check`, file listings and
   file reads. Report the numbers the commands printed, not the ones you expected (see
   `apm:verification`).
 - **If the old code does not exist (greenfield), score the old as N/A** and rate only the new code.
@@ -421,15 +421,15 @@ branch the bottom line reads "The old code was N/A (greenfield). The new code is
 - **Ignoring the base branch.** The comparison is the point: progress and regressions both show only
   against the old code.
 - **Reviewing only the diff** without understanding the broader context of the changed files.
-- **Counting by eye** what `apm metrics` measures.
-- **Running `apm debt baseline` during a review.** A review reports the numbers; only the manager
+- **Counting by eye** what `<CLI> metrics` measures.
+- **Running `<CLI> debt baseline` during a review.** A review reports the numbers; only the manager
   records a baseline.
 - **Scoring a UI-scoped dimension for code with no user interface**, or marking a dimension N/A that
   does apply, or leaving out the reason. Entry points and routing is never wholly N/A.
 - **Overriding the profile's `standard.ui`** because the code seems to disagree. Score by the
   profile and report the contradiction.
 - **Comparing with `main`** when the work was cut from another branch. The base is the branch you
-  were given, and `apm debt check --base` gets the same ref.
+  were given, and `<CLI> debt check --base` gets the same ref.
 - **Committing `BRANCH_REVIEW.md` yourself.** Return the report; the manager decides whether it is
   kept.
 - **Using one language's patterns on another.** Take the patterns for the project's languages from

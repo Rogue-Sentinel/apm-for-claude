@@ -47,9 +47,9 @@ no baseline and edits no profile.
 
 ## Measure
 
-Numbers come from tools, never from reading and estimating.
+Numbers come from tools, never from reading and estimating. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 
-- **`apm metrics`** (or `apm metrics --json` for every number) measures every selected file against
+- **`<CLI> metrics`** (or `<CLI> metrics --json` for every number) measures every selected file against
   the profile's limits, `standard.limits`: by default **15 lines of logic per function** (`function`),
   **200 per file** (`file`), and a review flag at **7 or more public methods** (`public_methods`). It
   lists each over-limit function and file as `path:line name -- N lines`, largest first, the wide
@@ -59,10 +59,10 @@ Numbers come from tools, never from reading and estimating.
   `standard.debt_sources`, and its numbers join the ratchet. Run each declared checker, and any
   checker found during the scan, and record its numbers. A checker found but not yet declared is
   reported as a candidate for `standard.debt_sources`.
-- **`apm debt check`**, when the project already has a baseline, reports whether any debt has grown
+- **`<CLI> debt check`**, when the project already has a baseline, reports whether any debt has grown
   since it was recorded (exit 1, which also covers a baseline loosened against the base ref with no
   new acceptance recorded). Exit 2 means there is no baseline yet, which is expected at init. The audit
-  never runs `apm debt baseline`: only the manager records a baseline, after the user has seen the
+  never runs `<CLI> debt baseline`: only the manager records a baseline, after the user has seen the
   numbers.
 - **Counts for each category**, taken with `git grep -c -E`, using the patterns per language in
   [the branch review's evidence reference](../branch-review/references/evidence-by-language.md)
@@ -87,7 +87,7 @@ The rules are in `apm:test-first`.
 The rules are in `apm:refactoring`; the limits are in `apm:clean-code`.
 
 - Every function over the profile's function limit (`standard.limits.function`, default 15 lines of
-  logic) is a candidate for extract method. Take the list from `apm metrics`, largest first; never
+  logic) is a candidate for extract method. Take the list from `<CLI> metrics`, largest first; never
   judge length by eye.
 - Every file over the file limit (default 200 lines of logic) is a candidate for splitting, and every
   wide class (7 or more public methods) needs a stated reason.
@@ -156,10 +156,10 @@ Produce the report in this shape:
 
 ### Measurements
 - Limits: function F, file L, public methods P (from the profile, or the defaults)
-- apm metrics: N functions over the limit (largest: path:line name -- N lines),
+- <CLI> metrics: N functions over the limit (largest: path:line name -- N lines),
   N files over the limit, N wide classes, N files unmeasured
 - Project checkers: name -> numbers (declared, or a candidate for standard.debt_sources)
-- apm debt check: exit 0 / 1 (each regression) / 2 (no baseline yet)
+- <CLI> debt check: exit 0 / 1 (each regression) / 2 (no baseline yet)
 - Proposed standard.ui: true / false (the evidence), or the contradiction with the profile's value
 
 ### Findings by Category
@@ -229,13 +229,13 @@ have to pay some down first. **Needs Attention** otherwise. Say in one line why.
 ## Common mistakes
 
 - **Counting lengths by eye**, or using a fixed number instead of the profile's limits. The numbers
-  come from `apm metrics` and the profile.
+  come from `<CLI> metrics` and the profile.
 - **Findings with no file, no line or no fix.** The reader cannot act on "the architecture is
   messy".
 - **Treating every finding as urgent.** Rank by impact; most findings are scheduled, and many are
   left to the boy scout rule.
 - **A top 5 of rewrites.** Every action is incremental and fits one task.
-- **Changing code during the audit**, or running `apm debt baseline`. The audit reports; the manager
+- **Changing code during the audit**, or running `<CLI> debt baseline`. The audit reports; the manager
   records the baseline once the user has seen the numbers.
 - **Auditing vendored or generated code.** It inflates the numbers and nobody will fix it.
 - **Skipping a category** because nothing seemed wrong. Each category gets a score and the evidence

@@ -9,8 +9,8 @@ Patterns are POSIX extended regular expressions, as `git grep -E` reads them. A 
 section leaves out has no pattern worth counting there; read the code instead. A project adds its own
 patterns under `standard.review_patterns` (see [the last section](#project-patterns-standardreview_patterns)).
 
-Sizes are never counted with a pattern: `apm metrics` measures functions and files for every
-language in this file.
+Sizes are never counted with a pattern: `<CLI> metrics` measures functions and files for every
+language in this file. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 
 ## TypeScript
 
@@ -29,7 +29,7 @@ Also JavaScript. Pathspecs: `'*.ts' '*.tsx'`, and `'*.js' '*.jsx'` where the pro
 - **Module architecture.** Components per file: `export (default )?(function|const) [A-Z]`. Largest
   React component files: `git ls-files '*.tsx' '*.jsx' | xargs wc -l | sort -rn | head -20`. `wc -l`
   counts raw lines, so it only finds the largest files; the scored sizes are the lines of logic from
-  `apm metrics`. Layer crossings: `from ['"](@/|(\.\./)+)<outer layer>/` inside an inner layer,
+  `<CLI> metrics`. Layer crossings: `from ['"](@/|(\.\./)+)<outer layer>/` inside an inner layer,
   against the profile's `standard.layers`.
 - **Entry points and routing.** Lazy loading: `React\.lazy\(`, `lazy\(\(\) => import\(`,
   `loadable\(`, dynamic `import\(`. Nested layouts: `<Outlet`, `children:` in a route table. Error
@@ -101,7 +101,7 @@ Pathspecs: `'*.cpp' '*.cc' '*.cxx' '*.h' '*.hpp'`.
   `getInstance\(`.
 - **Module architecture.** Layer crossings: `#include "<outer layer>/` inside an inner layer, against
   the profile's `standard.layers`.
-  `apm metrics` counts both arms of a conditional-compilation block; a project needing exactness
+  `<CLI> metrics` counts both arms of a conditional-compilation block; a project needing exactness
   declares its own checker.
 - **Entry points and routing.** `int main\(`. Host callbacks: the functions a host application or
   framework calls into (plugin start and stop, message, timer and command callbacks). Name the
