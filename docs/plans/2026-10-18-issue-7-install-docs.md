@@ -156,3 +156,15 @@ None. No task writes a protected path, deletes a file, or runs a destructive com
 - Every test in `tests/test_docs.py` and `tests/test_manifest.py` passes; no existing test was changed or
   weakened.
 - `<CLI> debt check` passes against `main`.
+
+## Pre-flight scan
+
+*Run by the manager before Task 1, 2026-10-18.*
+
+| Rows checked | Finding |
+|---|---|
+| Task pairs sharing a file or interface | None: Task 2 changes no files unless the review finds something; it consumes only Task 1's commits. |
+| Task 1 self-consistency: tests vs code | The parametrized install test needs `TUTORIAL` and `HEADINGS[0]`, both already defined in `tests/test_docs.py`; `section()` is already imported. The troubleshooting test uses `HEADINGS[9]` = `## 10. Troubleshooting`, matching the tutorial. Consistent. |
+| Task 1 self-consistency: files | Creates nothing; modifies README.md, docs/tutorial.md, .claude-plugin/marketplace.json and the two test files, all named in its Files block. Consistent. |
+| Existing doc tests vs the new text | New commands start with `/plugin` or `claude`, so `test_no_python_command_line_is_shown_to_the_user`, `test_the_user_is_never_told_to_run_apm_in_a_shell` and `test_every_command_it_shows_is_a_real_subcommand` do not match them; `test_no_british_spelling` applies to the new prose (American spelling). No `<CLI>` block is added, so the label test is unaffected. |
+| Rubric defects the plan mandates | None. Both new tests assert concrete strings and order. |
