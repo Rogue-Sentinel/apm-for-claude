@@ -310,7 +310,9 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
     ```
     {"version": 1, "limits": {"function": 15, "file": 200, "public_methods": 7},
      "totals": {"long_functions": n, "long_files": n, "wide_classes": n,
-                "excess_function_lines": n, "excess_file_lines": n},
+                "excess_function_lines": n, "excess_file_lines": n,
+                "unmeasured_files": n},   # syntax errors and unbalanced files; added after the Task 4 review
+     "unmeasured": ["<path>", ...],    # a file that stops parsing hides its debt, so this may only shrink
      "functions": {"<path>::<name>": lines, ...},   # only items over the limit
      "files": {"<path>": lines, ...},
      "classes": {"<path>::<name>": public_methods, ...},
