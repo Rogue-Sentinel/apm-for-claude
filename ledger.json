@@ -32,7 +32,12 @@
           "text": "Planner: apm audit has the same '0 when never measured' problem (audit_report._totals prints wide classes 0); not covered by this plan, follow-up."
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-18T19:16:01.530173+00:00",
+          "text": "User approved the plan: .h by content check (option B); keep read-only Task 6 parity check on XP12; function pointers not methods and Outer::Inner naming accepted."
+        }
+      ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-9-brace-wide-classes.md",
       "questions": [],
@@ -72,6 +77,11 @@
       "at": "2026-10-18T19:15:20.006524+00:00",
       "event": "filed 11 https://github.com/Rogue-Sentinel/apm-for-claude/issues/11",
       "issue": 11
+    },
+    {
+      "at": "2026-10-18T19:16:01.530193+00:00",
+      "event": "decision 9 User approved the plan: .h by content check (option B); keep read-only Task 6 parity check on XP12; function pointers not methods and Outer::Inner naming accepted.",
+      "issue": 9
     }
   ]
 }
