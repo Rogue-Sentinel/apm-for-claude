@@ -56,6 +56,9 @@ exits 0 (the ratchet is the gate, not the report). `<CLI>` is the framework's co
 may run `<CLI> metrics` and `<CLI> debt check`, with the exact command line the manager put in
 their brief: both only read. **Only the manager runs `<CLI> debt baseline`**; a worker never
 does, and the guard denies it. Before you edit a function, know its number.
+Public methods are counted only for the languages that have a class scanner, listed in
+[references/class-scanners-by-language.md](references/class-scanners-by-language.md); for any other
+language with classes the review-flag line says "not measured" and names the language, never 0.
 
 ## Counting lines of logic
 
