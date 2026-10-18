@@ -57,3 +57,33 @@ def test_operators_outside_quotes_rule_the_call_out(command: str) -> None:
 )
 def test_other_programs_are_not_calls(command: str) -> None:
     assert not _is_call(command)
+
+
+CLI = f'python "{PLUGIN_CLI}"'
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        rf'{CLI} approve --command "git rm -r -q .claude\skills\clean-code" --reason r',
+        rf"{CLI} approve --command 'git rm -r -q .claude\skills\clean-code' --reason r",
+        rf"{CLI} approve --command 'Remove-Item -Recurse -Force C:\work\build' --reason r",
+        rf'{CLI} task 1 t1 --status done --evidence "ran pytest tests\test_x.py"',
+    ],
+)
+def test_a_backslash_bash_reads_literally_keeps_the_call(command: str) -> None:
+    assert _is_call(command)
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        rf'{CLI} approve --command \" ; rm -rf build ; \" --reason r',
+        rf'{CLI} approve --command "x\" ; rm -rf build ; \"" --reason r',
+        rf'{CLI} approve --command "rmdir /s /q C:\build\" --reason r',
+        rf'{CLI} approve --command "\\server\share" --reason r',
+        rf"{CLI} approve --command C:\x --reason r",
+    ],
+)
+def test_a_backslash_bash_would_read_as_an_escape_rules_the_call_out(command: str) -> None:
+    assert not _is_call(command)
