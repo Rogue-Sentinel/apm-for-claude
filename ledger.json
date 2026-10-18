@@ -54,9 +54,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "tests/test_metrics_class_report.py tests/test_metrics.py tests/test_cli_metrics.py tests/test_own_limits.py: 58 passed in the worktree and on the branch after merge 7f9499c; metrics 0/60 fn, 0/4 files over; debt check nothing worse; live run prints 'not measured (no class scanner for C++, Java)'.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Report classes as not measured",
           "worker": "implementer"
         },
@@ -219,6 +220,11 @@
     {
       "at": "2026-10-18T19:19:06.844195+00:00",
       "event": "task 9/2 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:21:32.294122+00:00",
+      "event": "task 9/2 done",
       "issue": 9
     }
   ]
