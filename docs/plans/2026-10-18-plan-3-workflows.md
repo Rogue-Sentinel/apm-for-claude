@@ -388,6 +388,12 @@ test edit.*
 - [ ] **Step 3: Implement.** **Step 4: Run** them. Expected: PASS.
 - [ ] **Step 5: Commit** `"Audit a project: mode, in-flight work, debt issues and coverage"`.
 
+*Ruling during Task 7: debt issues appear only in `debt_issues`, not in `in_flight`, so they need no decision:
+spec §6.1 adopts existing debt issues into the ratchet's list automatically. Task 8 adopts every `debt_issues`
+entry without a decision. A remote-only branch's detail reads `N ahead, only on origin`; `audit()` also takes
+`config: MetricsConfig`; with no main or master, the base falls back to `HEAD` with a note. Cost if wrong: one
+line in `scan_issues`.*
+
 ### Task 8: Init applies the approved audit
 
 **Files:**
