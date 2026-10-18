@@ -30,7 +30,7 @@ class FileMetric:
 
 
 # Languages with a class scanner, and brace languages that have no methods to count.
-CLASS_LANGUAGES: frozenset[str] = frozenset({"Python"})
+CLASS_LANGUAGES: frozenset[str] = frozenset({"Python", "C++"})
 CLASSLESS_LANGUAGES: frozenset[str] = frozenset({"C"})
 
 
