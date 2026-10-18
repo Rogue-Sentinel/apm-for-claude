@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field, replace
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 from apm.metrics_heads import continues, function_name, keeps_head
 from apm.metrics_lang import Language, count_logic, strip_code
@@ -42,6 +42,7 @@ from apm.metrics_model import FileMetric, FunctionMetric
 _STRUCTURAL = re.compile(r"[{}();\n]")
 _CALLEE = re.compile(r"([\w$.:]+)\s*$")
 _Found = tuple[int, FunctionMetric, bool]
+_Kind = Literal["decl", "func", "callback"]
 
 
 class _Call(NamedTuple):
@@ -51,7 +52,7 @@ class _Call(NamedTuple):
 
 @dataclass
 class _Scope:
-    kind: str = "decl"
+    kind: _Kind = "decl"
     name: str = ""
     line: int = 1
     open_at: int = 0

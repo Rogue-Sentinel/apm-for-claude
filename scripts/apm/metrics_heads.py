@@ -12,9 +12,9 @@ import re
 _CONTROL = frozenset(
     "if for while switch catch foreach using lock synchronized with when match do try else guard elif".split()
 )
-_LEADING = frozenset("if for while switch catch foreach else do try guard match elif loop finally".split())
-_GUARDED = frozenset("using lock synchronized with when".split())
-_CARRY = frozenset("if for switch while".split())
+_CONTROL_AT_START = frozenset("if for while switch catch foreach else do try guard match elif loop finally".split())
+_CONTROL_IF_PARENTHESIZED = frozenset("using lock synchronized with when".split())
+_PARENLESS_CONTROL = frozenset("if for switch while".split())
 _NOT_A_NAME = frozenset(
     "pub func function fun fn def async await decltype alignas noexcept sizeof static_assert __declspec".split()
 )
@@ -35,7 +35,7 @@ _TIGHT = re.compile(r"\s*(\W)\s*")
 
 def function_name(head: str, in_call: bool = False) -> str | None:
     """The function a `{` opens after `head`, or None when it opens a declarative block."""
-    text = tidy(argument_head(head) if in_call else head)
+    text = _tidy(_argument_head(head) if in_call else head)
     call = _first_call(text)
     if _is_control(text, call) or not _function_shape(text):
         return None
@@ -47,10 +47,10 @@ def function_name(head: str, in_call: bool = False) -> str | None:
 def keeps_head(head: str) -> bool:
     """A `;` inside a paren-less control head (Go `if x := f(); g(x) {`) does not end the head."""
     first = re.match(r"\s*(\w+)\s*(\()?", head)
-    return bool(first) and first.group(1) in _CARRY and not first.group(2)
+    return bool(first) and first.group(1) in _PARENLESS_CONTROL and not first.group(2)
 
 
-def argument_head(head: str) -> str:
+def _argument_head(head: str) -> str:
     """The part of `head` after the innermost unclosed `(` or the last top-level `,`."""
     depth = 0
     for i in range(len(head) - 1, -1, -1):
@@ -63,7 +63,7 @@ def argument_head(head: str) -> str:
     return head
 
 
-def tidy(head: str) -> str:
+def _tidy(head: str) -> str:
     head = _repeat(_BRACKETED, _ANNOTATION.sub(" ", head))
     if "operator" not in head:
         protected = head.replace("->", "\x01").replace("=>", "\x02")
@@ -109,7 +109,7 @@ def _first_call(text: str) -> re.Match[str] | None:
 def _is_control(text: str, call: re.Match[str] | None) -> bool:
     first = re.match(r"(\w+)\s*(\()?", text)
     word, paren = (first.group(1), first.group(2)) if first else ("", None)
-    if word in _LEADING or (word in _GUARDED and paren):
+    if word in _CONTROL_AT_START or (word in _CONTROL_IF_PARENTHESIZED and paren):
         return True
     return bool(call) and call.group(1).split("::")[-1] in _CONTROL
 
