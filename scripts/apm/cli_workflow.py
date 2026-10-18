@@ -58,6 +58,12 @@ def github(project: Project, args: argparse.Namespace) -> int:
     return handle(project, args)
 
 
+def audit(project: Project, args: argparse.Namespace) -> int:
+    from apm.cli_audit import audit as handle  # lazy, like github: keeps the handlers free of import cycles
+
+    return handle(project, args)
+
+
 WORKFLOW_HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
-    "note": note, "review": review, "github": github,
+    "note": note, "review": review, "github": github, "audit": audit,
 }
