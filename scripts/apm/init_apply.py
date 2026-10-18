@@ -66,15 +66,25 @@ def _is_ancestor(ref: str, base: str, root: Path, run) -> bool:
     return run(argv, cwd=root, capture_output=True, text=True, encoding="utf-8").returncode == 0
 
 
+def _exists(ref: str, root: Path, run) -> bool:
+    argv = ["git", "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"]
+    return run(argv, cwd=root, capture_output=True, text=True, encoding="utf-8").returncode == 0
+
+
 def _merged(item: dict, base: str, root: Path, run) -> bool:
-    """Whether the item's branch is in `base`. Items with no branch (issues, documents) always are."""
+    """Whether every copy of the item's branch that exists, local and on origin, is in `base`.
+
+    Items with no branch (issues, documents) always are. With no copy left, the plain name is asked,
+    which git cannot prove merged.
+    """
     if item["kind"] == "branch":
         name = item["id"].removeprefix("branch:")
     elif item["kind"] == "worktree" and item["title"] != "detached":
         name = item["title"]
     else:
         return True
-    return any(_is_ancestor(ref, base, root, run) for ref in (name, f"origin/{name}"))
+    refs = [ref for ref in (name, f"origin/{name}") if _exists(ref, root, run)] or [name]
+    return all(_is_ancestor(ref, base, root, run) for ref in refs)
 
 
 def _decision_line(item: dict, decision: object, audit: dict, root: Path, run) -> list[str]:
