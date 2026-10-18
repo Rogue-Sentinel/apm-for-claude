@@ -74,13 +74,13 @@ def test_file_level_callbacks_are_named_after_their_callee_in_source_order():
         ("describe", 1, 4),
         ("beforeEach", 3, 1),
         ("it", 6, 2),
-        ("it#2", 10, 1),
+        ("it", 10, 1),
     ]
 
 
-def test_two_file_level_callbacks_with_the_same_callee_are_numbered():
+def test_repeated_callees_keep_their_plain_name_in_source_order():
     text = "it('a', () => {\n  a();\n});\nit('b', function () {\n  b();\n  c();\n});\n"
-    assert _found("a.js", text) == [("it", 1), ("it#2", 2)]
+    assert _found("a.js", text) == [("it", 1), ("it", 2)]
 
 
 def test_dotted_callee_and_iife():
@@ -116,3 +116,13 @@ def test_conversion_operator_keeps_the_space_in_its_name():
 def test_signature_line_for_destructors_and_operators_on_their_own_line():
     metric = _measure("a.cpp", "int x;\nA::~A()\n{\n  go();\n}\nbool A::operator==(int o)\n{\n  go();\n}\n")
     assert [(f.name, f.line) for f in metric.functions] == [("A::~A", 2), ("A::operator==", 6)]
+
+
+def test_a_function_and_callbacks_with_one_name_are_not_renumbered():
+    text = "function route() {\n  a();\n}\nroute('/a', () => {\n  b();\n});\nroute('/b', () => {\n  c();\n});\n"
+    assert _found("a.js", text) == [("route", 1), ("route", 1), ("route", 1)]
+
+
+def test_multiline_generic_return_type_stays_one_head():
+    text = "class A {\n  async load(): Promise<\n    number\n  > {\n    return 1;\n  }\n}\n"
+    assert _found("a.ts", text) == [("load", 1)]

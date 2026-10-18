@@ -126,8 +126,8 @@ def _name_of(text: str, call: re.Match[str] | None) -> str:
     return found.group(1) if found else "<anonymous>"
 
 
-_LINE_END = re.compile(r"(?:->|=>|[=+\-*/%&|^?:,(.]|\b(?:where|throws|extends|implements))\s*$")
-_LINE_START = re.compile(r"\s*(?:[{.)\]:,=?&|+]|->|=>|\b(?:throws|where|extends|implements)\b)")
+_LINE_END = re.compile(r"(?:->|=>|[=+\-*/%&|^?:,(.<]|\b(?:where|throws|extends|implements))\s*$")
+_LINE_START = re.compile(r"\s*(?:[{.)\]:,=?&|+>]|->|=>|\b(?:throws|where|extends|implements)\b)")
 
 
 def continues(head: str, rest: str) -> bool:

@@ -10,8 +10,8 @@ functions inside it are found.
 
 A callback passed as a call argument, at file level or inside another such callback, is a function
 named after its callee (`describe`, `it`, `app.get`). Its lines leave out the callbacks nested in
-it as call arguments, and each of those is reported on its own. Duplicate callback names are
-numbered in source order: `it`, `it#2`. Overloads of named functions are not numbered.
+it as call arguments, and each of those is reported on its own. Functions are listed in source order
+and repeated names stay as they are (`it`, `it`); numbering duplicates is the snapshot's job.
 
 Known limits. This is a scanner, not a compiler, and these cases are read wrongly:
 - a C++ constructor whose initializer list uses braces (`: x_{1} {`) is read as a function that
@@ -24,6 +24,9 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
 - a Rust `match` arm (`_ => {`) at declarative scope is read as an anonymous function, a Go
   `map[string]func() {...}` literal is read as one anonymous function, and a C function that returns
   a function pointer (`int (*get(void))(int) {`) takes the wrong name;
+- an object-literal method inside a call's arguments within a callback (`render({ onClick() {...} })`)
+  is reported under the callee's name (`render`), not its own;
+- a class-field callback (`handle = debounce(() => {...})`) is named after its callee, not its field;
 - a comma-separated head in an object literal or enum takes the name of its first call;
 - `<` and `>` used as comparison operators inside a head can be taken for generic arguments;
 - a JavaScript template literal with a nested template ends at the first closing backtick;
@@ -32,7 +35,7 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import Literal, NamedTuple
 
 from apm.metrics_heads import continues, function_name, keeps_head
@@ -41,7 +44,7 @@ from apm.metrics_model import FileMetric, FunctionMetric
 
 _STRUCTURAL = re.compile(r"[{}();\n]")
 _CALLEE = re.compile(r"([\w$.:]+)\s*$")
-_Found = tuple[int, FunctionMetric, bool]
+_Found = tuple[int, FunctionMetric]
 _Kind = Literal["decl", "func", "callback"]
 
 
@@ -71,17 +74,6 @@ def measure_braces(path: str, text: str, language: Language) -> FileMetric:
     return FileMetric(path, language.name, lines, functions=functions, functions_measured=True)
 
 
-def _number_callbacks(found: list[_Found]) -> tuple[FunctionMetric, ...]:
-    seen: dict[str, int] = {}
-    metrics = []
-    for _, metric, is_callback in sorted(found, key=lambda item: item[0]):
-        seen[metric.name] = seen.get(metric.name, 0) + is_callback
-        if is_callback and seen[metric.name] > 1:
-            metric = replace(metric, name=f"{metric.name}#{seen[metric.name]}")
-        metrics.append(metric)
-    return tuple(metrics)
-
-
 class _Scanner:
     def __init__(self, code: str) -> None:
         self.code = code
@@ -92,7 +84,10 @@ class _Scanner:
     def run(self) -> tuple[tuple[FunctionMetric, ...], bool]:
         for match in _STRUCTURAL.finditer(self.code):
             self._step(self.stack[-1], match.group(), match.start())
-        return _number_callbacks(self.found), not self.stray and len(self.stack) == 1
+        return self._ordered(), not self.stray and len(self.stack) == 1
+
+    def _ordered(self) -> tuple[FunctionMetric, ...]:
+        return tuple(metric for _, metric in sorted(self.found, key=lambda item: item[0]))
 
     def _step(self, top: _Scope, char: str, at: int) -> None:
         if char == "{":
@@ -158,7 +153,7 @@ class _Scanner:
         else:
             body = self._body(top, at)
             metric = FunctionMetric(top.name, top.line, count_logic(body))
-            self.found.append((top.open_at, metric, top.kind == "callback"))
+            self.found.append((top.open_at, metric))
             self._pop(at)
 
     def _close_decl(self, at: int) -> None:
