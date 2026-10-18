@@ -45,7 +45,8 @@
         {
           "attempts": 0,
           "id": "2",
-          "status": "pending"
+          "status": "pending",
+          "title": "Backslash rule"
         },
         {
           "attempts": 0,
@@ -498,6 +499,11 @@
     {
       "at": "2026-10-18T20:25:58.342132+00:00",
       "event": "task 11/1 updated",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:26:00.705152+00:00",
+      "event": "task 11/2 updated",
       "issue": 11
     }
   ]
