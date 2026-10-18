@@ -8,7 +8,8 @@ a method that counts as public (`is_public_method`).
 
 Known limits. This is a scanner, not a compiler, and these cases are read wrongly:
 - a macro that expands to a declaration or an access label (`Q_OBJECT`, `public slots:`) is not
-  expanded, so a method hidden in a macro is not counted;
+  expanded, so a method hidden in a macro is not counted, and a macro with no `;` before a member
+  runs into that member's head;
 - a method that returns a function pointer (`void (*get())(int);`) is read as a pointer member;
 - `noexcept(...)` with nested parentheses is not stripped as a qualifier;
 - a `<` or `>` used as a comparison inside a head can be taken for template arguments.
@@ -18,7 +19,7 @@ from __future__ import annotations
 import re
 from typing import Literal
 
-_ACCESS_WORDS = frozenset({"public", "protected", "private"})
+_ACCESS_LABEL = re.compile(r"\b(public|protected|private)\s*$")
 _CLASS_WORDS = frozenset({"class", "struct", "union", "final"})
 _TEMPLATE = re.compile(r"template\s*<")
 _ATTRIBUTE = re.compile(r"\[\[.*?\]\]")
@@ -94,9 +95,14 @@ def class_head(head: str) -> tuple[str, str]:
 
 
 def access_label(head: str) -> str | None:
-    """`public`, `protected` or `private` when the head, before a `:`, is only that word."""
-    word = head.strip()
-    return word if word in _ACCESS_WORDS else None
+    """`public`, `protected` or `private` when the head, before a `:`, ends in that word.
+
+    Text before the word is dropped with it: Qt macros such as `Q_OBJECT` or `Q_PROPERTY(...)`
+    end with no `;`, so they run into the label's head. `signals:` and `public slots:` are not
+    labels, and their members keep the access before them, as XP12's checker reads them.
+    """
+    match = _ACCESS_LABEL.search(head)
+    return match.group(1) if match else None
 
 
 def is_function_head(head: str) -> bool:
