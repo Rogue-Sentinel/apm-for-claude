@@ -362,6 +362,8 @@ user picks another option, this task and ADR 0004 are replanned before the build
   PASS, with all four reproduction tests from Task 1 green.
 - [ ] **Step 5: Commit** `"Read a .h header as C++ when its code is C++"`.
 
+*Ruling during Task 4: the verbatim skill sentence names a language, which `tests/test_skills.py::test_no_banned_term_outside_by_language_references` forbids outside `references/*-by-language.md` (the framework is language agnostic). So the language detail goes in a new `skills/clean-code/references/class-scanners-by-language.md` (which languages count public methods, and the `.h` rule), and the **Measuring** paragraph gains a language-neutral sentence linking to it: "Public methods are counted only for the languages that have a class scanner, listed in [references/class-scanners-by-language.md](references/class-scanners-by-language.md); for any other language with classes the review-flag line says \"not measured\" and names the language, never 0." The structural criterion "`skills/clean-code/SKILL.md` names the languages whose public methods are counted" is met through that linked reference. No test is changed. Cost if wrong: one sentence moved between two files.*
+
 **ADR 0004, "A `.h` header is C++ when its code holds a C++-only construct":** context (issue 9: `.h` mapped
 to C, so every C++ header was skipped; C and C++ function scanning is identical, so the language only decides
 the class scan and the label); decision (the marker list above, checked on stripped code, `.h` only);
