@@ -15,7 +15,12 @@
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
-      "concerns": [],
+      "concerns": [
+        {
+          "at": "2026-10-18T18:43:57.752375+00:00",
+          "text": "Planner: apm audit has the same '0 when never measured' problem (audit_report._totals prints wide classes 0); not covered by this plan, follow-up."
+        }
+      ],
       "decisions": [],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-9-brace-wide-classes.md",
@@ -45,6 +50,11 @@
     {
       "at": "2026-10-18T18:43:55.564890+00:00",
       "event": "issue 9 status awaiting-approval",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T18:43:57.752400+00:00",
+      "event": "concern 9 Planner: apm audit has the same '0 when never measured' problem (audit_report._totals prints wide classes 0); not covered by this plan, follow-up.",
       "issue": 9
     }
   ]
