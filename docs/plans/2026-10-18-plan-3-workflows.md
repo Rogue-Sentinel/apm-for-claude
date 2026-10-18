@@ -767,3 +767,4 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
 - Task 2 re-review S6: `_RUN_STRING` (`-\w*c`) also matches `grep -c` and `head -c` (false positives that fail
   closed).
 - Task 9: `promised_paths` counts any backticked `.md` token, so prose such as "No `SKILL.md` names a language" (Plan 2's criteria) becomes a promised root file and would fail criterion 4; requiring a `/` would miss a root `README.md`. A plan with no criteria section passes criterion 4 with "0 criteria". A `DebtError` becomes a failing criterion 2 check, not exit 2. The final review decides.
+- Task 14 (manager's read): README says `gh` writes are denied "to the manager unless you approve in chat"; the manager files and closes issues freely, only workers are denied `gh` writes. Fix in the final wave. Install uses `/plugin marketplace add Rogue-Sentinel/apm-for-claude`, not live-checked in that exact form.
