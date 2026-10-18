@@ -389,6 +389,11 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
       is worse than the one at `REF` and the working tree records no acceptance that `REF` lacks (a
       baseline can only be loosened through `--accept`). Otherwise exit 0. It prints the regressions, then
       the improvements, then a hint to run `debt baseline` when it would tighten.
+  - *Added after the Task 5 review:* **tightening a limit is not a regression.** When the current limit is
+    tighter than the base's, `compare` first projects the current snapshot onto the base's limit. That means
+    keeping only the items over the base's limit and recomputing the totals at that limit. Code that was
+    fine under the old limit is not new debt. `debt baseline` then records the tighter limit with no
+    `--accept` needed.
   - Guard: `profile.WORKER_PROTECTED = (".apm/**",)`. Workers may never write the profile or the baseline,
     by tool or by command. `decide` adds it to the globs only when `agent_id` is set. The worker-mutation
     pattern also denies `debt baseline`. `debt check`, `metrics` and `coverage` stay allowed for workers.
