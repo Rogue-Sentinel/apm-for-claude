@@ -233,9 +233,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 14 at 240f91a: PASS clean tree, base merged, layers, test (full suite), debt, review, plan (7 criteria); merge gate: passed",
           "id": "3",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -1290,6 +1291,11 @@
     {
       "at": "2026-10-18T23:43:33.861537+00:00",
       "event": "task 14/3 running",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:43:36.431010+00:00",
+      "event": "task 14/3 done",
       "issue": 14
     }
   ]
