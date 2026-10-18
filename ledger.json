@@ -76,7 +76,8 @@
         {
           "attempts": 0,
           "id": "6",
-          "status": "pending"
+          "status": "pending",
+          "title": "XP12 parity check (manual)"
         },
         {
           "attempts": 0,
@@ -187,6 +188,11 @@
     {
       "at": "2026-10-18T19:16:31.323165+00:00",
       "event": "task 9/5 updated",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:33.453704+00:00",
+      "event": "task 9/6 updated",
       "issue": 9
     }
   ]
