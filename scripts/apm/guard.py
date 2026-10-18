@@ -21,6 +21,8 @@ _ASK_USER = (
     ". Ask the user in chat; if they approve this exact action, record it with "
     f'{_CLI} approve --command "<the exact full command>" --reason "<why>" '
     "(or --path <glob> for a file write), then retry."
+    " Run the approve call with the Bash tool, on its own, with the command in single quotes "
+    "if it holds a double quote."
 )
 
 
