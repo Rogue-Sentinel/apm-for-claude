@@ -215,6 +215,17 @@ token, like the already-denied `gh auth token`), and `gh pr checkout` leaves the
 worker's worktree off its task branch). Under the retry rule this was the second failure, so fix round 2 goes to a
 fresh worker on opus. Cost if wrong: more false positives for workers, who fail closed and use the Grep tool.*
 
+*Rulings during Task 2 fix round 2: (1) `tests/test_guard.py::test_worker_may_read_apm_state` pinned
+`echo apm issue` and `bash -c "echo apm issue"` as allowed; ruling (a) denies that shape on purpose, so both
+cases move to the denied text mentions in `tests/test_guard_workers_wrappers.py` (removing them from
+`tests/test_guard.py` also shrinks that already over-limit file; listed in the PR). (2) The worker found a real
+bypass in Plan 1's `mask_data`: `bash -c -m 'apm note 1'` (bash reads `-m` as an option and still runs the `-c`
+string), and the same for the gh and `.apm/` checks. `mask_data` never masks a value inside a segment that runs a
+shell's command string (`bash`, `sh`, `zsh`, `dash`, `pwsh`, `powershell` with `-c` or `-Command`, or `cmd /c`).
+That is fixed in this round as its own commit, with failing tests first across all three worker checks. (3) The
+subcommand may be any later word after the apm program, which also catches `apm $EMPTY note 1`. Cost if wrong:
+more fail-closed false positives.*
+
 ### Task 3: Metrics follow-ups: plain files, a git ref, and files in two layers
 
 **Files:**
