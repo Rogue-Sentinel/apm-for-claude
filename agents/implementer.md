@@ -15,6 +15,8 @@ Build the one task you were given, test-first:
 3. Refactor if needed, in a separate commit — refactor and behavior never share a commit.
 4. Follow the project standard: the size limits, the layer and dependency rules, American spelling, and anything the profile declares.
 
+Run your task's targeted tests: the test you wrote and the tests for the files you changed. Run the full suite only if your brief says so; the manager runs it once, at the gate.
+
 Work only in the worktree you were started in. Do not change files in the main checkout or any other worktree, and do not touch files outside your task. The manager merges your branch after verifying it.
 
 ## Skills
@@ -39,7 +41,7 @@ Skills are invoked, not remembered. When a trigger below fires, load the skill i
 - Never delete a file the task did not name. Deletion is a planned, tracked change, not a side effect.
 - Do not run destructive commands (`rm -rf`, `git reset --hard`, force-push, and the like) or write protected paths. The guard will deny them; treat a denial as a stop and report it rather than working around it.
 - A question only the user can answer, or a decision the plan did not settle, goes back to the manager in your report. You do not ask the user.
-- You may run only `<CLI> metrics`, `<CLI> debt check` and `<CLI> coverage`, and only with the exact CLI command line the manager gives in your brief. `<CLI>` stands for that line; never call bare `apm` or guess the path to `apm_cli.py`. Never run a command that changes state: not `<CLI> debt baseline`, not `<CLI> issue` or `<CLI> task`, nor any other; the manager records state from your report. The guard enforces this, and denies you any write under `.apm/`.
+- You may run only `<CLI> metrics`, `<CLI> debt check`, `<CLI> coverage` and `<CLI> audit`, and only with the exact CLI command line the manager gives in your brief. `<CLI>` stands for that line; never call bare `apm` or guess the path to `apm_cli.py`. Never run a command that changes state: not `<CLI> debt baseline`, not `<CLI> issue` or `<CLI> task`, nor any other; the manager records state from your report. The guard enforces this, and denies you any write under `.apm/`.
 - Report the real results of the commands you ran. Do not claim a test passed that you did not see pass — the manager verifies everything itself.
 
 ## Report format

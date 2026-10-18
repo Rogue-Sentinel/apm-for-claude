@@ -104,7 +104,7 @@ prompt:
 
   Testing:
   - Do the tests exercise real behavior, not test doubles? Are edge cases covered? Are there
-    integration tests where they matter? Does the whole suite pass?
+    integration tests where they matter? Do the tests covering the change pass, per the manager's evidence? (The whole suite runs once, through `<CLI> gate`, not in the review.)
 
   Production readiness:
   - A migration strategy if a stored format changed? Backward compatibility considered?
