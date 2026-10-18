@@ -310,7 +310,12 @@
     "19": {
       "allowlist": [],
       "branch": "issue-19-memory-folder",
-      "concerns": [],
+      "concerns": [
+        {
+          "at": "2026-10-18T23:14:55.180343+00:00",
+          "text": "Plan is written in the scratchpad (2026-10-18-issue-19-memory-folder.md); it is committed on issue-19-memory-folder when that branch is cut after #14 merges."
+        }
+      ],
       "decisions": [],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-19-memory-folder.md",
@@ -1132,6 +1137,11 @@
     {
       "at": "2026-10-18T23:14:52.858891+00:00",
       "event": "issue 19 status awaiting-approval",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:14:55.180372+00:00",
+      "event": "concern 19 Plan is written in the scratchpad (2026-10-18-issue-19-memory-folder.md); it is committed on issue-19-memory-folder when that branch is cut after #14 merges.",
       "issue": 19
     }
   ]
