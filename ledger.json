@@ -368,9 +368,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Task 1 review must-fix: add a pin run from a linked worktree's cwd that the worktree-slug memory folder stays denied.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "failed",
           "title": "Failing tests and pins",
           "worker": "implementer"
         },
@@ -1393,6 +1394,11 @@
     {
       "at": "2026-10-18T23:51:37.862789+00:00",
       "event": "task 19/1r done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:51:40.381995+00:00",
+      "event": "task 19/1 failed",
       "issue": 19
     }
   ]
