@@ -205,11 +205,13 @@
     },
     "17": {
       "allowlist": [],
+      "branch": "issue-17-release-0.3.1",
       "concerns": [],
       "decisions": [],
       "kind": "feature",
+      "plan": "docs/plans/2026-10-18-issue-17-release-0.3.1.md",
       "questions": [],
-      "status": "queued",
+      "status": "building",
       "tasks": [],
       "title": "Release apm 0.3.1 with the #9 and #11 fixes",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/17"
@@ -870,6 +872,11 @@
     {
       "at": "2026-10-18T22:38:43.935907+00:00",
       "event": "filed 17 https://github.com/Rogue-Sentinel/apm-for-claude/issues/17",
+      "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:39:08.934205+00:00",
+      "event": "issue 17 status building",
       "issue": 17
     }
   ]
