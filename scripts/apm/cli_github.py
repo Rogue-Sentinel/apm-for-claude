@@ -57,15 +57,21 @@ def _refusal(project: Project, number: int) -> str | None:
     return f"issue {number} is {status or 'unknown'}; close it only once it is integrating or merged"
 
 
+def _closed_on_github(project: Project, args: argparse.Namespace) -> bool:
+    try:
+        close_issue(project.worktree_root, args.number, f"Shipped in {args.pr}.", run=RUN)
+    except GitHubError as err:
+        print(f"apm: {err}\nclose it by hand, then record it with apm issue {args.number} --status merged", file=sys.stderr)
+        return False
+    return True
+
+
 def close(project: Project, args: argparse.Namespace) -> int:
     refusal = _refusal(project, args.number)
     if refusal:
         print(f"apm: {refusal}", file=sys.stderr)
         return 1
-    try:
-        close_issue(project.worktree_root, args.number, f"Shipped in {args.pr}.", run=RUN)
-    except GitHubError as err:
-        print(f"apm: {err}\nclose it by hand, then record it with apm issue {args.number} --status merged", file=sys.stderr)
+    if not _closed_on_github(project, args):
         return 2
 
     def apply(ledger: dict) -> str:
