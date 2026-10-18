@@ -11,9 +11,10 @@ from typing import Any
 from apm import ledger as lg
 from apm.briefing import render_briefing
 from apm.cli_standard import HANDLERS as STANDARD_HANDLERS
+from apm.cli_workflow import mutate as _mutate
 from apm.paths import Project, to_native_path
 from apm.setup import setup_project
-from apm.state_store import commit_state, load_state
+from apm.state_store import load_state
 
 ISSUE_FIELDS = ("title", "kind", "lane", "status", "branch", "plan")
 TASK_FIELDS = ("title", "status", "worker", "model", "evidence")
@@ -21,14 +22,6 @@ TASK_FIELDS = ("title", "status", "worker", "model", "evidence")
 
 def _given(args: argparse.Namespace, names: tuple[str, ...]) -> dict[str, Any]:
     return {n: getattr(args, n) for n in names if getattr(args, n) is not None}
-
-
-def _mutate(project: Project, number: int | None, apply: Callable[[dict], str]) -> None:
-    ledger = lg.load_ledger(project.ledger_path)
-    event = apply(ledger)
-    lg.append_log(ledger, number, event, datetime.now(timezone.utc))
-    lg.save_ledger(project.ledger_path, ledger)
-    commit_state(project, event)
 
 
 def brief(project: Project, args: argparse.Namespace) -> int:
