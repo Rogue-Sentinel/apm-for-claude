@@ -56,9 +56,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "guard*/hook* tests on the branch after merge 2a2bebd: only Task 4's FAIL-now tests fail (worktree run: 14 failed = Tasks 2+4, 1102 passed); test_guard_echo 7 passed; per-task review clean; metrics 0/53 fn, 0/5 files over; debt check nothing worse.",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Echo the typed command",
           "worker": "implementer"
         },
@@ -668,6 +669,11 @@
     {
       "at": "2026-10-18T20:53:27.307514+00:00",
       "event": "task 11/3r done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:53:29.709019+00:00",
+      "event": "task 11/3 done",
       "issue": 11
     }
   ]
