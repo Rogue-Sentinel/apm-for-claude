@@ -309,6 +309,8 @@ its class/struct/union defaults, its scope walk), except on purpose:
   first; in the second, `[database.hpp]` now PASSES and the three `.h`/text tests still FAIL for the `.h` reason.
 - [ ] **Step 5: Commit** `"Count the public methods of C++ classes"`.
 
+*Ruling during Task 3: RED was a behavior failure (C++ files reported no classes; 14 failed, 4 passed — the four that expect an empty result), not the "no module `apm.metrics_cpp`" the brief predicted, because the tests go through `measure_text` and never import the new module. That is the stronger kind of red. Cost if wrong: none.*
+
 ### Task 4: Read a `.h` header as C++ when its code is C++
 
 *This task plans the recommended option, a content check. The choice is the user's; see the report. If the
