@@ -30,7 +30,7 @@ _GNU_ATTRIBUTE = re.compile(r"\b__attribute__\s*\(\s*\((?:[^()]|\([^()]*\))*\)\s
 _OPERATOR = re.compile(r"\boperator\b")
 _OPERATOR_ANGLE = re.compile(r"\boperator\s*[<>]")
 _ANGLES = re.compile(r"<[^<>]*>")
-_BASE_COLON = re.compile(r"(?<!:):(?!:)")
+BASE_COLON = re.compile(r"(?<!:):(?!:)")
 _CLASS_HEAD = re.compile(r"(?:class|struct|union)\b")
 _NAMESPACE = re.compile(r"\bnamespace\b")
 _EXTERN_BLOCK = re.compile(r'extern\s*""')
@@ -94,7 +94,7 @@ def scope_kind(head: str) -> _Kind:
 def class_head(head: str) -> tuple[str, str]:
     """The class name and the access its body starts in (`class` is private, `struct` public)."""
     tidy = tidy_head(head)
-    words = [w for w in _BASE_COLON.split(tidy)[0].split() if w not in _CLASS_WORDS]
+    words = [w for w in BASE_COLON.split(tidy)[0].split() if w not in _CLASS_WORDS]
     access = "private" if tidy.startswith("class") else "public"
     return (words[-1] if words else "<anonymous>", access)
 

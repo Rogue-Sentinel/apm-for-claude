@@ -24,13 +24,12 @@ from dataclasses import dataclass, replace
 from typing import Literal
 
 from apm.metrics_cpp_heads import (
-    access_label, class_head, is_function_head, is_public_method, scope_kind,
+    BASE_COLON, access_label, class_head, is_function_head, is_public_method, scope_kind,
 )
 from apm.metrics_lang import Language, strip_code
 from apm.metrics_model import ClassMetric, FileMetric
 
 _EVENT = re.compile(r"[{};]|(?<!:):(?!:)")
-_BASE_COLON = re.compile(r"(?<!:):(?!:)")
 
 
 @dataclass
@@ -139,7 +138,7 @@ class _Walker:
 
     def _name_line(self, head: str, name: str, at: int) -> int:
         """The line of the class name in its head, or of the brace when the head does not show it."""
-        base = _BASE_COLON.search(head)
+        base = BASE_COLON.search(head)
         region = head[:base.start()] if base else head
         hits = list(re.finditer(rf"(?<!\w){re.escape(name)}(?!\w)", region))
         end = hits[-1].end() if hits else len(head)

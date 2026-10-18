@@ -11,13 +11,18 @@ from collections.abc import Mapping
 LEGACY_CLASS_SCANNERS = ("Python",)
 
 
+def class_path(key: str) -> str:
+    """The file path of a class key such as `src/db.h::Database`."""
+    return key.split("::", 1)[0]
+
+
 def _scanners(snapshot: Mapping) -> set[str]:
     return set(snapshot.get("class_scanners", LEGACY_CLASS_SCANNERS))
 
 
 def _unmeasured_language(key: str, languages: Mapping[str, str], scanned: set[str]) -> str:
     """The language of the class's file when the baseline did not scan it; empty when it did or is unknown."""
-    language = languages.get(key.split("::", 1)[0], "")
+    language = languages.get(class_path(key), "")
     return language if language not in scanned else ""
 
 
