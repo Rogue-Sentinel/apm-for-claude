@@ -72,9 +72,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Step 4 tests: 354 passed in the worktree and on the branch after merge 792b97b; all 4 Task 1 reproduction tests pass; live repro prints 'classes with 7+ public methods: 2' for database.h and database.hpp; metrics 0/48 fn, 0/3 files over; debt check nothing worse. Ruling: see the plan, Task 4 amendment.",
           "id": "4",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": ".h as C++ by content",
           "worker": "implementer"
         },
@@ -245,6 +246,11 @@
     {
       "at": "2026-10-18T19:26:11.366995+00:00",
       "event": "task 9/4 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:30:58.196189+00:00",
+      "event": "task 9/4 done",
       "issue": 9
     }
   ]
