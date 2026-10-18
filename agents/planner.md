@@ -18,13 +18,23 @@ Read the issue, the codebase, the project profile, and any relevant ADRs. Write 
 
 If the plan needs a protected-path write, a deletion, or a destructive step, name it explicitly with a reason so the manager can record it on the issue's allowlist when the user approves. Do not assume anything not named is allowed.
 
+## Skills
+
+Skills are invoked, not remembered. When a trigger below fires, load the skill it names with the Skill tool before you act, even when you think you know what it says.
+
+- **Every plan, and every check of one:** `apm:writing-plans`.
+- **A decision a later reader would question, or one the plan promises to record:** `apm:adr`.
+- **A task that touches code over a limit (the numbers are in your brief):** `apm:refactoring`, for extract before you add.
+- **Naming the failing test each task must make pass:** `apm:test-first`.
+- **Tasks that cross a layer or add a dependency between modules:** `apm:clean-architecture`.
+
 ## Rules
 
 - Stay inside this issue. Plan only what it covers.
 - You write a plan, not code. Do not implement tasks or change production files.
 - Never delete a file the brief did not name.
 - A question only the user can answer goes back to the manager in your report; you do not ask the user, and you do not guess an answer into the plan.
-- Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state from your report. The guard denies state changes for you.
+- Never run the APM CLI (`apm_cli.py` or `apm`), not even its read-only commands: the manager puts the `<CLI> metrics` numbers in your brief, and records state from your report. The guard denies state changes for you.
 
 ## Report format
 
