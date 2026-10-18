@@ -1,4 +1,6 @@
 """The debugging, verification, review, skill-writing and diagnosis skills carry what their sources did."""
+import re
+
 import pytest
 
 from skill_helpers import SKILLS_DIR, assert_sections, parse_skill, section, sections
@@ -37,9 +39,21 @@ REFERENCES = {
 }
 ANALYST_DIMENSIONS = (
     "Skill timeline", "Plan adherence", "Repeated work", "Stumbles", "Quality evidence",
-    "Request conflicts", "Cost and time",
+    "Request conflicts", "Cost and time", "Roles and safety",
 )
-REVIEW_SEVERITIES = ("Critical", "Important", "Minor")
+REVIEW_TIERS = ("#### Must fix", "#### Suggestions")
+OLD_TIERS = ("Critical", "Important", "Minor")
+WORKSPACE = "apm-diagnosis/<session-id>/"
+WORKSPACE_FILES = ("transcripts.md", "case-and-report.md", "export-and-redaction.md")
+CLI_VERBS = (
+    "metrics", "debt", "brief", "coverage", "issue", "task", "question", "resolve", "approve",
+    "allow", "setup",
+)
+BARE_CLI = re.compile(r"(?<![\w:/<>-])apm (?:" + "|".join(CLI_VERBS) + r")\b")
+WRITING_RED_FLAGS = (
+    "before the test", "by hand", "tests after", "spirit", "different because",
+    "delete it and start over",
+)
 
 
 def _reference(name: str, file_name: str) -> str:
@@ -75,6 +89,12 @@ def test_the_fix_includes_the_instruction_or_knowledge_behind_the_bug():
 def test_three_failed_fixes_go_back_to_the_manager():
     text = section(_body("systematic-debugging"), "## After three failed fixes")
     assert "manager" in text
+    assert "one tier stronger" in text and "same model" in text
+
+
+def test_the_fix_removes_the_cause_not_just_the_symptom():
+    text = section(_body("systematic-debugging"), "## Reproduce it as a failing test")
+    assert "simplest code" in text and "removes the cause" in text
 
 
 def test_tracing_carries_the_polluter_search():
@@ -97,11 +117,43 @@ def test_pushed_back_findings_are_decided_by_the_manager_or_the_user():
     assert "the manager decides" in text and "asks the user" in text
 
 
-def test_the_reviewer_brief_keeps_its_severities_and_verdict():
+def _skill_texts(name: str) -> list[tuple[str, str]]:
+    return [(str(path.relative_to(SKILLS_DIR)), path.read_text(encoding="utf-8"))
+            for path in sorted((SKILLS_DIR / name).rglob("*.md"))]
+
+
+def test_the_reviewer_brief_has_two_tiers_and_a_verdict():
     text = _reference("code-review", "reviewer-checklist.md")
-    for severity in REVIEW_SEVERITIES:
-        assert f"#### {severity}" in text, severity
+    for tier in REVIEW_TIERS:
+        assert tier in text, tier
     assert "Ready to merge?" in text and "## Declined to judge" in text
+
+
+@pytest.mark.parametrize("file_name", ("SKILL.md", "references/reviewer-checklist.md"))
+def test_code_review_uses_only_must_fix_and_suggestion(file_name):
+    text = (SKILLS_DIR / "code-review" / file_name).read_text(encoding="utf-8")
+    found = [tier for tier in OLD_TIERS if re.search(rf"\*\*{tier}\b|#+ {tier}\b", text)]
+    assert not found, f"{file_name} still grades with {found}"
+
+
+def test_code_review_defers_suggestions_and_points_to_the_fix_loop():
+    text = section(_body("code-review"), "## Requesting a review")
+    assert "`apm:executing-plans`" in text and "deferred" in text
+    assert "as debt" not in _body("code-review")
+
+
+@pytest.mark.parametrize("name", sorted(REQUIRED))
+def test_runnable_text_names_the_cli_not_bare_apm(name):
+    found = [f"{where}: {match}" for where, text in _skill_texts(name)
+             for match in BARE_CLI.findall(text)]
+    assert not found, found
+
+
+def test_the_cli_placeholder_is_glossed_where_it_is_used():
+    for name in sorted(REQUIRED):
+        for where, text in _skill_texts(name):
+            if "`<CLI>" in text and where.endswith("SKILL.md"):
+                assert "`<CLI>` is the framework's command line" in text, where
 
 
 def test_writing_skills_states_the_framework_skill_contract():
@@ -117,6 +169,19 @@ def test_writing_skills_carries_wording_and_diagrams():
     assert "## Diagrams" in headings
 
 
+def test_writing_skills_has_red_flags():
+    text = section(_body("writing-skills"), "## Red flags").lower()
+    missing = [flag for flag in WRITING_RED_FLAGS if flag not in text]
+    assert not missing, missing
+
+
+def test_subagent_testing_carries_the_debugging_skill_example():
+    text = _reference("writing-skills", "testing-skills-with-subagents.md")
+    example = section(text, "## A worked example: bulletproofing a debugging skill")
+    for needle in ("complex system", "failed first fix", "redundancy", "structural defenses"):
+        assert needle in example, needle
+
+
 def test_subagent_testing_carries_the_worked_campaign():
     headings = sections(_reference("writing-skills", "testing-skills-with-subagents.md"))
     assert "## A worked campaign: testing an instruction file" in headings
@@ -125,6 +190,35 @@ def test_subagent_testing_carries_the_worked_campaign():
 def test_transcripts_are_found_under_the_projects_directory():
     text = section(_body("session-diagnosis"), "## Finding the transcripts")
     assert "~/.claude/projects/" in text
+
+
+@pytest.mark.parametrize("file_name", WORKSPACE_FILES)
+def test_the_workspace_is_in_the_system_temp_directory(file_name):
+    assert WORKSPACE in _reference("session-diagnosis", file_name), file_name
+
+
+def test_the_workspace_path_is_named_and_the_old_one_is_gone():
+    assert WORKSPACE in _body("session-diagnosis")
+    for name in sorted(REQUIRED):
+        for where, text in _skill_texts(name):
+            assert ".apm/diagnosis" not in text, where
+
+
+def test_analysts_are_auditors_under_the_worker_cap():
+    text = section(_body("session-diagnosis"), "## Triage")
+    assert "`apm:auditor`" in text and "worker cap" in text and "sonnet" in text
+
+
+def test_the_scrubber_is_an_implementer_in_a_worktree():
+    text = section(_reference("session-diagnosis", "export-and-redaction.md"), "## Building a bundle")
+    assert "`apm:implementer`" in text and 'isolation: "worktree"' in text
+
+
+def test_the_retry_rule_is_two_failures_then_one_tier_stronger_then_the_user():
+    briefs = _reference("session-diagnosis", "analyst-briefs.md")
+    for heading in ("## Repeated work", "## Roles and safety"):
+        text = section(briefs, heading)
+        assert "one tier stronger" in text and "the user" in text, heading
 
 
 def test_every_analyst_dimension_has_a_brief():
@@ -137,3 +231,20 @@ def test_the_report_keeps_every_required_section():
     text = _reference("session-diagnosis", "case-and-report.md")
     for heading in ("## The case file", "## The report", "## 7. Instructions involved"):
         assert heading in text, heading
+
+
+def test_diagrams_keep_the_shape_mapping_and_the_triggers_edge():
+    text = section(_reference("writing-skills", "best-practices.md"), "## Diagrams")
+    for needle in ("diamond", "plaintext", "ellipse", "octagon", "double circle", "dotted",
+                   "triggers", "GOOD", "BAD"):
+        assert needle in text, needle
+
+
+def test_redaction_catches_uuids():
+    text = section(_reference("session-diagnosis", "export-and-redaction.md"), "## The redaction policy")
+    assert "UUIDs" in text
+
+
+def test_credits_trace_the_best_practices_to_anthropic():
+    credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")
+    assert "Anthropic's skill-authoring documentation" in credits

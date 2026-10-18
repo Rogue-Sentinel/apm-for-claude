@@ -65,4 +65,5 @@ overflow the context of the reader. So:
    characters). Use the extraction commands recorded in the case file for the source in front of you.
 3. **Narrow anything over 500 characters.** If a command returns more than 500 characters for one
    record, tighten the field or the slice.
-4. **Read-only.** Never modify, move or delete a session file. Work on copies, inside the workspace.
+4. **Read-only.** Never modify, move or delete a session file. Work on copies, inside the workspace,
+   `<system temp>/apm-diagnosis/<session-id>/`.

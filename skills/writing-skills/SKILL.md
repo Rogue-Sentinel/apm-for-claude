@@ -274,8 +274,12 @@ debug) with its own skills, and keeps the project's domain.
 **Who runs the tests.** Workers cannot dispatch agents, so the **manager runs the scenarios**. The
 worker writing a skill writes the structural test and the pressure scenarios with the skill, and
 reports them; the manager dispatches the baseline and the with-skill runs, at most the profile's
-worker cap at once (three at most), reads every answer itself, and records the results. A scenario
-never reaches the user: the subagent answers the manager.
+worker cap at once (three at most), reads every answer itself, and records each run under the
+issue's number like any task. A run that plays a worker role is dispatched as that role
+(`apm:implementer`, `apm:debugger`, `apm:reviewer`...) with `isolation: "worktree"`, and told it
+takes no real action: it only chooses and explains. A skill only the manager uses is tested by
+dispatching `general-purpose` with the manager's prompt as its context. A scenario never reaches the
+user: the subagent answers the manager.
 
 **The cycle:**
 
@@ -343,6 +347,18 @@ QUALITY
 SHIP
 [ ] committed on the task's branch; the manager verifies, reviews and merges it
 ```
+
+## Red flags
+
+Any of these means: **delete it and start over** from the baseline.
+
+- A skill, or an edit to one, written before the test: before the baseline ran, or before the
+  structural test was seen failing.
+- "I already tested it by hand", meaning you read it through and it looks clear.
+- "Tests after achieve the same purpose": running the scenarios once the skill is written.
+- "It's about the spirit, not the ritual."
+- "This is different because...": a simple addition, just a section, only documentation.
+- Keeping the untested draft "as a reference", or adapting it while the tests run.
 
 ## References
 

@@ -99,10 +99,11 @@ findPolluter(artifact, testPattern):
             -- zero directories, so files directly in the base directory are not missed
     report "found N test files"
 
+    if exists(artifact):
+        report "the artifact already exists before any test has run; start from a clean copy"
+        stop with a failing status                 -- never delete it to reset the search
+
     for index, file in files:
-        if exists(artifact):
-            report "the artifact already exists before test index of N; skipping file"
-            continue
         report "[index/N] running file"
         runTests(file), ignoring its exit status   -- a failing test may still be the polluter
         if exists(artifact):
@@ -115,12 +116,15 @@ findPolluter(artifact, testPattern):
 ```
 
 - **Start clean.** Run it in a fresh copy where the artifact does not exist. If the artifact is
-  already there, stop and report it; do not delete it to reset the search. Deletion is a planned,
-  tracked change, never a side effect of debugging.
+  already there before the first file runs, the search stops and reports it, as the pseudo-code
+  does; do not delete it to reset the search. Deletion is a planned, tracked change, never a side
+  effect of debugging. Because the search stops at the first file after which the artifact exists,
+  it never needs to run a file with the artifact already present.
 - **One file at a time**, in a fixed order, so the result is repeatable. A failing test can still
   be the one that pollutes, so a test's own result does not stop the search.
-- Write the search as a small script in your worktree, run it through its interpreter, and report
-  the polluter it found with the output.
+- Write the search as a small script in the system's temporary directory, outside the project so it
+  is neither committed nor measured, run it through its interpreter from your worktree, and report
+  the polluter it found, with the output.
 
 ## A worked example
 

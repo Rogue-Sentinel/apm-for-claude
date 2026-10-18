@@ -124,7 +124,10 @@ Find work the session did more than once.
    compaction, a human correction, a failed attempt in the ledger. Say which: a read again after an
    edit is not a finding; a read again after a compaction is a finding attributed to the compaction;
    a read again with nothing in between is a finding of its own. A dispatch again after a failure is
-   a retry; say whether it moved to a stronger model, as the retry rule requires.
+   a retry. The retry rule is: two failures on the same model, then one round one tier stronger
+   (haiku, then sonnet, then opus), then the user. Say which step each retry was, and whether it
+   followed the rule: a third try on the same model, or a jump of more than one tier, is a finding,
+   and so is a failure on the stronger model that was retried again instead of going to the user.
 4. Look for re-derived decisions: assistant text that reaches a conclusion already stated earlier
    (the same file, the same design choice, the same command). Quote both places.
 5. One finding per group, with the first and last line numbers and the count.
@@ -153,8 +156,10 @@ finding, with a count.
 Judge the process against its own claims. This is not a code review; do not judge the code the
 session produced.
 
-1. **Tests:** every test run (a command that runs the project's test runner, as named in its profile
-   or instruction file), with its result line. Report the runs that failed, and what the assistant
+1. **Tests:** every test run, with its result line: any command that runs tests, whether it is the
+   runner the profile or the instruction file names, another runner, a single test file, or a script
+   that wraps one. Do not limit the search to the declared runner; a test run with an undeclared
+   command is still a test run, and a finding if the declared one was skipped. Report the runs that failed, and what the assistant
    did next.
 2. **Verification behind claims:** find the assistant text that claims done, fixed, passing,
    verified, works, or complete. For each, look back in the same turn for a tool result that shows
@@ -226,7 +231,10 @@ holds.
    Any approval recorded without the user's explicit yes in chat in the turns before it.
 4. **The ledger and the cap.** Dispatches with no `running` record before them, workers that
    returned with no `done` or `failed` record after them, more workers running at once than the cap,
-   and a retry on the same model after two failures.
+   and any break of the retry rule (two failures on the same model, then one round
+   one tier stronger, then the user): a third try on the same model, a jump of more than one tier, or a
+   failure on the stronger model that did not reach the user, as a question the manager asked in
+   chat, before any further attempt.
 5. **Deletion.** Any deletion the plan did not name, and what was done about it.
 
 Report each with its line, and quote the record.

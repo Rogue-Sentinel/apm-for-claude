@@ -45,15 +45,21 @@ The manager requests it; a worker never dispatches a reviewer (workers cannot sp
    ```
 2. **Dispatch** `apm:reviewer` with the profile's model for that role (default opus), filling the
    brief in [references/reviewer-checklist.md](references/reviewer-checklist.md). Record the
-   dispatch in the ledger as for any worker.
-3. **Act on the findings** (see "Receiving a review"):
-   - **Critical**: fix now, before anything else.
-   - **Important**: fix before the next task starts, and before any merge.
-   - **Minor**: record it; fix it under the boy scout rule, or the manager files it as debt.
+   dispatch in the ledger as for any worker: `<CLI> task N ID --status running --worker reviewer
+   --model opus`. `<CLI>` is the framework's command line, as the manager's prompt defines it.
+3. **Act on the findings** (see "Receiving a review"). There are two tiers:
+   - **Must fix**: every finding that blocks the next task or a merge. The reviewer's note on each
+     says why (a security hole, a risk of data loss, broken behavior, a failed debt check, a broken
+     limit, missing planned work), and the most severe go first. They enter the fix loop.
+   - **Suggestion**: recorded as deferred, in the plan file's `## Deferred findings` section
+     (`Task N: <one line>`), and listed for the final review, which decides which must be fixed
+     before merge. A suggestion never enters the fix loop, and is never silently discarded.
    - **Wrong**: push back with technical reasoning (see "Pushing back").
-4. **Re-review after fixes.** The fixes go back to a worker, the manager verifies them itself, and
-   the same reviewer brief is sent again for the new range. A merge waits until the final review has
-   no unresolved findings.
+4. **Re-review after fixes, and the limit on fix rounds,** follow `apm:executing-plans`: a fix
+   round is one fix dispatch and one **scoped** re-review of the fix (its re-review brief, not this
+   full brief again). The first try and one fix round run on the same model; after two failures,
+   one round goes one tier stronger; if that also fails, every open must-fix finding goes to the
+   user. A merge waits until the final review has no unresolved findings.
 
 Example:
 
@@ -66,11 +72,11 @@ manager:   BASE = the commit before task 2, HEAD = the task branch tip
              REQUIREMENTS:    task 2 of the approved plan, with its acceptance criteria
              BASE, HEAD:      a7981ec, 3df7661
 reviewer:  strengths: clean separation, tests exercise the real index
-           Important: no progress output on a long repair
-           Minor: the reporting interval 100 is a bare number
+           must fix: no progress output on a long repair
+           suggestion: the reporting interval 100 is a bare number
            ready to merge: with fixes
-manager:   routes the Important finding to an implementer, verifies the fix itself,
-           records the Minor one, re-reviews, then starts task 3
+manager:   routes the must-fix finding to an implementer, verifies the fix itself,
+           records the suggestion as deferred, runs a scoped re-review, then starts task 3
 ```
 
 ## What the reviewer is given
@@ -95,7 +101,7 @@ The brief carries:
 The full brief, what to check, the calibration rules, the output format and an example are in
 [references/reviewer-checklist.md](references/reviewer-checklist.md). For a scored review of a whole
 branch, the reviewer also uses `apm:branch-review`; for smells, `apm:code-smells`; for dependency
-direction, `apm:clean-architecture`, with `apm debt check` output as evidence.
+direction, `apm:clean-architecture`, with `<CLI> debt check` output as evidence.
 
 ## Receiving a review
 
@@ -138,7 +144,12 @@ logic). Test each fix on its own, and check for regressions (`apm:verification`)
 finding is its own commit, separate from behavior (`apm:refactoring`).
 
 **On a pull request**, the manager replies to an inline comment in that comment's thread, not as a
-new top-level comment on the pull request.
+new top-level comment on the pull request. Each code host has its own call for a thread reply; on
+one host's API, for example, it is a reply posted to the review comment itself:
+
+```
+gh api repos/<owner>/<repository>/pulls/<pull-request>/comments/<comment-id>/replies -f body="<reply>"
+```
 
 ## Verify before you agree
 
@@ -157,6 +168,12 @@ mechanism, a professional-grade version), search the codebase for real use first
 ```
 if nothing uses it:  "Nothing calls this endpoint. Remove it instead (YAGNI)?"
 if it is used:       implement it properly
+```
+
+```
+reviewer:  "Implement proper metrics tracking: a store, date filters, and a spreadsheet export"
+RIGHT      "Searched the codebase: nothing calls the metrics endpoint. Remove it (YAGNI)? Or is
+            there a use I'm missing?"
 ```
 
 You and the reviewer both serve the user's plan. A feature nobody needs is not added because a
@@ -229,8 +246,9 @@ If you are about to write "thanks", delete it and state the fix instead.
 ## Red flags
 
 - Skipping a review because the change is "simple".
-- Ignoring a Critical finding.
-- Starting the next task, or merging, with an Important finding unfixed.
+- Ignoring a must-fix finding, however it was labeled.
+- Starting the next task, or merging, with a must-fix finding unfixed.
+- A suggestion neither fixed nor recorded as deferred.
 - Arguing with valid technical feedback.
 - Implementing a finding you have not verified.
 - Implementing the clear items and leaving the unclear ones for later.

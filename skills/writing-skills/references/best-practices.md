@@ -144,7 +144,8 @@ Progress:
 the check; if it fails, read the message, fix, run it again; go on only when it passes") or a
 document ("review the draft against the style guide's checklist; note each issue with its section;
 revise; check again"). Either way the agent proceeds only when the check passes. In this framework
-the loop is the test suite, the checkers and `apm debt check`.
+the loop is the test suite, the checkers and `<CLI> debt check` (`<CLI>` is the framework's
+command line, as the manager's prompt defines it).
 
 ## Content
 
@@ -314,14 +315,48 @@ goes in tables, examples in code blocks, linear steps in numbered lists. A diagr
 only for a decision that is easy to get wrong, a loop where an agent might stop too early, or a
 choice between two approaches. When one is used, it is written as text inside a code block (an
 indented decision tree, as in `apm:systematic-debugging`, or a graph description language), because
-agents read the source, not a picture. Its conventions: a **question** ends with `?` and is a
-decision node; an **action** starts with a verb; a **command** is written literally, as it is run; a
-**state** describes a situation ("the test is failing"); a **warning** stands out as a stop ("NEVER
-fix only the symptom"); the **entry and exit** are marked; edges out of a decision are labeled with
-the answer ("yes", "no", the condition); and no label is generic. The source this skill was adapted
-from also shipped a script that renders such diagrams to images for people to look at; the framework
-leaves it out, because it needs an external renderer and a runtime the framework does not depend on,
-and because a skill's reader is an agent reading the text.
+agents read the source, not a picture.
+
+**Each kind of node has its own shape**, so a reader knows what a node is before reading it:
+
+| Node | Shape | Written as | Example |
+|------|-------|------------|---------|
+| A question (a decision) | diamond | ends with `?` | "Is the test passing?" |
+| An action | box (the default) | starts with a verb | "Write the test first" |
+| A command | plaintext | literally, as it is run | `git status` |
+| A state | ellipse | describes the situation | "The test is failing", "I am stuck" |
+| A warning | octagon, filled red | a stop, in capitals | "NEVER fix only the symptom" |
+| The entry or the exit | double circle | names the start or the end | "Process starts", "Process complete" |
+
+To choose a shape, ask in order: is it a decision (diamond)? A command (plaintext)? A warning
+(octagon)? An entry or exit (double circle)? A state (ellipse)? Otherwise it is an action (box).
+
+**Edges are labeled.** Out of a binary decision, "yes" and "no". Out of a multiple choice, the
+condition for each branch ("condition A", "condition B", "otherwise"). Where one process finishing
+triggers another, a dotted edge labeled "triggers" joins the exit of the first to the entry of the
+second. The usual structure: a trigger state, a first check, the main action, a command, a second
+check, then the exit on "ok" or a warning on "problem".
+
+**Every label means something.**
+
+```
+GOOD  "Test failed" (state) -> "Read the error message" (action) -> "Can you reproduce it?" (question)
+          -> yes -> "git diff HEAD~1" (command)
+      "NEVER ignore errors" (warning)
+
+BAD   "Something wrong" as a box          -- a state, so an ellipse
+      "Fix it" as a box                   -- too vague to act on
+      "Check" as a box                    -- a question, so a diamond, with a question mark
+      "Run command" as a box              -- a command, so plaintext, with the actual command
+```
+
+No code inside a diagram (a node that holds a line of code can be neither copied nor read easily),
+and no generic labels (step1, helper2).
+
+The source this skill was adapted from also shipped a script that renders such diagrams to images
+for people to look at. The framework leaves it out, because it needs an external renderer and a
+runtime the framework does not depend on, and because a skill's reader is an agent reading the
+text.
 
 ## Checklist for an effective skill
 

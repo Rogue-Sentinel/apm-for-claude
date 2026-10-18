@@ -65,10 +65,13 @@ commands it ran with their real output, so the manager knows what to re-run and 
 | The build succeeds | the build command: exit status 0 | a clean lint, logs that "look good" |
 | A bug is fixed | the original symptom, re-tested: it passes | the code changed, so it is assumed fixed |
 | A regression test works | the full cycle: red without the fix, green with it | a test that passed once |
-| Debt did not grow | `apm debt check` against the base: exit 0 | `apm metrics` read by eye |
+| Debt did not grow | `<CLI> debt check` against the base: exit 0 | `<CLI> metrics` read by eye |
 | A worker finished | the diff in its worktree shows the changes, and the manager's own run passes | the worker's report says "success" |
 | Requirements are met | each item of the plan's task and acceptance criteria, checked one by one | the tests pass |
 | A promised document exists | the file, opened and read | a commit message that says it was added |
+
+`<CLI>` is the framework's command line, as the manager's prompt defines it; workers may run its
+read-only verbs, `metrics` and `debt check`.
 
 The key patterns:
 

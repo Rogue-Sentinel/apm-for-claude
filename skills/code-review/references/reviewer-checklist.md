@@ -85,8 +85,8 @@ prompt:
     not just in name, and every promised document and decision record present?
 
   The standard:
-  - Size limits: run apm metrics, and apm debt check --base [BASE_BRANCH]. A failed debt check
-    is a must-fix finding.
+  - Size limits: run [CLI] metrics, and [CLI] debt check --base [BASE_BRANCH]. A failed debt
+    check is a must-fix finding.
   - Test-first: a test for every behavior, seen failing first; a regression test before every bug
     fix; no skipped test, no test waiting on a person, no test weakened to go green.
   - Extract before you add; refactoring and behavior in separate commits; logic that does not
@@ -112,7 +112,8 @@ prompt:
 
   ## Calibration
 
-  Grade every finding by its real severity; not everything is Critical. Say what was done well
+  Grade every finding honestly: must fix only when it blocks the next task or a merge, and say
+  why in its note; not every finding is a must-fix. Say what was done well
   before the problems: accurate praise helps the implementer trust the rest. If the problem is in
   the plan itself rather than the work, say so.
 
@@ -125,14 +126,14 @@ prompt:
 
   ### Issues
 
-  #### Critical (must fix)
-  [Bugs, security issues, risks of data loss, broken behavior, a failed debt check]
+  #### Must fix
+  [Everything that blocks the next task or a merge, most severe first. Begin each with its
+  severity note: security, data loss, broken behavior, a failed debt check, a broken limit,
+  missing planned work, an architecture problem, poor error handling, a test gap.]
 
-  #### Important (must fix before the next task or a merge)
-  [Architecture problems, missing planned work, poor error handling, test gaps, a broken limit]
-
-  #### Minor (suggestions)
-  [Style, optimization opportunities, documentation polish]
+  #### Suggestions
+  [Style, optimization opportunities, documentation polish. The manager records these as
+  deferred, for the final review.]
 
   For each issue: the file and line; what is wrong; why it matters; how to fix it, if that is
   not obvious; and the rule or criterion it breaks.
@@ -144,12 +145,12 @@ prompt:
   Ready to merge? Yes | No | With fixes
   Reasoning: [one or two sentences of technical assessment]
 
-  ## Critical rules
+  ## Rules for the review
 
-  Do: grade by real severity; be specific (file:line, never vague); explain why each issue
+  Do: put each finding in the right tier, with its severity note; be specific (file:line, never vague); explain why each issue
   matters; acknowledge strengths; give a clear verdict.
 
-  Don't: say "looks good" without checking; mark a nitpick as Critical; comment on code you did
+  Don't: say "looks good" without checking; mark a nitpick as must fix; comment on code you did
   not read; be vague ("improve the error handling"); avoid a verdict.
 
   You report to the manager only. You never address the user. A question only the user can
@@ -168,14 +169,15 @@ prompt:
 | `[BASE_BRANCH]` | the branch the work was cut from |
 | `[LIMITS]`, `[LAYERS]`, `[CHECKERS]`, `[OVERRIDES]`, `[PROTECTED]`, `[UI]` | from the project profile |
 | `[VERIFICATION_OUTPUT]` | the commands the manager ran itself, with their output |
+| `[CLI]` | the framework's command line, exactly as the manager runs it (the `<CLI>` of the manager's prompt) |
 
 ## What comes back
 
 The framework's structured report: status (done and clean, blocked, or needs decision, saying
 plainly whether the work is ready to merge), files changed ("none"), commands run with their real
 output, concerns (the strengths, issues, recommendations and assessment above), and found elsewhere
-(problems outside the range). Critical and Important findings are must-fix; Minor ones are
-suggestions the manager records. Each line under "Declined to judge" is the manager's to rule on.
+(problems outside the range). Must-fix findings enter the fix loop of `apm:executing-plans`;
+suggestions are recorded as deferred and listed for the final review. Each line under "Declined to judge" is the manager's to rule on.
 
 ## An example report
 
@@ -187,20 +189,17 @@ suggestions the manager records. Each line under "Declined to judge" is the mana
 
 ### Issues
 
-#### Critical (must fix)
-none
-
-#### Important (must fix before the next task or a merge)
-1. No help text in the command wrapper
+#### Must fix
+1. Broken behavior, for users: no help text in the command wrapper
    - File: index-conversations:1-31
    - What: there is no --help; users will not discover --concurrency
    - Fix: add a --help case with usage examples
-2. Dates are not validated
+2. Broken behavior, silent data loss in results: dates are not validated
    - File: search.ext:25-27
    - What: an invalid date silently returns no results
    - Fix: validate the ISO format, and fail with an example of a valid date
 
-#### Minor (suggestions)
+#### Suggestions
 1. Progress output
    - File: indexer.ext:130
    - What: no "X of Y" count on long runs, so users cannot tell how long to wait
@@ -214,6 +213,6 @@ none
 
 ### Assessment
 Ready to merge? With fixes
-Reasoning: The core is sound, with good structure and tests. The two Important findings are small,
+Reasoning: The core is sound, with good structure and tests. The two must-fix findings are small,
 and do not touch the core behavior.
 ```

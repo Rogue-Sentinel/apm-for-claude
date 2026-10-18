@@ -119,7 +119,11 @@ the root cause:
   see it **fail**, restore the fix, and see it pass. Claims follow `apm:verification`.
 
 The test-first rules (`apm:test-first`, "A bug fix starts with a failing test") apply in full:
-never weaken another test to make room for the fix, and never skip one.
+never weaken another test to make room for the fix, and never skip one. One difference matters:
+test-first's "simplest code that passes" is not debugging's "root cause". A hard-coded value or a
+guard at the symptom can turn the regression test green and leave the cause in place. Here the fix
+is the smallest change that removes the cause, found by the investigation, not the smallest change
+that makes the test pass.
 
 ## Trace backward to the source
 
@@ -186,9 +190,9 @@ Should the structure change instead of the symptoms being chased?
 This is not a failed hypothesis; it is a wrong architecture, and changing an architecture is not a
 debugger's decision. Report **needs decision** to the manager, with the three attempts, what each
 showed, and the structural question. **The manager decides, or brings it to the user** as a design
-decision. This is separate from the manager's retry rule, under which a worker that fails the same
-task twice is retried on a stronger model: three failed fixes inside one run is a stop, not a
-reason to retry.
+decision. This is separate from the manager's retry rule for a task (two failures on the same model,
+then one round one tier stronger, then the user): three failed fixes inside one run is a stop and a
+report, never a reason for the debugger to try again itself.
 
 ## When there is no root cause
 

@@ -1,7 +1,9 @@
 # The case file and the report
 
-Both live in the workspace, `.apm/diagnosis/<session-id>/`, which is never committed. The case file
-is what the analysts work from; the report is what the user reads.
+Both live in the workspace, `<system temp>/apm-diagnosis/<session-id>/`, in the system's temporary
+directory, outside the repository and the measured tree. The operating system may clean it, so the
+report is copied elsewhere only if the user asks. The case file is what the analysts work from; the
+report is what the user reads.
 
 ## Contents
 
@@ -16,7 +18,7 @@ Fill it after locating the sessions, before any analyst is dispatched.
 ````
 # Case: <session-id>
 
-Workspace: .apm/diagnosis/<session-id>/
+Workspace: <system temp>/apm-diagnosis/<session-id>/ (the full path, as told to the user)
 Created: <ISO timestamp>
 
 ## Problem statement (agreed with the user)
@@ -91,7 +93,7 @@ Fill every section, in order, write it to the workspace, show it to the user, an
 ````
 # Session diagnosis: <session-id>
 
-Report path: .apm/diagnosis/<session-id>/report.md
+Report path: <system temp>/apm-diagnosis/<session-id>/report.md
 Written: <ISO timestamp>
 
 ## 1. Problem statement (required)

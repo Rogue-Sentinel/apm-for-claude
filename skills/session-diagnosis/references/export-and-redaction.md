@@ -22,7 +22,7 @@ Apply these categories, with the `PUBLIC_REPOS` and `PROPRIETARY` lists the user
 |----------|-------------|---------------|
 | Email addresses | `<EMAIL-n>` | anything shaped like an email address |
 | People | `<PERSON-n>` | given names, surnames, handles (`@name`), git author names; replace the whole name; role words ("the reviewer", "the user", "the manager") stay |
-| Account and organization identifiers | `<ORG-n>` | ids labeled account, org, owner, tenant, workspace or team |
+| Account and organization identifiers | `<ORG-n>` | UUIDs, and ids labeled account, org, owner, tenant, workspace or team |
 | Secrets | `<SECRET-n>` | keys, tokens, passwords, bearer strings, private keys, and anything assigned to a variable named like `*_KEY`, `*_TOKEN`, `*_SECRET`, `PASSWORD` or `Authorization` |
 | Hosts and addresses | `<HOST-n>` | host names that are not public package or documentation domains, network addresses, internal URLs |
 | Home paths | `~` | any absolute path under a home directory becomes `~/...`, with the account name removed |
@@ -51,9 +51,12 @@ line numbers.
 1. Ask the user the redaction level, saying what each includes: **skeleton** (no tool-result
    bodies), **evidence** (bodies only for the cited events), or **full**. Ask for the `PUBLIC_REPOS`
    and `PROPRIETARY` lists.
-2. Build the bundle in the workspace, as the README below lays out.
-3. Dispatch the scrubber brief, then the scrub auditor brief, each as a read-only worker. Repeat
-   both until the audit returns `CLEAN`.
+2. Build the bundle in the workspace, at `<system temp>/apm-diagnosis/<session-id>/bundle/`, as the
+   README below lays out.
+3. Dispatch the scrubber brief to `apm:implementer` with `isolation: "worktree"`: it is the one
+   worker here that writes, and it writes only under the bundle, never in the project or the
+   session store. Then dispatch the scrub auditor brief to `apm:auditor`, which stays read-only.
+   Repeat both until the audit returns `CLEAN`. Record each dispatch as for any task.
 4. Complete the README's evidence check and reconciliation.
 5. Show the user the final scrub log, the file list, and the privacy and evidence outcomes.
 6. Archive it (a zip or a compressed tar) **only after the user approves**. Give the archive's path,
@@ -160,7 +163,9 @@ Procedure:
 3. After rewriting, count the occurrences again in every final file except scrub-log.md. Write
    BUNDLE/scrub-log.md as a table of placeholder, category and count. Never write a plain-text
    replacement map, or any original value, into the log.
-4. Return the scrub-log table and the list of files rewritten. Nothing else.
+4. Return your structured report to the manager: under files changed, the files rewritten (all
+   under BUNDLE); under concerns, the scrub-log table and any classification you could not settle.
+   Nothing else.
 ````
 
 ## The scrub auditor brief

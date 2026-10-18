@@ -22,6 +22,12 @@ that the wrong instruction gets fixed and the failure does not repeat.
 and routes the fixes. Analysts are read-only workers that report to the manager only. The session
 can be the current one or a past one, named by its id or its path.
 
+**Record it like any work.** When the user asks for the diagnosis to be filed as an issue, the
+manager files it and records every analyst and pressure-run dispatch under that issue number, as for
+any task: `<CLI> task N ID --status running --worker auditor --model <model>` before the dispatch,
+and `done` or `failed` with the evidence after it. `<CLI>` is the framework's command line, as the
+manager's prompt defines it.
+
 ## The core rule
 
 **Every finding cites `path:line`. No citation, no finding.** Every number comes from the
@@ -78,12 +84,14 @@ path and record meaning against the files in front of you, never from this descr
    "none". Recency alone is not confirmation.
 2. **Enumerate the worker transcripts**, and match each to the dispatch that started it.
 3. **Collect the framework's own evidence**: the ledger on the `apm/state` branch (the task
-   statuses, workers, models, attempts and recorded evidence; read it through `apm brief` and
+   statuses, workers, models, attempts and recorded evidence; read it through `<CLI> brief` and
    `git log apm/state`, never by editing it), the approved plan, the profile, and the agent prompts
    and `apm:` skills of the installed plugin version.
-4. **Make the workspace** at `.apm/diagnosis/<session-id>/` in the project, and tell the user its
-   path. It holds session data, so it is never committed; the guard blocks writes outside the
-   project, so it does not go in the home directory.
+4. **Make the workspace** at `<system temp>/apm-diagnosis/<session-id>/`, in the system's temporary
+   directory, and tell the user its full path. The guard allows writes there for the manager and for
+   workers, and it sits outside the repository and outside the tree the metrics measure, so session
+   data is never committed or counted. Say that the operating system may clean its temporary
+   directory: if the user wants to keep the report, copy it where they ask, and only then.
 5. **Fill the case file** there, following
    [references/case-and-report.md](references/case-and-report.md).
 
@@ -108,9 +116,12 @@ from [references/analyst-briefs.md](references/analyst-briefs.md):
 | Cost and time | where the tokens and the wall-clock went |
 | Roles and safety | the framework's own boundaries: who talked to the user, who changed what, the guard |
 
-- **Analysts are read-only workers.** Dispatch each as `apm:auditor` (the read-only survey role) on
-  the profile's model for it, and **never more at once than the worker cap** (three at most): run the
-  eight dimensions in waves. Split a dimension by turn range when the transcript is long.
+- **Analysts are read-only workers.** Dispatch each as `apm:auditor` (the read-only survey role).
+  The synthesis dimensions (cost and time, plan adherence, quality evidence) run on `sonnet`; the
+  rest run on the profile's auditor model (default haiku). Each returns the auditor's structured
+  report, with its findings under **concerns** in the brief's format, not in place of the report.
+- **Never more at once than the worker cap** (the profile's, three at most): run the eight
+  dimensions in waves. Split a dimension by turn range when the transcript is long.
 - **Pass exact paths and ids.** An analyst's "current session" is its own; it only knows the paths
   you give it.
 - **Human prompts only.** Hook output, injected context, system reminders and tool results are not
@@ -200,6 +211,7 @@ the transcript's own failure as the baseline.
 | "I'll fix the skill right now, while I'm here." | The fix goes through the normal path, tested, and a framework change through an approved issue. |
 | "The agent just made a mistake; no instruction is involved." | Look first. Say "not involved" only with the evidence that the instruction was right. |
 | "All eight analysts at once will be faster." | The worker cap holds here too. Run them in waves. |
+| "I'll keep the workspace in the project, it's handier." | Session data in the tree gets measured or committed. It goes in the temp directory. |
 
 ## References
 
@@ -221,4 +233,5 @@ the transcript's own failure as the baseline.
 - **Stopping at "what happened"** without finding the instruction behind it.
 - **Editing an instruction during the diagnosis** instead of routing a tested fix.
 - **Filing an issue, or building a bundle, without the user's approval** of the exact text.
-- **Committing the workspace**, which holds session data.
+- **Putting the workspace in the project**, where session data is measured or committed, instead
+  of `<system temp>/apm-diagnosis/<session-id>/`.

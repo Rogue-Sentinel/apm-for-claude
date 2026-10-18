@@ -37,7 +37,7 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 | `systematic-debugging` | `systematic-debugging` (and its root-cause tracing, defense-in-depth and condition-based-waiting references, its waiting helpers and its polluter search) |
 | `verification` | `verification-before-completion` |
 | `code-review` | `requesting-code-review` (and its code-reviewer brief), `receiving-code-review` |
-| `writing-skills` | `writing-skills` (and its guides to testing skills with subagents, authoring best practices and persuasion principles, its instruction-file testing example, and its diagram conventions) |
+| `writing-skills` | `writing-skills` (and its guides to testing skills with subagents and persuasion principles, its instruction-file testing example, and its diagram conventions); its authoring best practices are Anthropic's skill-authoring documentation, bundled by superpowers, and the creation log of superpowers' `systematic-debugging` is carried as its debugging-skill example |
 | `session-diagnosis` | `diagnosing-superpowers` (and its analyst prompts, references and templates), retargeted to APM sessions |
 
 ### The user's own working agreement
