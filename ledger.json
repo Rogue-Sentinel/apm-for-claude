@@ -90,7 +90,12 @@
     },
     "13": {
       "allowlist": [],
-      "concerns": [],
+      "concerns": [
+        {
+          "at": "2026-10-18T20:36:26.815545+00:00",
+          "text": "Hit again by the issue 11 Task 1 reviewer: grep ... .apm/profile.json 2>/dev/null denied as a protected-path write."
+        }
+      ],
       "decisions": [],
       "kind": "bug",
       "questions": [],
@@ -561,6 +566,11 @@
       "at": "2026-10-18T20:36:24.543736+00:00",
       "event": "task 11/1r done",
       "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:36:26.815566+00:00",
+      "event": "concern 13 Hit again by the issue 11 Task 1 reviewer: grep ... .apm/profile.json 2>/dev/null denied as a protected-path write.",
+      "issue": 13
     }
   ]
 }
