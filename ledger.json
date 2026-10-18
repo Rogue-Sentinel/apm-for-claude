@@ -44,10 +44,12 @@
       "status": "building",
       "tasks": [
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "1",
-          "status": "pending",
-          "title": "Reproduce the bug as failing tests"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Reproduce the bug as failing tests",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -199,6 +201,11 @@
     {
       "at": "2026-10-18T19:16:35.691390+00:00",
       "event": "task 9/7 updated",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:44.611985+00:00",
+      "event": "task 9/1 running",
       "issue": 9
     }
   ]
