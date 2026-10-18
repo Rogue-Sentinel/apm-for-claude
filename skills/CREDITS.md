@@ -19,6 +19,10 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 | `code-smells` | `clean-code-detect-smells` (and its smell catalog) |
 | `refactoring` | `refactor-extract-method` (and its extraction heuristics), `refactor-rename`, `refactor-replace-conditional-with-polymorphism` (and its before-and-after examples) |
 | `test-first` | `tdd-test-first` (and its checklist), `tdd-red-green-refactor` (and its cycle steps), `tdd-arrange-act-assert` (and its patterns) |
+| `solid` | `solid-single-responsibility` (and its indicators), `solid-open-closed` (and its strategies), `solid-liskov-substitution` (and its violation examples), `solid-interface-segregation` (and its patterns), `solid-dependency-inversion` (and its patterns) |
+| `object-design` | `oop-encapsulation` (and its checklist), `oop-composition-over-inheritance` (and its patterns) |
+| `functional-core` | `fp-pure-functions` (and its purity rules), `fp-higher-order-functions` (and its patterns), `fp-error-handling` (and its result and option reference) |
+| `clean-architecture` | `hexagonal-ports-adapters` (and its anatomy), `hexagonal-domain-isolation` (and its anti-corruption layer patterns) |
 
 ### obra/superpowers
 
@@ -33,8 +37,10 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 
 The limits and the definition of a line of logic, "extract before you add", "logic does not move
 sideways", "refactor and behavior never share a commit", the rules against skipped, waiting and
-weakened tests, and the decision-record practice come from the working agreement and decision records
-of the user's own earlier project. They carry no third-party license.
+weakened tests, the decision-record practice, the architecture rule that keeps frameworks and input
+and output at the edges so the core is tested without them, and the idioms that absence is a typed
+value and the clock is a parameter come from the working agreement and decision records of the
+user's own earlier project. They carry no third-party license.
 
 ## License notices
 

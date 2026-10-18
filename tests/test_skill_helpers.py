@@ -56,6 +56,11 @@ def test_reference_style_definitions_are_links():
     assert local_links(text) == ["references/guide.md", "references/with space.md"]
 
 
+def test_footnote_definitions_are_not_links():
+    text = "A claim.[^1]\n\n[^1]: The source says so.\n[^note]: see-also.md\n[r]: real.md\n"
+    assert local_links(text) == ["real.md"]
+
+
 def test_angle_bracket_inline_links_are_links():
     text = "[a](<references/a b.md>) and [c](references/c.md \"title\")"
     assert local_links(text) == ["references/a b.md", "references/c.md"]
