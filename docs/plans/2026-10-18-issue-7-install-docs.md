@@ -55,8 +55,12 @@ Checked; one line.
 
 ## File Structure
 
+*Changed at plan approval (2026-10-18): the user added the tutorial to this issue. Section 1 gets the same
+note, and section 10, Troubleshooting, gets the "Failed to add marketplace." symptom and its fix.*
+
 ```
 README.md                          (modify) ## Install gains the remove-the-old-marketplace note
+docs/tutorial.md                   (modify) section 1 gains the same note; section 10 gains the symptom
 .claude-plugin/marketplace.json    (modify) gains a top-level "description"
 tests/test_docs.py                 (modify) one new test on the README install section
 tests/test_manifest.py             (modify) one new test on the marketplace description
@@ -73,6 +77,7 @@ line; splitting them would double the verification and records for no separate d
 **Files:**
 - Modify: `README.md` (the `## Install` section only)
 - Modify: `.claude-plugin/marketplace.json` (add `description`)
+- Modify: `docs/tutorial.md` (`## 1. Install and set up` and `## 10. Troubleshooting` only)
 - Test: `tests/test_docs.py`, `tests/test_manifest.py`
 
 **Interfaces:**
@@ -84,10 +89,15 @@ line; splitting them would double the verification and records for no separate d
   - In `tests/test_manifest.py`, `test_marketplace_describes_itself_with_the_plugin_description`:
     `load(".claude-plugin/marketplace.json")["description"]` equals
     `load(".claude-plugin/plugin.json")["description"]`, and is non-empty after `strip()`.
-  - In `tests/test_docs.py`, `test_the_readme_install_says_to_remove_an_old_local_marketplace_first`: in
-    `section(_text(README), "## Install")`, both `/plugin marketplace remove rogue-sentinel` and
+  - In `tests/test_docs.py`, `test_the_install_says_to_remove_an_old_local_marketplace_first`, parametrized
+    over two cases, `(README, "## Install")` and `(TUTORIAL, HEADINGS[0])`, with ids `README.md` and
+    `tutorial.md`: in `section(_text(path), heading)`, both `/plugin marketplace remove rogue-sentinel` and
     `claude plugin marketplace remove rogue-sentinel` appear, and the index of
     `/plugin marketplace remove rogue-sentinel` is lower than the index of `/plugin marketplace add`.
+    *(Amended at approval: was README-only, named `test_the_readme_install_...`.)*
+  - In `tests/test_docs.py`, `test_troubleshooting_explains_a_failed_marketplace_add`: in
+    `section(_text(TUTORIAL), HEADINGS[9])`, the text `Failed to add marketplace.` and
+    `/plugin marketplace remove rogue-sentinel` both appear.
 - [ ] **Step 2: Run** `python -m pytest tests/test_manifest.py tests/test_docs.py -q`. Expected: the two new
   tests FAIL (`KeyError: 'description'`; the remove line is not in the section), every other test passes.
 - [ ] **Step 3: Implement**
@@ -106,6 +116,14 @@ line; splitting them would double the verification and records for no separate d
     > Then, in Claude Code:
 
     The install block, `/apm:setup` and the rest of the section are unchanged.
+  - `docs/tutorial.md`, `## 1. Install and set up`: the sentence "These are the only commands you type."
+    becomes true again by naming the exception, e.g. "These are the only commands you type, plus one more if
+    you installed APM from a local folder before." The same conditional note as the README's follows that
+    paragraph, before the install block, with both remove commands. Nothing else in section 1 changes.
+  - `docs/tutorial.md`, `## 10. Troubleshooting`: a new bold-led paragraph, placed first, in the section's
+    style: **Adding the marketplace fails with only "Failed to add marketplace."** It says the likely cause
+    (an old local-folder marketplace with the same name, left behind when the plugin was uninstalled) and the
+    fix (`/plugin marketplace remove rogue-sentinel`, then add again). No other paragraph changes.
 - [ ] **Step 4: Run** `python -m pytest tests/test_manifest.py tests/test_docs.py -q`. Expected: PASS.
   Then run `claude plugin validate .` in the worktree. Expected: `✔ Validation passed`, with no
   `Found 1 warning` line and no `description:` warning.
@@ -125,13 +143,16 @@ line; splitting them would double the verification and records for no separate d
 None. No task writes a protected path, deletes a file, or runs a destructive command.
 
 ## Structural acceptance criteria (checked before the PR)
-- Only `README.md`, `.claude-plugin/marketplace.json`, `tests/test_docs.py`, `tests/test_manifest.py` and
-  this plan change on the branch.
+- Only `README.md`, `docs/tutorial.md`, `.claude-plugin/marketplace.json`, `tests/test_docs.py`,
+  `tests/test_manifest.py` and this plan change on the branch.
+- The tutorial keeps its ten numbered sections in order (`test_the_tutorial_has_the_ten_sections_in_order`),
+  and section 10 names `Failed to add marketplace.` with the remove command.
 - `claude plugin validate .` prints `✔ Validation passed` with no warnings (output in the PR).
 - The marketplace `description` is top-level and equals `plugin.json`'s `description`; there is no
   `metadata` key.
-- In the README's `## Install` section, `/plugin marketplace remove rogue-sentinel` comes before
-  `/plugin marketplace add`, and the note is worded as conditional on an earlier local-folder install.
+- In the README's `## Install` section and the tutorial's section 1, `/plugin marketplace remove rogue-sentinel`
+  comes before `/plugin marketplace add`, and the note is worded as conditional on an earlier local-folder
+  install.
 - Every test in `tests/test_docs.py` and `tests/test_manifest.py` passes; no existing test was changed or
   weakened.
 - `<CLI> debt check` passes against `main`.
