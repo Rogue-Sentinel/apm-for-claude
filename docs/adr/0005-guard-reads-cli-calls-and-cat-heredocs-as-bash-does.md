@@ -22,10 +22,8 @@ approval, and the guard denies the recording. Four causes, each confirmed on the
 4. **A heredoc body is data only for `git commit -F -`.** The body of `cat > body.md <<'EOF'` is split on
    newlines and each line is scanned as a command, so an issue body that quotes `git rm -r -q x` is denied.
 
-ADR-0002 sets the threat model: a cooperative manager or worker making a mistake. Its rule 2, read
-literally, makes any denial that becomes an allow a must-fix, which no false-positive fix can meet. This record
-reads that rule for this change, as the user approved on 2026-10-18, and applies the reading to two narrow
-deny-to-allow cases.
+ADR-0002 sets the threat model: a cooperative manager or worker making a mistake. Its rule 2 needs a reading
+for this change, given under Decision, and two narrow deny-to-allow cases follow from it.
 
 ## Decision
 
@@ -35,15 +33,25 @@ deny-to-allow cases.
   its backslashes are ones bash reads literally: inside single quotes, or inside double quotes before any
   character except `"` or `\`. A backslash outside quotes, `\"` and `\\` inside double quotes, `$`, a backtick,
   a newline and a carriage return still rule the call out.
-- **`cat` heredoc rule.** A lone `cat` on the command's first line that writes a quoted-tag heredoc
-  (`<<'EOF'`, `<<"EOF"`, `<<-'EOF'`) to a `.md` or `.txt` file has its body read as data. The file it writes is
-  still checked.
+- **`cat` heredoc rule.** The body of a heredoc is read as data only when all of these hold:
+  - the first non-blank line of the command holds a lone `cat`;
+  - that line has one `>` or `>>` to an unquoted path of `[\w./:~-]` characters ending in `.md` or `.txt`;
+  - that line has one `<<` or `<<-` heredoc with a single- or double-quoted tag, in either order with the
+    redirect, and nothing else on the line;
+  - the body ends at the first line that is the tag, with blanks allowed around it;
+  - nothing after that end tag is masked, so it is scanned like any other command text.
+
+  The file it writes is still checked.
+- **Carriage-return rule.** Nothing in a command holding a carriage return is masked. Git Bash ends a heredoc at
+  a line `TAG\r`, which the guard's end-of-line match does not see, so a mask could run past where bash ended
+  the body. This also stops message arguments (`-m`, `--body` and the like) from being masked in such a command.
+  Both fail closed: a few more commands are scanned whole and denied.
 - **The exemption stays Bash-only and main-session-only.** PowerShell's quoting (`""`, and the curly quotes it
   treats as quotes) is not read. The denial and the instructions now say to record an approval with the Bash
   tool.
 - **A denial echoes the command as typed**, once, not the masked segment.
 
-How ADR-0002 rule 2 was read. Read literally, it makes any denial that becomes an allow a must-fix, which no
+How ADR-0002 rule 2 is read. Read literally, it makes any denial that becomes an allow a must-fix, which no
 false-positive fix can meet. The user approved, on 2026-10-18, reading it for this change as: never allow a
 command that does what the guard must stop. Under that reading exactly two classes of denial become allows:
 
@@ -53,7 +61,9 @@ command that does what the guard must stop. Under that reading exactly two class
 
 Every other verdict is unchanged. The tests pin the realistic neighbors: a chained approve call, a backslash
 bash reads as an escape, a heredoc that feeds code (`bash <<'EOF'`, `python - <<'PY'`, `cat <<'EOF' | bash`, a
-script written then run), an unquoted tag, a heredoc not on the first line, and the file a heredoc writes.
+script written then run), an unquoted tag, a `cat` heredoc after another line (`cd docs` on a line before it, or
+`cd docs &&` before it), a destructive line after the end tag, a command holding a carriage return, and the file
+a heredoc writes.
 
 ## Consequences
 
@@ -61,7 +71,10 @@ script written then run), an unquoted tag, a heredoc not on the first line, and 
   hook from Bash.
 - A path ending in `\` inside double quotes, `\\`, and `\"` still rule the call out. Use single quotes.
 - A `.md` or `.txt` file written by a heredoc and then executed is a known limit, as in ADR-0002.
-- A heredoc not on the first line, or with an unquoted tag, is still scanned.
+- A heredoc not on the first non-blank line, or with an unquoted tag, is still scanned.
+- A command holding a carriage return is scanned whole, including its message arguments.
+- A PowerShell-tool command with `<<` is masked the same way, but it runs nothing, because PowerShell does not
+  parse `<<`.
 - The echo of a long script is long.
 - A PowerShell approve call is still denied. The instruction to use Bash is the fix.
 

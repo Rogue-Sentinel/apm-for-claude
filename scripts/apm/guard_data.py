@@ -1,7 +1,7 @@
 """Mask the text of message arguments: it is data, not a command, so the guard must not read it as one.
 
-Known limits: a file written by a masked `cat` heredoc and then run (`bash body.md`) is not seen; a `cat`
-heredoc body, or a `git commit -F -` heredoc body, in a command holding a CR is not masked.
+Known limits: a file written by a masked `cat` heredoc and then run (`bash body.md`) is not seen; nothing in
+a command holding a CR is masked.
 """
 from __future__ import annotations
 
@@ -57,21 +57,19 @@ def _mask_heredoc(found: re.Match[str]) -> str:
     return found.group("head") + found.group("end")
 
 
-def _heredocs_masked(pattern: re.Pattern[str], command: str) -> str:
-    # Git Bash ends a quoted heredoc at a line `EOF\r`, which `$` does not match, so a mask could run past
-    # where bash ended the body. A command holding a CR is left whole, which fails closed.
-    return command if "\r" in command else pattern.sub(_mask_heredoc, command)
-
-
 def mask_data(command: str) -> str:
     """Empty the value of each message argument and the heredoc body of `git commit -F -`.
 
     The body of a quoted-tag `cat` heredoc written to a `.md` or `.txt` file on the first line is emptied
     first, whatever else the command runs. A value that the shell would expand (`$(...)` or backticks
     outside single quotes) is code and stays, and so does every message argument in a command that runs
-    a shell's command string.
+    a shell's command string. A command holding a CR is returned whole.
     """
-    command = _heredocs_masked(_CAT_HEREDOC, command)
+    if "\r" in command:
+        # Git Bash ends a heredoc at a line `TAG\r`, which `$` does not match, so a mask could run past
+        # where bash ended the body. The guard masks nothing in such a command, which fails closed.
+        return command
+    command = _CAT_HEREDOC.sub(_mask_heredoc, command)
     if _SHELL_STRING.search(command.replace('"', "").replace("'", "")):
         return command
-    return _ARGUMENT.sub(_mask_argument, _heredocs_masked(_HEREDOC, command))
+    return _ARGUMENT.sub(_mask_argument, _HEREDOC.sub(_mask_heredoc, command))

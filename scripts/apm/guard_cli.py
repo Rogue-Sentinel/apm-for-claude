@@ -38,6 +38,9 @@ def _name(token: str) -> str:
 
 def _arguments(tokens: list[str], cwd: Path, windows: bool) -> list[str] | None:
     """The arguments after `python <this plugin>/scripts/apm_cli.py`, or None for any other program."""
+    # Known limit: a script path that starts with a backslash (`'\c\Users\...\apm_cli.py'`) is mapped to `C:/...`
+    # and counts as the plugin CLI. Windows Python would open it on the current drive instead, but no cooperative
+    # caller types it.
     if len(tokens) < 2 or not _INTERPRETER.fullmatch(_name(tokens[0])):
         return None
     script = to_native_path(tokens[1], cwd, windows)

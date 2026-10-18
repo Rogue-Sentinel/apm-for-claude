@@ -93,3 +93,14 @@ def test_a_cat_heredoc_in_a_command_holding_a_cr_stays_scanned(git_repo: Path, c
 def test_a_git_commit_heredoc_in_a_command_holding_a_cr_stays_scanned(git_repo: Path) -> None:
     command = "git commit -F - <<'EOF'\nmsg\nEOF\r\nrm -rf build\nEOF"
     assert _decide(git_repo, command).kind == "deny"
+
+
+@pytest.mark.parametrize("extra", [{}, {"agent_id": "w1"}], ids=["main", "worker"])
+def test_a_commit_heredoc_whose_message_has_an_open_quote_and_a_cr_stays_denied(git_repo: Path, extra: dict) -> None:
+    command = "git commit -F - <<'EOF'\nsubject -m 'x\nEOF\r\nEOF\nrm -rf build; echo 'done'"
+    assert _decide(git_repo, command, **extra).kind == "deny"
+
+
+def test_a_cat_heredoc_after_another_line_stays_scanned(git_repo: Path) -> None:
+    command = "cd docs\ncat > body.md <<'EOF'\nrm -rf build\nEOF"
+    assert _decide(git_repo, command).kind == "deny"
