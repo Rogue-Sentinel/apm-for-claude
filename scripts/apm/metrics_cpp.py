@@ -13,6 +13,8 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
 - a class defined in a macro argument, or whose head is built by a macro, is read by its text;
 - `#ifdef` arms that each open a class or a function leave an extra `{`, and the file is then
   reported as "unbalanced braces" by the function scanner, so no classes are reported either;
+- a C++20 `requires` clause before an inline body (`void b() requires C<T> { } void c();`) merges that
+  method with the next one, so only one of the two is counted;
 - the limits of `metrics_cpp_heads` and of `strip_code` in `metrics_lang` apply first.
 """
 from __future__ import annotations

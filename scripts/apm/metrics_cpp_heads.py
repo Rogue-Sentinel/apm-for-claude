@@ -12,7 +12,9 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
   runs into that member's head;
 - a method that returns a function pointer (`void (*get())(int);`) is read as a pointer member;
 - `noexcept(...)` with nested parentheses is not stripped as a qualifier;
-- a `<` or `>` used as a comparison inside a head can be taken for template arguments.
+- a `<` or `>` used as a comparison inside a head can be taken for template arguments;
+- a C++20 `requires` clause before an inline body (`void b() requires C<T> { } void c();`) is not a
+  qualifier, so the body is not seen as a method body and the next member merges into that head.
 """
 from __future__ import annotations
 
@@ -24,6 +26,9 @@ _CLASS_WORDS = frozenset({"class", "struct", "union", "final"})
 _TEMPLATE = re.compile(r"template\s*<")
 _ATTRIBUTE = re.compile(r"\[\[.*?\]\]")
 _DECL_SPEC = re.compile(r"\b(?:alignas|__declspec)\s*\([^()]*\)")
+_GNU_ATTRIBUTE = re.compile(r"\b__attribute__\s*\(\s*\((?:[^()]|\([^()]*\))*\)\s*\)")
+_OPERATOR = re.compile(r"\boperator\b")
+_OPERATOR_ANGLE = re.compile(r"\boperator\s*[<>]")
 _ANGLES = re.compile(r"<[^<>]*>")
 _BASE_COLON = re.compile(r"(?<!:):(?!:)")
 _CLASS_HEAD = re.compile(r"(?:class|struct|union)\b")
@@ -41,7 +46,7 @@ _NAME = re.compile(
 _NOT_A_NAME = frozenset({"decltype", "alignas", "noexcept", "sizeof", "static_assert", "__declspec"})
 _NOT_A_METHOD = re.compile(r"(?:using|friend|typedef|static_assert|enum)\b")
 _DELETED = re.compile(r"=\s*delete\s*$")
-_FUNCTION_POINTER = re.compile(r"^[^()]*\(\s*(?:[\w:]+::)?[*&]\s*\w*\s*\)\s*\(")
+_FUNCTION_POINTER = re.compile(r"^[^()]*\(\s*(?:[\w:]+::)?[*&]\s*\w*\s*(?:\[[^\]]*\]\s*)*\)\s*[(\[]")
 _Kind = Literal["namespace", "class", "other"]
 
 
@@ -60,7 +65,7 @@ def _drop_templates(head: str) -> str:
 
 def _drop_angles(head: str) -> str:
     """Remove template arguments, so `std::function<void()>` holds no parentheses."""
-    if "operator" in head:
+    if _OPERATOR_ANGLE.search(head):
         return head
     previous = None
     while previous != head:
@@ -69,8 +74,8 @@ def _drop_angles(head: str) -> str:
 
 
 def tidy_head(head: str) -> str:
-    """The head without template prefixes, attributes, `alignas`, `__declspec` and angle arguments."""
-    plain = _DECL_SPEC.sub("", _ATTRIBUTE.sub("", _drop_templates(head)))
+    """The head without template prefixes, attributes, `alignas`, `__declspec`, `__attribute__` and angle arguments."""
+    plain = _GNU_ATTRIBUTE.sub("", _DECL_SPEC.sub("", _ATTRIBUTE.sub("", _drop_templates(head))))
     return _drop_angles(plain).strip()
 
 
@@ -128,7 +133,7 @@ def _is_data_member(tidy: str) -> bool:
     if _FUNCTION_POINTER.match(tidy):
         return True
     equals, paren = tidy.find("="), tidy.find("(")
-    return "operator" not in tidy and 0 <= equals < paren
+    return not _OPERATOR.search(tidy) and 0 <= equals < paren
 
 
 def is_public_method(head: str, class_name: str) -> bool:
