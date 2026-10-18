@@ -108,10 +108,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Final review (opus) 0d03ee9..88f7b6a: 1 must-fix open (M1: 'operator' substring makes on_operator_change / operator_id count as methods; confirmed by the manager). Suggestions S1-S6 ruled into the fix wave. See the plan, Final review section.",
+          "evidence": "Final review (opus) 1 must-fix + 6 suggestions; fix wave merged 76e79d4; scoped re-review: all 7 addressed, 0 open, ready to merge. 3 deferred findings in the plan.",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -338,6 +338,11 @@
     {
       "at": "2026-10-18T19:59:26.436729+00:00",
       "event": "task 9/review running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T20:01:16.323930+00:00",
+      "event": "task 9/review done",
       "issue": 9
     }
   ]
