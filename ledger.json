@@ -1,5 +1,23 @@
 {
   "approvals": [],
-  "issues": {},
-  "log": []
+  "issues": {
+    "9": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "metrics reports 0 wide classes for C++ (and every brace language): only Python classes are counted",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/9"
+    }
+  },
+  "log": [
+    {
+      "at": "2026-10-18T18:29:13.675801+00:00",
+      "event": "filed 9 https://github.com/Rogue-Sentinel/apm-for-claude/issues/9",
+      "issue": 9
+    }
+  ]
 }
