@@ -168,3 +168,13 @@ None. No task writes a protected path, deletes a file, or runs a destructive com
 | Task 1 self-consistency: files | Creates nothing; modifies README.md, docs/tutorial.md, .claude-plugin/marketplace.json and the two test files, all named in its Files block. Consistent. |
 | Existing doc tests vs the new text | New commands start with `/plugin` or `claude`, so `test_no_python_command_line_is_shown_to_the_user`, `test_the_user_is_never_told_to_run_apm_in_a_shell` and `test_every_command_it_shows_is_a_real_subcommand` do not match them; `test_no_british_spelling` applies to the new prose (American spelling). No `<CLI>` block is added, so the label test is unaffected. |
 | Rubric defects the plan mandates | None. Both new tests assert concrete strings and order. |
+
+## Final review rulings
+
+*Ruling after the final review (2026-10-18, opus, at c6d4c52): no must-fix findings; three suggestions, all in
+`docs/tutorial.md`. The manager re-grades all three as fix-now, because this branch introduced them and every
+reader of the tutorial sees them: (1) re-wrap the changed sentence at lines 19-20 to the file's ~110-char width;
+(2) the intro at line 11 lists what you type as "the two install lines and `/apm:setup`" and must mention the
+conditional remove line too; (3) the section 10 fix gains the `claude plugin marketplace remove rogue-sentinel`
+terminal alternative, matching section 1 and the README. One fix dispatch, one scoped re-review. Cost if wrong:
+a few minutes of rework on wording.*
