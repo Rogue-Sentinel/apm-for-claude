@@ -20,7 +20,7 @@ _PIECE = re.compile(
     "(?:\\.|[^"\\])*"      # a double-quoted string
     |'[^']*'               # a single-quoted string
     |\\.                   # an escaped character
-    |(?P<op>&?[<>][<>&]*)  # a run of redirect characters
+    |(?P<op>[&*]?[<>][<>&]*)  # a run of redirect characters, PowerShell's `*>` whole
     """,
     re.DOTALL | re.VERBOSE,
 )

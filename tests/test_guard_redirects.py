@@ -16,6 +16,7 @@ from apm.guard_redirects import space_redirects
         ('echo "x">log', 'echo "x" > log'),
         ("cat <<'EOF'>log", "cat  << 'EOF' > log"),
         ("x<in", "x < in"),
+        ("x *>$null", "x  *> $null"),
     ],
 )
 def test_an_unquoted_redirect_is_set_apart(text: str, spaced: str) -> None:
