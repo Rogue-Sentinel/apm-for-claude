@@ -812,3 +812,12 @@ is a Task 13 ordering fix, amended there. S8 is done: the Task 14 criterion now 
 - S12: the gate checks the local base; fetch first.
 
 Every deferred finding the review ruled "leave" stays in the list above.*
+
+*Decision by the user after the fix-wave re-review (2026-10-18): one more small guard fix round for the two
+residual must-fix holes, each reproduced by the manager, then a scoped re-review, then the gate and the PR.
+(1) The continuation join treats an escaped backslash (or a doubled backtick) before a newline as a
+continuation, so a protected write after `cat x \` and a newline was allowed: a regression against `main`.
+Join only when an odd number of backslashes, or of backticks, comes before the newline. (2)
+`python -m scripts.apm_cli <state subcommand>` was allowed for workers: also match a module word whose last
+dotted part is `apm_cli`. The older hole the re-review noted, a command substitution after a read-only prefix
+(`cat $(...)`), was already open on `main`; it is filed as a follow-up issue, not fixed here.*
