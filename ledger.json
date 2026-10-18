@@ -225,6 +225,14 @@
           "id": "3",
           "status": "pending",
           "title": "Merge gate"
+        },
+        {
+          "attempts": 1,
+          "id": "1r",
+          "model": "opus",
+          "status": "running",
+          "title": "Task 1 review",
+          "worker": "reviewer"
         }
       ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
@@ -1078,6 +1086,11 @@
       "at": "2026-10-18T23:02:49.152474+00:00",
       "event": "issue 19 status planning",
       "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:05:40.162005+00:00",
+      "event": "task 14/1r running",
+      "issue": 14
     }
   ]
 }
