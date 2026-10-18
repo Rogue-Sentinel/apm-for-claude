@@ -1,7 +1,7 @@
 """The skill-test helpers read Markdown the way a renderer does."""
 import pytest
 
-from skill_helpers import british_spellings, local_links, prose_lines, sections
+from skill_helpers import british_spellings, local_links, prose_lines, section, sections
 
 FOUR_BACKTICK_FENCE = """# Title
 ````
@@ -45,6 +45,17 @@ def test_backtick_opener_with_a_backtick_in_its_info_is_not_a_fence():
 
 def test_prose_lines_drop_fence_lines_and_their_contents():
     assert prose_lines("a\n~~~~\nb\n~~~~\nc") == ["a", "c"]
+
+
+def test_section_runs_to_the_next_heading_of_its_level_and_keeps_fences():
+    text = "## A\none\n### A1\ntwo\n```\n## fenced\n```\n## B\nthree\n"
+    assert section(text, "## A") == "one\n### A1\ntwo\n```\n## fenced\n```"
+    assert section(text, "### A1") == "two\n```\n## fenced\n```"
+    assert section(text, "## B") == "three"
+
+
+def test_section_ignores_a_fenced_copy_of_the_heading():
+    assert section("```\n## A\nfenced\n```\n## A\nreal\n", "## A") == "real"
 
 
 def test_links_inside_inline_code_do_not_count():

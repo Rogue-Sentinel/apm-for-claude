@@ -310,7 +310,9 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
     ```
     {"version": 1, "limits": {"function": 15, "file": 200, "public_methods": 7},
      "totals": {"long_functions": n, "long_files": n, "wide_classes": n,
-                "excess_function_lines": n, "excess_file_lines": n},
+                "excess_function_lines": n, "excess_file_lines": n,
+                "unmeasured_files": n},   # syntax errors and unbalanced files; added after the Task 4 review
+     "unmeasured": ["<path>", ...],    # a file that stops parsing hides its debt, so this may only shrink
      "functions": {"<path>::<name>": lines, ...},   # only items over the limit
      "files": {"<path>": lines, ...},
      "classes": {"<path>::<name>": public_methods, ...},
@@ -318,7 +320,13 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
      "accepted": []}
     ```
     Duplicate function names in one file get `#2`, `#3`, … in source order.
-  - `@dataclass(frozen=True) class Comparison: regressions: tuple[str, ...]; improvements: tuple[str, ...]`, with property `worse -> bool`.
+  - `@dataclass(frozen=True) class Comparison: regressions: tuple[str, ...]; improvements: tuple[str, ...]; moves: tuple[str, ...] = ()`, with property `worse -> bool`.
+  - *Amended after the Task 5 review:* the per-section comparison lives in `scripts/apm/debt_compare.py`.
+    `snapshot` also takes `scope: MetricsConfig | None` and records `"scope": {"include", "exclude"}`. A
+    narrowed scope, a missing limit, or a baseline `version` other than 1 is a regression. Duplicate-named
+    items that move between files are matched by exact (bare name, number) before pairing by size. One
+    known limit is documented: a "move" can hide a same-named function that was under the limit and grew
+    past it, because the snapshot lists only items over a limit.
   - `compare(base: dict, current: dict) -> Comparison`. A regression is any of the following:
     - a total that rose;
     - an item in both whose number rose (*"grew: path::name 18 → 21"*);

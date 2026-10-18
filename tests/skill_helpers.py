@@ -105,20 +105,47 @@ def _closes(line: str, fence: str) -> bool:
     return run[0] == fence[0] and len(run) >= len(fence)
 
 
+def _prose_flags(lines: Sequence[str]) -> list[bool]:
+    """For each line, whether it lies outside every code fence (a fence line itself does not)."""
+    flags, fence = [], None
+    for line in lines:
+        if fence:
+            flags.append(False)
+            fence = None if _closes(line, fence) else fence
+        else:
+            fence = _opening_fence(line)
+            flags.append(fence is None)
+    return flags
+
+
 def prose_lines(text: str) -> list[str]:
     """The lines of a Markdown text outside fenced code blocks, fence lines dropped."""
-    kept, fence = [], None
-    for line in text.splitlines():
-        if fence:
-            fence = None if _closes(line, fence) else fence
-        elif (fence := _opening_fence(line)) is None:
-            kept.append(line)
-    return kept
+    lines = text.splitlines()
+    return [line for line, prose in zip(lines, _prose_flags(lines)) if prose]
 
 
 def sections(body: str) -> list[str]:
     """Every heading line of a Markdown text, outside code fences."""
     return [line.rstrip() for line in prose_lines(body) if _HEADING.match(line)]
+
+
+def _heading_level(line: str) -> int:
+    return len(line) - len(line.lstrip("#"))
+
+
+def section(body: str, heading: str) -> str:
+    """The lines under `heading`, fences included, up to the next heading of its level or above."""
+    lines = body.splitlines()
+    kept, inside = [], False
+    for line, prose in zip(lines, _prose_flags(lines)):
+        is_heading = prose and bool(_HEADING.match(line))
+        if inside and is_heading and _heading_level(line) <= _heading_level(heading):
+            break
+        if inside:
+            kept.append(line)
+        inside = inside or (is_heading and line.rstrip() == heading)
+    assert inside, f"no heading {heading!r}"
+    return "\n".join(kept)
 
 
 def assert_sections(name: str, required: Sequence[str]) -> None:
