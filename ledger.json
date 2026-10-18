@@ -237,6 +237,14 @@
           "status": "done",
           "title": "Task 1 review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "2r",
+          "model": "opus",
+          "status": "running",
+          "title": "Task 2 review",
+          "worker": "reviewer"
         }
       ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
@@ -1143,6 +1151,11 @@
       "at": "2026-10-18T23:14:55.180372+00:00",
       "event": "concern 19 Plan is written in the scratchpad (2026-10-18-issue-19-memory-folder.md); it is committed on issue-19-memory-folder when that branch is cut after #14 merges.",
       "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:16:55.494579+00:00",
+      "event": "task 14/2r running",
+      "issue": 14
     }
   ]
 }
