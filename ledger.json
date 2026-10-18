@@ -235,9 +235,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Whole-branch review (sonnet): 0 must-fix, 2 deferred.",
           "id": "review",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Whole-branch review",
           "worker": "reviewer"
         }
@@ -931,6 +932,11 @@
     {
       "at": "2026-10-18T22:42:09.619005+00:00",
       "event": "task 17/review running",
+      "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:43:07.001631+00:00",
+      "event": "task 17/review done",
       "issue": 17
     }
   ]
