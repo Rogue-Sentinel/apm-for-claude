@@ -269,6 +269,17 @@
       "title": "Release apm 0.3.1 with the #9 and #11 fixes",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/17"
     },
+    "19": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/19"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -1006,6 +1017,11 @@
       "at": "2026-10-18T22:58:17.684470+00:00",
       "event": "concern 14 Planner: non-read-only commands whose quoted text names a protected path (echo 'x => docs/y') are denied today by the unquoted reading; existing and coarse, outside this issue.",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:01:41.600395+00:00",
+      "event": "filed 19 https://github.com/Rogue-Sentinel/apm-for-claude/issues/19",
+      "issue": 19
     }
   ]
 }
