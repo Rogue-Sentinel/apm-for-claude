@@ -3,7 +3,8 @@
 A line is logic when it holds a token other than a comment, a newline or an indent marker, and is not
 made only of brackets, semicolons and commas. A string spanning several lines counts on every line it
 spans, except a docstring, which is removed. A function's lines run from its first body statement to
-its end, so the decorators and the signature are not counted.
+its end, so the decorators and the signature are not counted; a function written on its def line
+counts that line.
 """
 from __future__ import annotations
 

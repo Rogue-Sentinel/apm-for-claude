@@ -153,7 +153,7 @@ def test_docstring_sharing_a_line_with_a_statement_keeps_the_statement():
 
 
 def test_docstring_after_non_ascii_text_on_its_line_is_found_by_column():
-    text = 'class Ünï(Exception): """Dôc."""; x = 1\n'
+    text = 'class Ünï(Exception): """Dôc\n    more."""\n'
     assert measure_python("a.py", text).lines == 1
 
 
@@ -194,6 +194,13 @@ def test_file_that_tokenizes_but_does_not_parse_counts_its_tokens():
 
 def test_multiline_fstring_counts_every_line_it_spans():
     assert measure_python("a.py", 'x = f"""\n(\n)\n"""\n').lines == 4
+
+
+def test_tokenize_fallback_skips_backslash_only_lines():
+    text = "x = = 1\ny = 1 + \\\n\\\n    2\n"
+    metric = measure_python("a.py", text)
+    assert metric.functions_measured is False
+    assert metric.lines == 3
 
 
 def test_python_language_constant_is_the_one_the_table_serves():
