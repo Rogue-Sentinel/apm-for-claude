@@ -26,7 +26,14 @@ You speak twice per piece of work: the request, and the approval of the plan. Th
 
 ## Install
 
-The plugin lives in the `rogue-sentinel` marketplace. In Claude Code:
+The plugin lives in the `rogue-sentinel` marketplace.
+
+If you installed APM from a local folder before, remove that marketplace first. Uninstalling the plugin
+leaves it behind, and because it has the same name, adding this one fails with only "Failed to add
+marketplace." Type `/plugin marketplace remove rogue-sentinel` in Claude Code, or
+`claude plugin marketplace remove rogue-sentinel` in a terminal. A first install skips this step.
+
+Then, in Claude Code:
 
 ```
 /plugin marketplace add Rogue-Sentinel/apm-for-claude

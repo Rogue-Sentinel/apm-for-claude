@@ -25,3 +25,9 @@ def test_marketplace_lists_apm_from_repo_root():
     assert plugins[0]["name"] == "apm"
     assert plugins[0]["source"] == "./"
     assert plugins[0]["description"].strip()
+
+
+def test_marketplace_describes_itself_with_the_plugin_description():
+    description = load(".claude-plugin/marketplace.json")["description"]
+    assert description.strip()
+    assert description == load(".claude-plugin/plugin.json")["description"]

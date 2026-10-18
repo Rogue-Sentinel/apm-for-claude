@@ -3,6 +3,7 @@
   "owner": {
     "name": "Rogue-Sentinel"
   },
+  "description": "Agentic project management for Claude Code: issues, workers, and guarded tool use.",
   "plugins": [
     {
       "name": "apm",
