@@ -88,3 +88,8 @@ def test_a_worker_filing_the_issue_body_is_denied_for_the_cli_call(git_repo: Pat
 )
 def test_a_cat_heredoc_in_a_command_holding_a_cr_stays_scanned(git_repo: Path, command: str, extra: dict) -> None:
     assert _decide(git_repo, command, **extra).kind == "deny"
+
+
+def test_a_git_commit_heredoc_in_a_command_holding_a_cr_stays_scanned(git_repo: Path) -> None:
+    command = "git commit -F - <<'EOF'\nmsg\nEOF\r\nrm -rf build\nEOF"
+    assert _decide(git_repo, command).kind == "deny"

@@ -1,7 +1,7 @@
 """Mask the text of message arguments: it is data, not a command, so the guard must not read it as one.
 
 Known limits: a file written by a masked `cat` heredoc and then run (`bash body.md`) is not seen; a `cat`
-heredoc body in a command holding a CR is not masked.
+heredoc body, or a `git commit -F -` heredoc body, in a command holding a CR is not masked.
 """
 from __future__ import annotations
 
@@ -74,4 +74,4 @@ def mask_data(command: str) -> str:
     command = _heredocs_masked(_CAT_HEREDOC, command)
     if _SHELL_STRING.search(command.replace('"', "").replace("'", "")):
         return command
-    return _ARGUMENT.sub(_mask_argument, _HEREDOC.sub(_mask_heredoc, command))
+    return _ARGUMENT.sub(_mask_argument, _heredocs_masked(_HEREDOC, command))
