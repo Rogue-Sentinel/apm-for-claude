@@ -2,22 +2,8 @@ from datetime import datetime, timezone
 
 from apm.debt import Comparison, accept, compare, snapshot
 from apm.metrics import Report
-from apm.metrics_model import ClassMetric, FileMetric, FunctionMetric
 from apm.standard_config import Limits
-
-LIMITS = Limits()
-
-
-def _file(path: str, lines: int = 10, funcs=(), classes=(), measured: bool = True,
-          language: str = "Python") -> FileMetric:
-    fns = tuple(FunctionMetric(name, 1 + i * 50, n) for i, (name, n) in enumerate(funcs))
-    cls = tuple(ClassMetric(name, 1, n) for name, n in classes)
-    return FileMetric(path, language, lines, fns, cls, functions_measured=measured,
-                      note="" if measured else "syntax error")
-
-
-def _snap(*files: FileMetric, sources=None) -> dict:
-    return snapshot(Report(tuple(files)), LIMITS, sources)
+from debt_helpers import LIMITS, file_metric as _file, snap as _snap
 
 
 def test_snapshot_lists_only_over_limit_items_and_totals() -> None:
