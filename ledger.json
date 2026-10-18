@@ -376,10 +376,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "2",
-          "status": "pending",
-          "title": "Open the memory folder, ADR 0006"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Open the memory folder, ADR 0006",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1419,6 +1421,11 @@
     {
       "at": "2026-10-18T23:53:23.197722+00:00",
       "event": "task 19/1 done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:53:25.430087+00:00",
+      "event": "task 19/2 running",
       "issue": 19
     }
   ]
