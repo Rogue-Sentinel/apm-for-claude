@@ -830,3 +830,16 @@ never be weaker than `main` (pinned by a test that compares the two readings). T
 the joined reading. (2) The quoted module gap: `mask_data` treats `-m`/`-am` as a message only for `git`, so
 `python -m 'apm_cli' note 1` is seen. (3) Stopping rule for this PR: after this round, only a regression against
 `main` or a broken fix blocks the merge. Any other new finding goes into one follow-up issue.*
+
+*Ruling under the stopping rule (2026-10-18): the last re-review compared the branch's guard with `main`'s over
+173,669 generated commands and the 871 test strings. Commits 00b5b69, 4643f76 and f6ba885 (both readings and
+the differential test) had no regression. Commit 63df3e2 (masking a short `-m` only for `git`) did:
+`touch -m 'a;ls' data/fleet.db`, `zip -m 'a;ls' data/fleet.db` and similar were denied by `main` and allowed here.
+63df3e2 is reverted (14ee908). The quoted python-module gap it targeted is already open on `main`, so it goes to the
+follow-up issue. The manager re-ran the reviewer's comparison on the reverted branch: 0 commands that `main` denies
+and the branch allows in the main-session, protected-path and read-only checks. The remaining differences are by
+design: a worker's `git commit -F -` heredoc body that names an apm subcommand is data; the new subcommands share
+the main session's CLI exemption; and the test strings carry a harness path artifact. Guard tests: 1047 passed.
+Follow-up issue (not fixed here): the quoted or attached `python -m` module form (`python -m 'apm_cli' note 1`,
+`python -mapm_cli note 1`); a command substitution after a read-only prefix; read-only prefixes `ls` and `dir`
+without a word boundary; and the quote-blind segment split.*
