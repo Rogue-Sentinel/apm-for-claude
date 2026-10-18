@@ -132,6 +132,23 @@ def test_no_british_spelling_under_skills():
     assert not found, found
 
 
+CLI_VERBS = (
+    "brief", "setup", "issue", "task", "allow", "approve", "question", "resolve",
+    "metrics", "debt", "coverage",
+)
+_BARE_APM = re.compile(r"(?<![\w./:<-])apm (?:" + "|".join(CLI_VERBS) + r")\b")
+
+
+def test_no_bare_apm_command_under_skills():
+    """Runnable text says `<CLI> <verb>`: another tool on the path may own the name `apm`."""
+    found = []
+    for path in skill_files():
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if _BARE_APM.search(line):
+                found.append(f"{path.relative_to(SKILLS_DIR)}:{number}: {line.strip()}")
+    assert not found, found
+
+
 def test_credits_name_the_source_and_carry_the_mit_notice():
     credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")
     assert "helmedeiros/clean-code-skills" in credits

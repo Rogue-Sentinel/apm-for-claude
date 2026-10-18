@@ -165,9 +165,9 @@ is reported as a loosened limit, like any other limit (`apm:clean-code`).
   queries, or a port whose role genuinely has that many operations can be right. The rule is not
   "never"; it is that **the reason is written down where a reviewer will see it.**
 - **What counts.** Every method a caller outside the type can call. Constructors and the
-  language's special methods do not count; neither do private helpers. `apm metrics` lists the
+  language's special methods do not count; neither do private helpers. `<CLI> metrics` lists the
   types it can count as wide types, and where it can count them, a newly wide type shows up in the
-  debt check like any other new item.
+  debt check like any other new item. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 - **Stating the reason.** Put a short comment at the type's declaration saying what the type is and
   why its surface is this wide ("Facade over the billing subsystem; each method is one use case"),
   and repeat the reason in the change's review notes. A worker who cannot state a reason reports

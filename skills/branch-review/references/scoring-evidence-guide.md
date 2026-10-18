@@ -8,8 +8,8 @@ to gather for each dimension and how to present it. The concrete patterns for ea
 ## How to gather evidence
 
 - **`<base>` is the branch the work was cut from**, the one you were given, falling back to the
-  project's main branch only when none was given. Every command here, and `apm debt check --base`,
-  uses the same ref.
+  project's main branch only when none was given. Every command here, and `<CLI> debt check --base`,
+  uses the same ref. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 - **Measure on both sides.** Every count is taken for the old code (the base) and the new code (the
   branch). `git grep` reads a commit directly, so the base needs no checkout:
 
@@ -22,10 +22,10 @@ to gather for each dimension and how to present it. The concrete patterns for ea
 
   Sum the per-file counts for a total, and keep the per-file lines: the largest ones are the
   evidence worth quoting.
-- **Sizes come from the tool.** `apm metrics` (and `apm metrics --json`) lists every function and
+- **Sizes come from the tool.** `<CLI> metrics` (and `<CLI> metrics --json`) lists every function and
   file over the profile's limits and every wide class. For the old side, read the baseline recorded on
-  the base (`git show <base>:.apm/debt.json`) or run `apm metrics` in a separate checkout of the base.
-- **The ratchet is evidence too.** `apm debt check --base <base>` prints each regression (including
+  the base (`git show <base>:.apm/debt.json`) or run `<CLI> metrics` in a separate checkout of the base.
+- **The ratchet is evidence too.** `<CLI> debt check --base <base>` prints each regression (including
   a baseline loosened against `<base>` with no new acceptance), or says there is no baseline. Quote
   what it printed.
 - **Patterns are evidence, not verdicts.** A count says how often something occurs; read a sample of
@@ -75,20 +75,20 @@ casts in `src/api/client.ext`, zero suppressed diagnostics."
 ## Module architecture
 
 ### What to look for
-- `apm metrics`: the files and functions over the limits, largest first.
+- `<CLI> metrics`: the files and functions over the limits, largest first.
 - The largest source files, and how many exported units each holds.
 - Imports that cross a layer in the wrong direction, against the profile's layer map when one is
   declared.
 
 ### Commands
 ```
-apm metrics
+<CLI> metrics
 git ls-files '<source pathspec>' | xargs wc -l | sort -rn | head -20
 git grep -c -E '<exported-unit pattern>' -- '<source pathspec>'
 ```
 
 `wc -l` counts raw lines, which is only a quick way to find the largest files; the scored numbers are
-the lines of logic from `apm metrics`.
+the lines of logic from `<CLI> metrics`.
 
 ### Evidence format
 "Module architecture: 5/10. `OrderForm.ext` is 480 lines of logic with 3 exported units; 8 of 22
@@ -247,8 +247,8 @@ were written."
 - A linter and a formatter, configured and passing.
 - Pre-commit hooks.
 - Import sorting rules and import path aliases.
-- A continuous integration pipeline, and what it runs: the tests, the linter, `apm metrics`,
-  `apm debt check`.
+- A continuous integration pipeline, and what it runs: the tests, the linter, `<CLI> metrics`,
+  `<CLI> debt check`.
 - Automatic fixing, consistent conventions, and documentation for a newcomer.
 
 ### Evidence format

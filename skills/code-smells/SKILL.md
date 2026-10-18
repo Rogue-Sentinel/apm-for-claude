@@ -65,9 +65,9 @@ Scan in four passes. The full catalog, with what each smell is, why it hurts and
    | Lazy class | a type that does too little to justify itself |
    | Unnecessary comments | comments that restate the code, or no longer match it |
 
-Use the numbers, not impressions, for the bloaters: `apm metrics` lists every over-limit function
+Use the numbers, not impressions, for the bloaters: `<CLI> metrics` lists every over-limit function
 and file and every wide type. The judgment smells (couplers, change preventers, most dispensables)
-come from reading the code.
+come from reading the code. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 
 ## Severity
 
@@ -96,7 +96,7 @@ Each finding is one entry a reader can act on without asking you anything:
 
 - **Where:** `path:line` and the name of the function or type.
 - **Which smell**, by its catalog name.
-- **Evidence:** the measured number (`apm metrics`), or a short quote of the code that shows it.
+- **Evidence:** the measured number (`<CLI> metrics`), or a short quote of the code that shows it.
 - **Severity:** impact and effort, and the cell of the matrix it lands in.
 - **Fix:** the refactoring that removes it, from the map below.
 - **Scope:** whether it is in code the current work touches (paid down in this work, through an
@@ -124,7 +124,7 @@ Example:
 ```
 src/orders/checkout.ext:42  placeOrder
   Smell:    long method (bloater)
-  Evidence: 38 lines of logic (limit 15), per apm metrics
+  Evidence: 38 lines of logic (limit 15), per <CLI> metrics
   Severity: high impact (changed in 9 of the last 20 commits), low effort -> fix now
   Fix:      extract method: validateOrder, calculateTotal, sendConfirmation
   Scope:    touched by this branch -> extract before you add

@@ -48,12 +48,13 @@ rules are invoked, not remembered: when a trigger below fires, load the skill it
   Where the metrics can count public methods, a newly flagged type shows up in the debt check like
   any other new item.
 
-**Measuring.** `apm metrics [--json] [PATH ...]` measures the project against its limits: the
+**Measuring.** `<CLI> metrics [--json] [PATH ...]` measures the project against its limits: the
 counts of over-limit functions and files, each one as `path:line name -- N lines`, the wide types,
 and any file whose functions could not be measured, with the reason. It works in any git
 repository, uses the profile's `standard` when there is one and the defaults otherwise, and always
-exits 0 (the ratchet is the gate, not the report). Workers may run `apm metrics` and
-`apm debt check`: both only read. **Only the manager runs `apm debt baseline`**; a worker never
+exits 0 (the ratchet is the gate, not the report). `<CLI>` is the framework's command line, as the manager's prompt defines it. Workers
+may run `<CLI> metrics` and `<CLI> debt check`, with the exact command line the manager put in
+their brief: both only read. **Only the manager runs `<CLI> debt baseline`**; a worker never
 does, and the guard denies it. Before you edit a function, know its number.
 
 ## Counting lines of logic
@@ -89,7 +90,7 @@ function total(order) {          // signature: not counted
 }                                 // lone bracket: not counted
 ```
 
-**The tool is a heuristic.** `apm metrics` is a scanner, not a compiler. It counts both arms of a
+**The tool is a heuristic.** `<CLI> metrics` is a scanner, not a compiler. It counts both arms of a
 conditional-compilation block (each branch between `#if`, `#else` and `#endif`), because it cannot
 know which one builds; only the directive lines themselves are dropped. It does not expand macros,
 and a constructor whose initializer list itself uses braces can be misread. Where it disagrees with
@@ -103,13 +104,13 @@ already over its limit.
 
 - Over the limit and you need to change it? Extract first, in its own commit, then make your
   change in the smaller piece. Load `apm:refactoring`.
-- The ratchet makes this mechanical: `apm debt check` compares the current numbers with the
+- The ratchet makes this mechanical: `<CLI> debt check` compares the current numbers with the
   recorded baseline and fails on any of these: a total that rose, an over-limit item that grew, a
   new over-limit item, a project checker's number that rose or vanished, or a loosened limit. A
   pure move (the same function, the same size, in another file) is not new debt.
-- `apm debt baseline` re-records the numbers; it only ever tightens on its own. Recording a worse
+- `<CLI> debt baseline` re-records the numbers; it only ever tightens on its own. Recording a worse
   baseline takes `--accept` with a reason, and only after the user has approved that specific
-  worsening. Only the manager runs `apm debt baseline`; workers never write the baseline or the
+  worsening. Only the manager runs `<CLI> debt baseline`; workers never write the baseline or the
   profile.
 - Debt in code your work touches is paid down in that work, through extract-before-you-add tasks.
   Debt elsewhere becomes a ranked issue for the user to schedule, not a detour.

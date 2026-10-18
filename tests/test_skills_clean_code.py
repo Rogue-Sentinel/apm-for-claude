@@ -81,7 +81,7 @@ def test_smell_catalog_keeps_every_category_and_smell():
 
 def test_clean_code_explains_metrics_and_the_profile_override():
     _, body = parse_skill("clean-code")
-    assert "`apm metrics`" in body
+    assert "`<CLI> metrics`" in body
     assert "`standard.limits`" in body
 
 
