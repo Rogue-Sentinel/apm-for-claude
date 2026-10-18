@@ -108,6 +108,20 @@ The full brief, what to check, the calibration rules, the output format and an e
 branch, the reviewer also uses `apm:branch-review`; for smells, `apm:code-smells`; for dependency
 direction, `apm:clean-architecture`, with `<CLI> debt check` output as evidence.
 
+## Findings about a guard, a hook or another safety check
+
+A check that reads command text cannot be complete, so a review that asks for "any way past it" never
+ends. The guard defends against a cooperative worker's mistakes, not an adversary's evasions
+(ADR 0002, `docs/adr/0002-guard-threat-model.md`). So, for a finding about a guard, a hook or any
+other safety check:
+
+- **It names the command.** The finding states a plausible way a cooperative worker, or the manager,
+  would produce the command while following its brief. If it cannot, it is a known limit: a
+  suggestion, recorded in the module's known-limits note, and never must-fix.
+- **A loosened verdict is always must-fix.** A change that loosens a verdict, so that something denied
+  before is now allowed, is a regression, whatever else it fixes.
+- **A false positive on routine work is a defect too**, graded by how routine the command is.
+
 ## Receiving a review
 
 ```

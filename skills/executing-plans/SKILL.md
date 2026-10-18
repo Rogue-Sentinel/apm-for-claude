@@ -361,6 +361,14 @@ addressed and that the fix broke nothing.
 - What it notices outside the fix diff is recorded as a deferred observation. It never extends the
   loop.
 
+**A scoped re-review blocks only on two things:** a finding that is not addressed, or a regression
+the fix introduced, including any verdict that got looser (a check that denied something before and
+allows it now). Every other new finding, including a new hole the base also had, goes to deferred
+findings or a follow-up and never starts another round. Say this in the re-review brief, before the
+first re-review is dispatched. For a guard, a hook or another safety check, the bar for a finding is
+the threat model of ADR 0002 (`docs/adr/0002-guard-threat-model.md`): a plausible way a cooperative
+worker would produce the command.
+
 ## Recording each task
 
 You own all state. Record **after every task**, not at the end, so a crash or a reset loses at most
