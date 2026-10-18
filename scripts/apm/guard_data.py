@@ -1,4 +1,7 @@
-"""Mask the text of message arguments: it is data, not a command, so the guard must not read it as one."""
+"""Mask the text of message arguments: it is data, not a command, so the guard must not read it as one.
+
+Known limit: a file written by a masked `cat` heredoc and then run (`bash body.md`) is not seen.
+"""
 from __future__ import annotations
 
 import re
@@ -10,6 +13,17 @@ _QUOTED = r""""(?:\\.|[^"\\])*"|'[^']*'"""
 _ARGUMENT = re.compile(r"(?P<option>" + _OPTION + r")(?P<value>" + _QUOTED + r")|\\.|" + _QUOTED, re.DOTALL)
 _HEREDOC = re.compile(
     r"""(?P<head>^[^\n]*\bgit\b[^\n]*\bcommit\b[^\n]*\s-F\s+-(?=\s)[^\n]*?<<-?\s*(?P<quote>['"]?)(?P<tag>\w+)(?P=quote)[^\n]*\n)"""
+    r"(?P<body>.*?)(?P<end>^[ \t]*(?P=tag)[ \t]*$)",
+    re.DOTALL | re.MULTILINE,
+)
+# The one `cat` heredoc that is data: a lone `cat` on the command's first line writes a quoted-tag heredoc
+# to a `.md` or `.txt` file, in either order. The head keeps the redirect target for the path checks. The
+# body ends at the tag with blanks allowed, which is at or before where bash ends it, so it masks no more.
+_CAT_OUT = r"[ \t]*>>?[ \t]*[\w./:~-]+\.(?:md|txt)"
+_CAT_HERE = r"""<<-?[ \t]*(?:'\w+'|"\w+")"""
+_CAT_HEREDOC = re.compile(
+    r"""(?P<head>\A\s*cat(?=[^\n]*?<<-?[ \t]*(?P<quote>['"])(?P<tag>\w+)(?P=quote))"""
+    r"(?:[ \t]+" + _CAT_HERE + _CAT_OUT + "|" + _CAT_OUT + r"[ \t]+" + _CAT_HERE + r")[ \t]*\n)"
     r"(?P<body>.*?)(?P<end>^[ \t]*(?P=tag)[ \t]*$)",
     re.DOTALL | re.MULTILINE,
 )
@@ -44,9 +58,11 @@ def _mask_heredoc(found: re.Match[str]) -> str:
 def mask_data(command: str) -> str:
     """Empty the value of each message argument and the heredoc body of `git commit -F -`.
 
+    The body of a quoted-tag `cat` heredoc written to a `.md` or `.txt` file on the first line is emptied too.
     A value that the shell would expand (`$(...)` or backticks outside single quotes) is code and stays,
     and so does every value in a command that runs a shell's command string.
     """
+    command = _CAT_HEREDOC.sub(_mask_heredoc, command)
     if _SHELL_STRING.search(command.replace('"', "").replace("'", "")):
         return command
     return _ARGUMENT.sub(_mask_argument, _HEREDOC.sub(_mask_heredoc, command))
