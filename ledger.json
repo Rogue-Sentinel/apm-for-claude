@@ -1,6 +1,17 @@
 {
   "approvals": [],
   "issues": {
+    "10": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/10"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -24,6 +35,11 @@
       "at": "2026-10-18T18:29:25.198417+00:00",
       "event": "issue 9 status planning",
       "issue": 9
+    },
+    {
+      "at": "2026-10-18T18:43:28.309700+00:00",
+      "event": "filed 10 https://github.com/Rogue-Sentinel/apm-for-claude/issues/10",
+      "issue": 10
     }
   ]
 }
