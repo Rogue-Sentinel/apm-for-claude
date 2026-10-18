@@ -236,9 +236,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 17 at 2e3a6e7: PASS clean tree, base merged, layers, test (full suite), debt, review, plan (3 criteria); merge gate: passed",
           "id": "2",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -961,6 +962,11 @@
     {
       "at": "2026-10-18T22:46:30.862824+00:00",
       "event": "task 17/2 running",
+      "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:46:33.283715+00:00",
+      "event": "task 17/2 done",
       "issue": 17
     }
   ]
