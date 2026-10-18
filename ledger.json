@@ -109,9 +109,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 9 at 1418ef4: PASS clean tree, base merged, layers, test (full suite), debt, review, plan (11 criteria); merge gate: passed",
           "id": "7",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -367,6 +368,11 @@
     {
       "at": "2026-10-18T20:04:32.354089+00:00",
       "event": "task 9/7 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T20:04:34.820153+00:00",
+      "event": "task 9/7 done",
       "issue": 9
     }
   ]
