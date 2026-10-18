@@ -70,8 +70,19 @@ function pipeline(steps...):
 handleRequest = pipeline(authenticate, authorize, validateInput, execute)
 ```
 
-A step that can stop the flow returns a result, and the pipeline passes a failure straight through
-(`result-and-option.md`).
+When a step can stop the flow, each step returns a result, and the pipeline chains them with
+flat-map. The first failure skips every later step and comes out at the end unchanged
+([result-and-option.md](result-and-option.md)):
+
+```
+function pipeline(steps...):
+    return input -> steps.reduce((r, step) -> r.flatMap(step), Ok(input))
+
+handleRequest = pipeline(authenticate, authorize, validateInput, execute)
+
+handleRequest(request)    // Ok(response), or the Err from the first step that failed:
+                          // an unauthenticated request never reaches authorize or execute
+```
 
 ## 7. Partial application
 

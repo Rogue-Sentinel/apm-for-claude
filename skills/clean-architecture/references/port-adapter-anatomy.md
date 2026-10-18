@@ -109,6 +109,10 @@ project's own layout, so the reviewer can check it.
 2. **Adapters import from the domain**: the port interfaces and the domain model.
 3. **The composition root imports everything** and wires it together.
 4. **Port interfaces live in the domain.** The domain owns them, not the adapters.
+5. **Use cases may live in the domain** (as `services/` does above) **or in an application layer
+   of their own**, between the domain and the adapters. Either works; the profile's layer map
+   (`standard.layers`) records which this project chose, so the reviewer checks the right
+   direction.
 
 ## Testing strategy
 

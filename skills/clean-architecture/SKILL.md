@@ -253,36 +253,71 @@ assert report.events == [HardLanding(at: hardLanding.time)]
 
 A project's layers, and the direction each may depend on, are declared in its profile under
 `standard.layers`. The auditor records them when a project is adopted; a fresh project agrees them
-with the user before the first commit. Each layer gives its name, the paths it covers, and the
-layers it may import from:
+with the user before the first commit. Each layer gives its `name`, the `paths` globs it covers,
+and `may_import`: the layers its files may import from. Two reserved names may appear in
+`may_import`:
+
+- `"outside"`: libraries beyond the language's standard library (frameworks, drivers, the
+  platform's interface, any third-party package).
+- `"*"`: every layer. A test layer needs this, because tests reach into every layer they test.
 
 ```
 "standard": {
   "layers": [
-    { "name": "domain",      "paths": ["core/"],     "may_import": [] },
-    { "name": "application", "paths": ["app/"],      "may_import": ["domain"] },
-    { "name": "adapters",    "paths": ["adapters/"], "may_import": ["application", "domain"] },
-    { "name": "entry",       "paths": ["main/"],     "may_import": ["adapters", "application", "domain"] }
+    { "name": "domain",      "paths": ["src/core/**"],     "may_import": [] },
+    { "name": "application", "paths": ["src/app/**"],      "may_import": ["domain"] },
+    { "name": "adapters",    "paths": ["src/adapters/**"], "may_import": ["application", "domain", "outside"] },
+    { "name": "entry",       "paths": ["src/main*"],       "may_import": ["adapters", "application", "domain", "outside"] },
+    { "name": "tests",       "paths": ["tests/**"],        "may_import": ["*", "outside"] }
   ]
 }
 ```
+
+The rules:
+
+- **The standard library is always allowed**, in every layer.
+- **An import within the same layer is always allowed.**
+- **An outside import is allowed only when the layer lists `"outside"`.** In the map above, the
+  domain and the application cannot import a framework; the adapters and the entry point can.
+- **An import of another layer is allowed only when `may_import` names that layer, or lists
+  `"*"`.**
+- **A file belongs to the layer whose `paths` glob matches it.** A file that two layers' globs both
+  match is an error in the map, not in the file: the map is fixed first. A file that no layer covers
+  is a finding (the map is incomplete, and the manager asks the user where it belongs), unless the
+  file is outside the measured tree (`standard.metrics`).
+- **Tests are a layer of their own**, with `may_import: ["*", "outside"]`, so a test may import
+  whatever it tests and whatever test library it uses, while nothing else may import the tests.
 
 **The reviewer checks every changed file's imports against the map.**
 
 ```
 for each file in changedFiles:
-    layer = layerOf(file)                      // by the longest matching path
+    if file is outside the measured tree: continue
+    matches = layers whose paths glob matches file
+    if matches is empty:   finding("no layer covers this file", file); continue
+    if matches has two or more: error("the map gives this file two layers", file, matches); continue
+    layer = the one match
+
     for each dependency in importsOf(file):
-        target = layerOf(dependency)
-        if target is an outside library and layer is "domain": finding("domain imports the outside", file)
-        else if target != layer and target not in layer.mayImport: finding("wrong direction", file)
+        if dependency is in the standard library:
+            continue                                          // always allowed
+        else if dependency is an outside library:
+            if "outside" not in layer.may_import:
+                finding("imports an outside library", file, dependency)
+        else:
+            target = layerOf(dependency)
+            if target == layer:
+                continue                                      // same layer: always allowed
+            else if "*" in layer.may_import:
+                continue                                      // a test layer: every layer allowed
+            else if target.name not in layer.may_import:
+                finding("imports a layer it may not", file, dependency)
 ```
 
-- A file that no layer covers is a finding too: the map is incomplete, and the manager asks the
-  user where it belongs.
-- **Changing the map is a decision, not a fix.** Allowing a new direction loosens the architecture
-  the way raising a limit loosens the standard: the worker reports it, the manager asks the user,
-  and an approved change is recorded as an ADR.
+- **Changing the map is a decision, not a fix.** Allowing a new direction, or `"outside"` in a
+  layer that did not have it, loosens the architecture the way raising a limit loosens the
+  standard: the worker reports it, the manager asks the user, and an approved change is recorded as
+  an ADR.
 - A project without a map is held to the dependency rule above, and the auditor proposes one.
 
 ## References

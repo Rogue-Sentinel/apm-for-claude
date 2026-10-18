@@ -57,8 +57,8 @@ can break what another relies on. Separate the responsibilities so that change i
 4. **Verify independence.** Change one responsibility and confirm that no other type has to
    change. Run the tests. If a change in one forces a change in another, the split was not clean.
 
-Signs: many public methods serving different purposes (at the profile's public-method limit, a
-reason is owed anyway: see `apm:object-design`); methods that use disjoint sets of the type's
+Signs: more than 5–7 public methods serving different purposes (at the profile's public-method
+limit, a reason is owed anyway: see `apm:object-design`); methods that use disjoint sets of the type's
 fields; a name with "And" in it, or a vague noun (`UserManagerAndValidator`); tests of one feature
 that need setup for an unrelated one (testing email needs a database); several people editing the
 same type for different reasons; imports from many unrelated modules.

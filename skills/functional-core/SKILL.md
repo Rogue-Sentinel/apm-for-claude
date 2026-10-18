@@ -262,8 +262,9 @@ assert isTrialOver(account(startedAt: day 0), now: day 30) == false
 - **Returning an option when the caller needs to know why.** That is a result.
 - **No way to transform the error** (no map-error), so every caller unpacks it by hand.
 - **Turning results back into exceptions inside the domain**, which defeats the purpose.
-- **Over-engineering simple validation** where the language's own idiom for it is clear and
-  checked.
+- **Over-engineering simple validation.** Where exceptions are the language's idiom for it, simple
+  validation may use the language's exceptions; a result is for failures the caller must handle and
+  compose.
 - **A sentinel for absence** (`0`, `-1`, an empty string) "just this once."
 - **Reading the clock, a random source or the environment inside the core** because passing it in
   felt like extra typing.

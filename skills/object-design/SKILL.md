@@ -45,7 +45,14 @@ outside depends on the internals.
 2. **Find the behavior.** Ask what decisions outside code makes with this data, and move each one
    into the object as a method named for the behavior, not for the data it touches.
 3. **Replace access with behavior.** `if account.balance >= amount: account.balance -= amount`
-   becomes `account.withdraw(amount)`, and the object enforces its own rule.
+   becomes `account.withdraw(amount)`, and the object enforces its own rule. The caller no longer
+   decides; it handles the outcome the object reports:
+
+   ```
+   account.withdraw(amount).match(
+       ok:  ()    -> showReceipt(amount),
+       err: error -> showError(error))         // InsufficientFunds: the rule lived in the account
+   ```
 4. **Remove the accessors no one needs any more.** Keep only those a framework genuinely requires
    (serialization, a persistence mapper), and mark them as being for that purpose.
 5. **Verify** that the object enforces every invariant itself and that no outside code can put it
@@ -188,7 +195,8 @@ for each type in changedTypes:
 
 - **Adding a getter and a setter for every field** by reflex.
 - **Returning a mutable collection** the type owns. Return a copy or a read-only view.
-- **Leaking the internal structure** through a debug or text representation that callers parse.
+- **Leaking the internal structure** through a string form (a debug or text representation),
+  whether or not anyone parses it. What it prints becomes something readers and logs rely on.
 - **Breaking encapsulation "just for the tests."** A test that needs the internals is telling you to
   redesign: test through behavior, or extract the part it wants to reach.
 - **Over-encapsulating a simple value type.** Plain read access to a point's coordinates is fine.

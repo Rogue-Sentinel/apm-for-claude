@@ -53,6 +53,12 @@ def test_layer_map_comes_from_the_profile():
     assert "`standard.layers`" in body
 
 
+def test_layer_map_names_both_reserved_import_names():
+    _, body = parse_skill("clean-architecture")
+    assert '"outside"' in body
+    assert '"*"' in body
+
+
 @pytest.mark.parametrize("name", sorted(REQUIRED))
 def test_credits_name_the_skill(name):
     credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")

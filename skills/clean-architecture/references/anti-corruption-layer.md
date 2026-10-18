@@ -47,10 +47,13 @@ type CreateOrderCommand:                 // the domain's command
     items: list of OrderItem
     customerEmail: EmailAddress
 
-function toCommand(request: CreateOrderRequest) -> CreateOrderCommand:
-    return new CreateOrderCommand(
-        request.items.map(i -> new OrderItem(ProductId.from(i.sku), Quantity.of(i.qty))),
-        EmailAddress.of(request.customer_email))
+function toCommand(request: CreateOrderRequest) -> Result of (CreateOrderCommand, InvalidRequest):
+    items = all(request.items.map(i ->                      // Ok(list), or the first Err
+        ProductId.from(i.sku).flatMap(id ->
+            Quantity.of(i.qty).map(quantity -> new OrderItem(id, quantity)))))
+    email = EmailAddress.of(request.customer_email)
+    return items.flatMap(okItems ->
+        email.map(okEmail -> new CreateOrderCommand(okItems, okEmail)))
 
 // outbound: a domain entity becomes a stored record
 type OrderPersistenceMapper:
@@ -58,8 +61,10 @@ type OrderPersistenceMapper:
     toDomain(row: OrderRow) -> Order
 ```
 
-Construction is also validation: `EmailAddress.of` and `Quantity.of` refuse bad input (returning a
-result, `apm:functional-core`), so nothing invalid crosses into the domain.
+Construction is also validation: `ProductId.from`, `Quantity.of` and `EmailAddress.of` each return
+a result and refuse bad input, so `toCommand` returns a result too (`apm:functional-core`). Nothing
+invalid crosses into the domain, and the edge turns an `Err` into its own response (a 400, an
+error message).
 
 ## 3. A facade over a complicated outside system
 
