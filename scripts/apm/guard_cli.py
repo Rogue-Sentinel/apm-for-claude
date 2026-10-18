@@ -10,6 +10,7 @@ from .paths import PLUGIN_ROOT, to_native_path
 
 SUBCOMMANDS = (
     "brief", "setup", "issue", "task", "allow", "question", "resolve", "approve", "metrics", "debt", "coverage",
+    "audit", "init", "github", "gate", "review", "note",
 )
 _INTERPRETER = re.compile(r"(?:python(?:3(?:\.\d+)?)?|py)(?:\.exe)?", re.IGNORECASE)
 # Escapes, expansions and line breaks make bash quoting hard to read, so they rule the exemption out.
