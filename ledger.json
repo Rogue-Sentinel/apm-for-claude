@@ -324,7 +324,12 @@
           "text": "Plan is written in the scratchpad (2026-10-18-issue-19-memory-folder.md); it is committed on issue-19-memory-folder when that branch is cut after #14 merges."
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-18T23:17:19.113773+00:00",
+          "text": "User approved the #19 plan in chat ('19 is approved'): main session may write this project's own memory folder (ADR 0006, the ADR 0005 reading of ADR 0002 applied to this one class), workers stay blocked, denials offer only approvals that can work; includes the manager's pre-approval addition for the state-directory command denial."
+        }
+      ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-19-memory-folder.md",
       "questions": [],
@@ -1156,6 +1161,11 @@
       "at": "2026-10-18T23:16:55.494579+00:00",
       "event": "task 14/2r running",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:17:19.113792+00:00",
+      "event": "decision 19 User approved the #19 plan in chat ('19 is approved'): main session may write this project's own memory folder (ADR 0006, the ADR 0005 reading of ADR 0002 applied to this one class), workers stay blocked, denials offer only approvals that can work; includes the manager's pre-approval addition for the state-directory command denial.",
+      "issue": 19
     }
   ]
 }
