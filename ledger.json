@@ -90,9 +90,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 11 at 84d41bd: PASS clean tree, base merged, layers, test (full suite), debt, review, plan (9 criteria); merge gate: passed",
           "id": "6",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -842,6 +843,11 @@
     {
       "at": "2026-10-18T21:26:00.412501+00:00",
       "event": "task 11/6 running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:26:02.847663+00:00",
+      "event": "task 11/6 done",
       "issue": 11
     }
   ]
