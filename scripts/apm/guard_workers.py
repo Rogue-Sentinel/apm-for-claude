@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import os
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from .guard_commands import protected_reason, split_segments
+from .guard_commands import first_denial, protected_reason
 from .guard_data import mask_data
 from .guard_github import gh_write_reason
 from .guard_paths import matches_any
@@ -57,35 +57,37 @@ def _runs_apm_state_change(words: list[str]) -> bool:
                for index, word in enumerate(words))
 
 
-def _state_change(command: str) -> str | None:
-    for segment in split_segments(mask_data(command)):
+def _state_change(segments: Sequence[str]) -> str | None:
+    for segment in segments:
         if any(_runs_apm_state_change(shell_words(text)) for text in spellings(segment)):
             return f"{_STATE_REASON}: {segment}"
     return None
 
 
-def _unreadable(command: str) -> str | None:
-    for segment in split_segments(mask_data(command)):
+def _unreadable(segments: Sequence[str]) -> str | None:
+    for segment in segments:
         if unreadable_braces(segment):
             return f"workers may not run a brace expansion too large for the guard to read: {segment}"
     return None
 
 
-def _github_write(command: str) -> str | None:
-    for segment in split_segments(mask_data(command)):
-        reason = gh_write_reason(segment)
-        if reason:
-            return reason
-    return None
+def _github_write(segments: Sequence[str]) -> str | None:
+    return next((reason for reason in map(gh_write_reason, segments) if reason), None)
 
 
-def _apm_write(command: str, cwd: Path, root: Path) -> str | None:
+def _apm_write(segments: Sequence[str], cwd: Path, root: Path) -> str | None:
     """A path inside `sh -c '...'` is seen too: `protected_reason` also reads a segment without its quotes."""
-    for segment in split_segments(mask_data(command)):
+    for segment in segments:
         reason = protected_reason(segment, WORKER_PROTECTED, cwd, root)
         if reason:
             return f"workers do not write .apm/ or the Claude settings; {reason}"
     return None
+
+
+def worker_segments_violation(segments: Sequence[str], cwd: Path, root: Path) -> str | None:
+    """Why a worker may not run these segments of a masked command: state, `.apm/` or GitHub writes."""
+    return (_unreadable(segments) or _state_change(segments) or _github_write(segments)
+            or _apm_write(segments, cwd, root))
 
 
 def worker_command_violation(command: str, event: Mapping[str, Any], cwd: Path, root: Path) -> str | None:
@@ -95,8 +97,7 @@ def worker_command_violation(command: str, event: Mapping[str, Any], cwd: Path, 
     """
     if not event.get("agent_id"):
         return None
-    return (_unreadable(command) or _state_change(command) or _github_write(command)
-            or _apm_write(command, cwd, root))
+    return first_denial(mask_data(command), lambda segments: worker_segments_violation(segments, cwd, root))
 
 
 def worker_file_violation(target: Path, event: Mapping[str, Any]) -> str | None:
