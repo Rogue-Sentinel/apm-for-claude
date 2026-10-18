@@ -117,9 +117,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Fix wave: M1, S1-S6. Targeted 422 passed in the worktree and on the branch after merge 76e79d4; on_operator_change probe now 0; XP12 parity rerun 30/30 identical; metrics 0/57 fn, 0/6 files over; braces/heads unchanged; debt check nothing worse.",
           "id": "fix",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix wave",
           "worker": "implementer"
         }
@@ -327,6 +328,11 @@
     {
       "at": "2026-10-18T19:54:25.360758+00:00",
       "event": "task 9/fix running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:59:23.924643+00:00",
+      "event": "task 9/fix done",
       "issue": 9
     }
   ]
