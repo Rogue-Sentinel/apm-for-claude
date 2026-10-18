@@ -51,7 +51,8 @@
         {
           "attempts": 0,
           "id": "3",
-          "status": "pending"
+          "status": "pending",
+          "title": "Echo the typed command"
         },
         {
           "attempts": 0,
@@ -504,6 +505,11 @@
     {
       "at": "2026-10-18T20:26:00.705152+00:00",
       "event": "task 11/2 updated",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:26:03.037846+00:00",
+      "event": "task 11/3 updated",
       "issue": 11
     }
   ]
