@@ -20,7 +20,7 @@ _ANY = frozenset({"*"})
 # defined with `gh alias set`). A name missing here is denied, so a new gh verb fails closed.
 _READS: dict[str, frozenset[str]] = {
     "issue": frozenset("list ls status view".split()),
-    "pr": frozenset("list ls status checks diff view checkout".split()),
+    "pr": frozenset("list ls status checks diff view".split()),  # not `checkout`: it moves the worktree
     "release": frozenset("list view download".split()),
     "repo": frozenset("list view clone gitignore license".split()),
     "label": frozenset({"list"}),
@@ -107,10 +107,19 @@ def _api_writes(words: list[str]) -> bool:
     return any(_flag_writes(token, following) for token, following in zip(words, followers))
 
 
+def _shows_token(words: list[str]) -> bool:
+    """`gh auth status --show-token` or `-t`, alone or in a cluster before `-h`, prints the token."""
+    return any(word.partition("=")[0] == "--show-token"
+               or (word[:1] == "-" and word[1:2] != "-" and "t" in word[1:].partition("h")[0])
+               for word in words)
+
+
 def _writes(words: list[str]) -> bool:
     group, verb = _group_and_verb(words)
     if group == "api":
         return _api_writes(words)
+    if (group, verb) == ("auth", "status") and _shows_token(words):
+        return True
     reads = _READS.get(group)
     return bool(group) and (reads is None or not ("*" in reads or verb in reads))
 

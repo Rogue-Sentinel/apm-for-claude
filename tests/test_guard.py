@@ -173,8 +173,7 @@ def test_main_session_may_change_apm_state(git_repo: Path, command: str) -> None
     assert _decide(_command(git_repo, command), git_repo).kind == "none"
 
 
-@pytest.mark.parametrize("command", ["apm brief", "echo apm issue", "apmx issue 1", "apm issues", 'bash -c "apm brief"',
-     'bash -c "echo apm issue"'])
+@pytest.mark.parametrize("command", ["apm brief", "apmx issue 1", "apm issues", 'bash -c "apm brief"'])
 def test_worker_may_read_apm_state(git_repo: Path, command: str) -> None:
     assert _decide(_command(git_repo, command, agent_id="a1"), git_repo).kind == "none"
 

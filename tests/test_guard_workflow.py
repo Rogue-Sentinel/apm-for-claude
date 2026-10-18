@@ -157,6 +157,12 @@ GH_DISGUISED = [
     'bash -c "exec -a gh gh issue create"',
     "gh $(echo issue) create",
     "gh $CMD create",
+    "gh auth status --show-token",
+    "gh auth status -t",
+    "gh auth status --show-token=true",
+    "gh auth status -at",
+    "gh auth status -h github.com --show-token",
+    "gh pr checkout 3",
 ]
 
 
@@ -189,7 +195,9 @@ GH_READS = [
     "gh --version",
     "gh help issue",
     "gh issue ls",
-    "gh pr checkout 3",
+    "gh auth status -h github.com",
+    "gh auth status --active",
+    "gh auth status -hgithub.com",
     "gh run watch 3",
     "gh search issues foo",
     "gh status",

@@ -35,6 +35,19 @@ CODE = [
     "git commit -F - <<'EOF'\nmsg\nEOF\nrm -rf build",
     "bash -c 'echo -m \"x; rm -rf y; echo \"'",
     'git commit -m "msg" ; git clean -fd',
+    # A shell takes `-m` and the like as its own options and still runs the `-c` string.
+    "bash -c -m 'rm -rf x'",
+    'BASH.EXE -c --title "rm -rf x"',
+    "/bin/sh -lc -m 'rm -rf x'",
+    '"C:/Program Files/Git/bin/bash.exe" -c -m "rm -rf x"',
+    "zsh -c --body 'rm -rf x'",
+    "dash -c -m 'rm -rf x'",
+    "pwsh -Command -m 'Remove-Item x -Recurse'",
+    "powershell.exe -c --message 'Remove-Item x -Recurse'",
+    r'C:\Windows\System32\cmd.exe /c --text "rd /s /q x"',
+    "cmd //c -m 'rd /s /q x'",
+    "env X=1 bash -c -m 'rm -rf x'",
+    "x=$(sh -c -m 'rm -rf x')",
 ]
 
 
