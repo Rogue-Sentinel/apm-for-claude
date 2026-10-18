@@ -461,3 +461,6 @@ Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task r
 - Task 1 re-review: ADR 0005 states the literal reading of rule 2 twice (Context and Decision); could be trimmed to one place.
 - Task 2 review (known limit): a script path starting with a backslash (`python '\c\Users\...\apm_cli.py' note x`) maps through `_windows_form` to C:/ and counts as the plugin CLI while Windows Python opens <current drive>:\c\...; no cooperative manager types it. Record in guard_cli's known limits, or refuse a script token starting with \.
 - Task 2 review: pin the accepted shapes verified only empirically: an apostrophe inside double quotes, a trailing \ inside single quotes, adjacent mixed quoting.
+- Task 3 review: pin the echo for the composed `_apm_write` reason, `_unreadable`, the piped-delete reason and a multi-line command (`reason.endswith(": " + command)`, one label).
+- Task 3 review (display): a multi-line command now gives a multi-line denial; accepted under Risks ("A long echo").
+- Task 3 review (found elsewhere): `test_guard_continuations.py:117`, `:149` and `test_guard_debt.py:65` assert only `".apm/" in reason`, which the echoed command satisfies by itself; tighten to `"workers do not write .apm/"` later.
