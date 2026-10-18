@@ -26,7 +26,9 @@ def run_source(source: DebtSource, root: Path, run=subprocess.run) -> dict[str, 
     """
     try:
         done = run(source.command, shell=True, cwd=root, capture_output=True, text=True,
-                   encoding="utf-8", errors="replace")
+                   encoding="utf-8", errors="replace", timeout=source.timeout)
+    except subprocess.TimeoutExpired as exc:
+        raise DebtError(f"{source.name}: timed out after {source.timeout}s") from exc
     except OSError as exc:
         raise DebtError(f"{source.name}: cannot run {source.command}: {exc}") from exc
     output = done.stdout or ""

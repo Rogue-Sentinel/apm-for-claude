@@ -218,3 +218,16 @@ def test_unknown_keys_are_rejected(standard: dict, where: str) -> None:
 def test_empty_strings_rejected_in_globs_and_patterns(standard: dict) -> None:
     with pytest.raises(ProfileError):
         load_standard(_profile(standard))
+
+
+def test_source_timeout_default_and_override() -> None:
+    default = load_standard(_profile({"debt_sources": [_source()]})).sources[0]
+    custom = load_standard(_profile({"debt_sources": [_source(timeout=30)]})).sources[0]
+
+    assert (default.timeout, custom.timeout) == (300, 30)
+
+
+@pytest.mark.parametrize("value", [0, -5, 1.5, "30", True, None])
+def test_bad_source_timeout_rejected(value: object) -> None:
+    with pytest.raises(ProfileError, match=r"debt_sources\[0\]\.timeout must be a positive integer"):
+        load_standard(_profile({"debt_sources": [_source(timeout=value)]}))
