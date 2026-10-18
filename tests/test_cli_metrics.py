@@ -171,7 +171,8 @@ def test_an_unknown_requirement_is_a_programming_error() -> None:
         apm_cli.project_for("everything")
 
 
-def test_cli_metrics_ref_and_overlaps(project: Path, capsys) -> None:
+@pytest.fixture
+def layered(project: Path) -> Path:
     source = project / "src" / "core" / "io"
     source.mkdir(parents=True)
     (source / "x.py").write_text(_big_function(20), encoding="utf-8")
@@ -181,13 +182,21 @@ def test_cli_metrics_ref_and_overlaps(project: Path, capsys) -> None:
     layers = [{"name": "domain", "paths": ["src/core/**"], "may_import": []},
               {"name": "adapters", "paths": ["src/**/io/**"], "may_import": ["domain"]}]
     _initialize(project, {"layers": layers})
+    return project
 
+
+def test_cli_metrics_ref_measures_the_committed_file(layered: Path, capsys) -> None:
+    assert apm_cli.main(["metrics", "--ref", "HEAD", "src"]) == 0
+
+    assert "big -- 20 lines" in capsys.readouterr().out
+
+
+def test_cli_metrics_overlaps_in_text_and_json(layered: Path, capsys) -> None:
     assert apm_cli.main(["metrics", "--ref", "HEAD", "src"]) == 0
     text = capsys.readouterr().out
     assert apm_cli.main(["metrics", "--json", "--ref", "HEAD", "src"]) == 0
     data = json.loads(capsys.readouterr().out)
 
-    assert "big -- 20 lines" in text
     assert "files in two layers:" in text and "src/core/io/x.py: domain, adapters" in text
     assert data["layer_overlaps"] == [["src/core/io/x.py", "domain", "adapters"]]
 
