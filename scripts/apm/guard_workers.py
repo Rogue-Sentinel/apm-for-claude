@@ -11,63 +11,49 @@ from .guard_commands import protected_reason, split_segments
 from .guard_data import mask_data
 from .guard_github import gh_write_reason
 from .guard_paths import matches_any
-from .guard_words import command_words, spellings
+from .guard_words import shell_words, spellings
 from .paths import worktree_relative
 from .profile import WORKER_PROTECTED
 
-# A worker never records state; the manager does. A segment changes state when `apm <subcommand>` is
-# run as a command (at the start, or behind a wrapper such as `env`, `sudo`, `xargs`, `-c`, `$(` or
-# `(`), or `apm_cli.py <subcommand>` appears anywhere, in any case, with an optional `--` before the
-# subcommand. `debt` counts unless it is `debt check`, which only reads: `debt baseline` rewrites the
-# ratchet's baseline, and an action added later is denied until it is classified.
+# A worker never records state; the manager does. A segment changes state when a word naming the apm
+# program (`apm`, by path, `.exe`/`.cmd`/`.bat`, in any case, or `apm_cli.py`) is followed anywhere later
+# in the segment by a state subcommand. There is no list of wrappers to fall behind (`eval`, `timeout 30s`,
+# `uv run`, `parallel` all run it), and an expansion that is empty at run time (`apm $X note 1`) cannot
+# hide the subcommand. `debt` counts unless the word after it starts with `check`, which only reads:
+# `debt baseline` rewrites the ratchet's baseline, and an action added later is denied until classified.
+# The cost is that text naming such a call (`echo apm note`, `grep apm issue docs`) is denied too; a
+# message argument is masked first, so a commit message that only names one is allowed. Known limits:
+# the subcommand built at run time (`apm $CMD 1`), and the program named at run time (`$APM note 1`).
 _STATE_SUBCOMMANDS = frozenset("issue task allow question resolve setup approve note review github init gate".split())
 # The subcommands a worker may run; every other one is denied above. A test walks the parser.
 WORKER_READ_ONLY = ("brief", "metrics", "coverage", "audit", "debt check")
-_WRAPPERS = frozenset(
-    "env sudo doas command exec xargs time nohup nice ionice setsid stdbuf timeout builtin then do else elif "
-    "if while until ! bash sh zsh dash ksh cmd powershell pwsh".split())
-_OPTION = re.compile(r"-|//?[a-z]$", re.IGNORECASE)
-_RUN_STRING = re.compile(r"-\w*c|-command|//?c", re.IGNORECASE)
+_APM_PROGRAMS = frozenset({"apm", "apm_cli.py"})
+_STATE_REASON = (
+    "workers do not change APM state; report to the manager instead "
+    "(to search for the text, use the Grep tool: it does not go through the shell)"
+)
 
 
 def _program(word: str) -> str:
     return re.sub(r"\.(?:exe|cmd|bat)$", "", word.rsplit("/", 1)[-1].lower())
 
 
-def _before_a_command(words: list[str]) -> bool:
-    """True when `words` only lead into a command: wrappers, options and their values, assignments."""
-    last = max((i for i, word in enumerate(words) if _RUN_STRING.fullmatch(word)), default=-1)
-    words = words[last + 1:]  # `bash -c "..."`: the string that follows starts a command
-    after_option = False
-    for word in words:
-        option = bool(_OPTION.match(word))
-        if not (after_option or option or "=" in word or word.isdigit() or _program(word) in _WRAPPERS):
-            return False
-        after_option = option
-    return True
-
-
 def _changes_state(after: list[str]) -> bool:
-    """True when the words after `apm` name a subcommand that records state."""
-    plain = [word for word in after if word != "--"]
-    if plain[:1] == ["debt"]:
-        return not plain[1:2] or not plain[1].startswith("check")
-    return bool(plain) and plain[0] in _STATE_SUBCOMMANDS
+    """True when any word after the program is a state subcommand, or `debt` not followed by `check`."""
+    followers = [*after[1:], ""]
+    return any(word in _STATE_SUBCOMMANDS or (word == "debt" and not following.startswith("check"))
+               for word, following in zip(after, followers))
 
 
 def _runs_apm_state_change(words: list[str]) -> bool:
-    for index, word in enumerate(words):
-        name = _program(word)
-        if name == "apm_cli.py" or (name == "apm" and _before_a_command(words[:index])):
-            if _changes_state(words[index + 1:]):
-                return True
-    return False
+    return any(_program(word) in _APM_PROGRAMS and _changes_state(words[index + 1:])
+               for index, word in enumerate(words))
 
 
 def _state_change(command: str) -> str | None:
-    for segment in split_segments(command):
-        if any(_runs_apm_state_change(words) for text in spellings(segment) for words in command_words(text)):
-            return f"workers do not change APM state; report to the manager instead: {segment}"
+    for segment in split_segments(mask_data(command)):
+        if any(_runs_apm_state_change(shell_words(text)) for text in spellings(segment)):
+            return f"{_STATE_REASON}: {segment}"
     return None
 
 
