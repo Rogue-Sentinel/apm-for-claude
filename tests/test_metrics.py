@@ -241,6 +241,7 @@ def test_report_json_carries_every_number() -> None:
     assert data["limits"] == {"function": 10, "file": 100, "public_methods": 5}
     assert data["files"] == [{
         "path": "a.py", "language": "Python", "lines": 250, "functions_measured": True, "note": "", "plain": False,
+        "classes_measured": True,
         "functions": [{"name": "f", "line": 3, "lines": 20}],
         "classes": [{"name": "C", "line": 1, "public_methods": 2}],
     }]
