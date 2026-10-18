@@ -80,10 +80,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "5",
-          "status": "pending",
-          "title": "Newly measured classes are not new debt"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Newly measured classes are not new debt",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -251,6 +253,11 @@
     {
       "at": "2026-10-18T19:30:58.196189+00:00",
       "event": "task 9/4 done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:31:00.693774+00:00",
+      "event": "task 9/5 running",
       "issue": 9
     }
   ]
