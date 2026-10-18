@@ -318,6 +318,17 @@
       "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/19"
     },
+    "20": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "Shell commands that write outside the project are never checked by the guard",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/20"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -1110,6 +1121,11 @@
       "at": "2026-10-18T23:10:53.360547+00:00",
       "event": "task 14/2 running",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:14:50.467857+00:00",
+      "event": "filed 20 https://github.com/Rogue-Sentinel/apm-for-claude/issues/20",
+      "issue": 20
     }
   ]
 }
