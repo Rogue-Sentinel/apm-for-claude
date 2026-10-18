@@ -110,9 +110,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 3 review (opus): 0 must-fix; 282-decision differential probe base vs head, 0 verdict changes; 2 suggestions deferred.",
           "id": "3r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 3 review",
           "worker": "reviewer"
         }
@@ -662,6 +663,11 @@
     {
       "at": "2026-10-18T20:48:05.844597+00:00",
       "event": "task 11/2 done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:53:27.307514+00:00",
+      "event": "task 11/3r done",
       "issue": 11
     }
   ]
