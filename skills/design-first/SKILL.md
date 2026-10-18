@@ -135,17 +135,20 @@ screen, a page, a printout), a layout or arrangement, a flow or sequence of step
 would look different from each other, or a structure that is easier to see than read (a diagram, a
 timeline, a map). The first time one comes up, offer to show it, in a message of its own with
 nothing else in it: "This might be easier if I show you. Want me to put up some mockups?" If they
-decline, stay in text and do not offer again unless they raise it. If they accept, use whatever the
-session can render (a page, a diagram, a throwaway clickable prototype) for mockups to react to and
-side-by-side options, and decide per question: requirements, scope, tradeoffs and conceptual choices
-stay in text, and a question *about* a screen is not automatically a visual question. Keep each
-screen to two to four options, say on it what question it answers, match its fidelity to the
-question (a wireframe for layout, polish only for a question about polish), use real content where
-placeholder content would hide a problem, iterate on a screen until it settles before moving on, and
-clear the stale screen when the conversation returns to text. Before you
-send a playback chunk that describes something they will look at, check: if they have not seen the
-offer yet, send the offer instead and hold the chunk for the next message; once they have accepted,
-put a mockup beside the description.
+decline, stay in text and do not offer again unless they raise it. The framework ships no mockup
+server of its own: if they accept, use whatever the session can render (a page, a diagram, a
+throwaway clickable prototype) for mockups to react to and side-by-side options, and decide per
+question: requirements, scope, tradeoffs and conceptual choices stay in text, and a question *about*
+a screen is not automatically a visual question. Every time you put something up, say in chat, in a
+line, what is on it ("three layouts for the home screen"), and ask for their reaction in chat. **Their
+chat reply is the primary feedback;** anything they click or mark on the mockup only adds to it. Keep
+mockups simple: layout and structure, not pixel-perfect design, and two to four options per screen.
+Say on each what question it answers, match its fidelity to the question (a wireframe for layout,
+polish only for a question about polish), use real content where placeholder content would hide a
+problem, iterate on a screen until it settles before moving on, and clear the stale screen when the
+conversation returns to text. Before you send a playback chunk that describes something they will
+look at, check: if they have not seen the offer yet, send the offer instead and hold the chunk for
+the next message; once they have accepted, put a mockup beside the description.
 
 ## Goals, non-goals and anti-goals
 
@@ -176,7 +179,9 @@ recommend and why.
 
 **Spike to feel things out.** A quick throwaway build is often the cheapest way to learn what they
 want or whether something works. Offer one when it would help; when they just want to spike, get
-out of the way. A spike runs only on their yes, in its own worktree, labeled throwaway. It gets no
+out of the way. A spike runs only on their yes. The manager dispatches an implementer
+(`apm:implementer`, in its own worktree) briefed that this is a throwaway spike: what to try, what
+to report back, and that it is never merged. It gets no
 tests or minimal ones, is not bulletproof, needs no plan, and is never merged. Bring what it taught
 you back into the conversation. Keeping its code is a new request through this gate: an approved
 design, an approved plan, and a rebuild from tests (`apm:test-first`).
@@ -193,8 +198,14 @@ going back to the user. Cover:
 - the calls you made, each marked as yours;
 - what is left to the builder.
 
-**Where it goes:** `docs/specs/YYYY-MM-DD-<topic>-design.md`, committed on the issue's branch, unless
-the profile or the user names another place. The user's preference wins.
+**Where it goes:** `docs/specs/YYYY-MM-DD-<topic>-design.md`, committed on the parent issue's
+branch, unless the profile or the user names another place. The user's preference wins.
+
+**How it reaches the sub-issues.** Once the user approves it, the parent issue's branch, holding only
+the design document, goes through the merge gate and its own pull request to `main` (their approval
+of the design is that pull request's approval), before any sub-issue's branch is cut. Every
+sub-issue branch is then cut from `main` and already carries the design, so each planner and each
+reviewer reads the same approved version.
 
 ## The builder check
 
@@ -230,9 +241,13 @@ approval. The design is the parent; each sub-issue is one piece that:
 
 The manager files each one as a GitHub issue (with the repository's issue forms and labels, if it
 has them), links it to the design document and the parent, and records it with
-`<CLI> issue N --title TEXT --status planning` (or `queued`, when another issue already holds its
-lane). Then each goes to the planner with the design document's path, one at a time per lane, and
-each plan comes back to the user for approval before any of it is built.
+`<CLI> issue N --title TEXT --lane LANE --status planning` (or `--status queued`, when another issue
+already holds that lane). Then each goes to the planner with the design document's path, one at a
+time per lane, and each plan comes back to the user for approval before any of it is built.
+
+**The parent issue** holds no tasks of its own. When the design is approved and split, record it as
+`<CLI> issue N --status building`: its sub-issues are being built. It stays open on GitHub, listing
+its sub-issues, until the last one merges; then it is recorded `merged` and closed.
 
 If the design turns out to be one piece, it is one issue. Do not split for the sake of splitting.
 
