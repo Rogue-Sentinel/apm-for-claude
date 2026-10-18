@@ -257,6 +257,9 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
     decides from the code. `review_patterns` maps a scorecard dimension name to grep patterns. *Added after Task 9.*
     It also has `layers: tuple[Mapping[str, Any], ...] = ()`, the layer map that the `clean-architecture` skill
     reads. Each entry is `{"name", "paths": [globs], "may_import": [layer names]}`. The loader checks that shape. *Added after Task 8.*
+    `may_import` may also hold two reserved names: `"outside"` (libraries beyond the language's standard
+    library) and `"*"` (every layer, as a test layer needs). A file whose path matches two layers' globs is
+    an error in the map. The loader accepts both reserved names and rejects an unknown layer name.
   - `load_standard(profile: Profile | None) -> Standard`. It reads `profile.extra["standard"]`
     (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`, `ui`, `layers`; `review_patterns` is
     checked for shape only, and an unknown dimension name is left for the review to report), uses the defaults when there's no profile or no key, and raises
