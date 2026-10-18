@@ -670,6 +670,7 @@ None. No task writes a protected path, deletes a file, or runs a destructive com
 edit in Task 13 is the manager's own, under no protected path.
 
 ## Structural acceptance criteria (checked before the PR)
+- `docs/adr/0002-guard-threat-model.md` exists, and the review skills bound guard findings by it (Task 15).
 - `README.md` and `docs/tutorial.md` exist and pass `tests/test_docs.py`, and `commands/setup.md` exists (Task 14; moved here after the final review, so the gate checks it).
 - Every runtime file is at most 200 lines of logic, and every runtime function at most 15
   (`test_framework_meets_its_own_limits`).
