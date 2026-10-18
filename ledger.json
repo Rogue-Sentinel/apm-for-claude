@@ -259,9 +259,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "One pin added (cd7da31): 88 passed in the worktree and on the branch; plan records the *> fix round (N1).",
           "id": "fix",
           "model": "haiku",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix",
           "worker": "implementer"
         }
@@ -1251,6 +1252,11 @@
       "at": "2026-10-18T23:37:29.034484+00:00",
       "event": "filed 21 https://github.com/Rogue-Sentinel/apm-for-claude/issues/21",
       "issue": 21
+    },
+    {
+      "at": "2026-10-18T23:39:18.367507+00:00",
+      "event": "task 14/fix done",
+      "issue": 14
     }
   ]
 }
