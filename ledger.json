@@ -25,7 +25,12 @@
           "text": "Planner: python - <<'PY' running shutil.rmtree / subprocess rm is allowed today (shell text only); record as a known limit. guard_cli._name splits on / only, so a quoted Windows interpreter path is never recognized (fails closed)."
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-18T20:25:39.225085+00:00",
+          "text": "User approved the plan: narrow backslash rule, Bash-only approvals, the cat-heredoc rule, ADR 0002 read as 'never allow a command that does what the guard must stop', recorded in ADR 0005."
+        }
+      ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-11-guard-approve.md",
       "questions": [],
@@ -416,6 +421,11 @@
     {
       "at": "2026-10-18T20:24:35.426916+00:00",
       "event": "concern 11 Planner: python - <<'PY' running shutil.rmtree / subprocess rm is allowed today (shell text only); record as a known limit. guard_cli._name splits on / only, so a quoted Windows interpreter path is never recognized (fails closed).",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:25:39.225104+00:00",
+      "event": "decision 11 User approved the plan: narrow backslash rule, Bash-only approvals, the cat-heredoc rule, ADR 0002 read as 'never allow a command that does what the guard must stop', recorded in ADR 0005.",
       "issue": 11
     }
   ]
