@@ -173,7 +173,12 @@
           "text": "Hit again by the issue 11 Task 1 reviewer: grep ... .apm/profile.json 2>/dev/null denied as a protected-path write."
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-18T22:58:15.480303+00:00",
+          "text": "Planner (issue 14): build #14 first; #13 should reuse guard_redirects.space_redirects (e.g. a writes_a_file helper) so _is_read_only does not regain #14's glued-redirect blind spot."
+        }
+      ],
       "kind": "bug",
       "questions": [],
       "status": "queued",
@@ -986,6 +991,11 @@
       "at": "2026-10-18T22:58:13.038426+00:00",
       "event": "issue 14 status awaiting-approval",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T22:58:15.480330+00:00",
+      "event": "decision 13 Planner (issue 14): build #14 first; #13 should reuse guard_redirects.space_redirects (e.g. a writes_a_file helper) so _is_read_only does not regain #14's glued-redirect blind spot.",
+      "issue": 13
     }
   ]
 }
