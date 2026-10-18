@@ -7,16 +7,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from apm.cli_errors import UsageError  # noqa: E402
 from apm.cli_handlers import HANDLERS  # noqa: E402
 from apm.cli_parser import build_parser  # noqa: E402
 from apm.ledger import LedgerError  # noqa: E402
 from apm.paths import SETUP_HINT, Project, find_project  # noqa: E402
 from apm.profile import ProfileError, load_profile  # noqa: E402
 from apm.setup import SetupError  # noqa: E402
-
-
-class UsageError(Exception):
-    """The command cannot run here; the message is one line for the user."""
 
 
 def _repo() -> Project:
