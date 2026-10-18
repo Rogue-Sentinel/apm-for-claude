@@ -201,6 +201,8 @@ calls (`env apm note 1`, `sudo apm ...`, `xargs apm ...`, `$(apm review 1)`, `(a
 could change APM state through a wrapper. It is fixed on this branch in the same fix round, as its own commit,
 with regression tests seen failing first. Cost if wrong: one more commit in the re-review.*
 
+*Ruling during Task 2 fix round 1: the shared word splitter lives in a new `scripts/apm/guard_words.py` (outside the round's file list), so `guard_github.py` and `guard_workers.py` share it without an import cycle. `grep -r 'gh issue' docs` moved from the allowed reads to the denied text searches, as the S2 ruling requires. Cost if wrong: one small file.*
+
 ### Task 3: Metrics follow-ups: plain files, a git ref, and files in two layers
 
 **Files:**
