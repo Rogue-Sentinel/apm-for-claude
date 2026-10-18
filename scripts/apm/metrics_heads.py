@@ -16,7 +16,7 @@ _LEADING = frozenset("if for while switch catch foreach else do try guard match 
 _GUARDED = frozenset("using lock synchronized with when".split())
 _CARRY = frozenset("if for switch while".split())
 _NOT_A_NAME = frozenset(
-    "func function fun fn def async await decltype alignas noexcept sizeof static_assert __declspec".split()
+    "pub func function fun fn def async await decltype alignas noexcept sizeof static_assert __declspec".split()
 )
 _ANNOTATION = re.compile(r"@[\w.]+(?:\s*\((?:[^()]|\([^()]*\))*\))?")
 _BRACKETED = re.compile(r"\[[^\[\]]*\]")
@@ -30,6 +30,7 @@ _ASSIGNED = re.compile(r"([\w$.]+)\s*(?::[^=()]*)?=(?![=>])")
 _PROPERTY = re.compile(r"([\w$]+)\s*:\s*(?:async\s+)?(?:function\b|\()")
 _ASSIGNMENT = re.compile(r"(?<![=!<>])=(?![=>])")
 _LITERAL_MARK = re.compile(r"=>|->|\b(?:function|func|fun)\b")
+_TIGHT = re.compile(r"\s*(\W)\s*")
 
 
 def function_name(head: str, in_call: bool = False) -> str | None:
@@ -120,7 +121,7 @@ def _assigns_value(text: str, call: re.Match[str]) -> bool:
 
 def _name_of(text: str, call: re.Match[str] | None) -> str:
     if call and "=>" not in text:
-        return re.sub(r"\s+", "", call.group(1))
+        return _TIGHT.sub(lambda m: m.group(1), " ".join(call.group(1).split()))
     found = _ASSIGNED.search(text) or _PROPERTY.search(text)
     return found.group(1) if found else "<anonymous>"
 

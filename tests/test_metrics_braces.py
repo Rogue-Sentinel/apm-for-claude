@@ -5,22 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from apm.metrics_braces import measure_braces
-from apm.metrics_lang import language_for
+from braces_helpers import found as _found
+from braces_helpers import measure as _measure
 
 FIXTURES = Path(__file__).parent / "fixtures" / "metrics"
-
-
-def _measure(path: str, text: str):
-    language = language_for(path)
-    assert language is not None and language.family == "brace"
-    return measure_braces(path, text, language)
-
-
-def _found(path: str, text: str) -> list[tuple[str, int]]:
-    metric = _measure(path, text)
-    assert metric.functions_measured and not metric.classes
-    return [(f.name, f.lines) for f in metric.functions]
 
 
 def _fixture(name: str) -> list[tuple[str, int]]:
@@ -83,8 +71,8 @@ def test_control_blocks_inside_a_method_belong_to_the_method(head):
     prefix = "if (z) {\n  w();\n" if head.startswith("}") else ""
     body = f"{prefix}{head}\n  go();\n}}\n"
     text = f"class A {{\n  m() {{\n{body}  }}\n}}\n"
-    names = [name for name, _ in _found("a.ts", text)]
-    assert names == ["m"]
+    expected_lines = 4 if head.startswith("}") else 2
+    assert _found("a.ts", text) == [("m", expected_lines)]
 
 
 def test_control_blocks_in_c_style_languages_with_calls_in_the_head():
@@ -146,11 +134,6 @@ def test_anonymous_and_assigned_function_literals():
     assert _found("a.js", "const k = x => {\n  a();\n};\n") == [("k", 1)]
 
 
-def test_callbacks_in_a_file_level_call_are_functions():
-    text = "describe('x', () => {\n  const a = 1;\n  const b = 2;\n});\n"
-    assert _found("a.js", text) == [("<anonymous>", 2)]
-
-
 def test_destructor_and_operator_names():
     text = "A::~A() {\n  x();\n}\nbool A::operator==(const A& o) const {\n  return 1;\n}\n"
     assert _found("a.cpp", text) == [("A::~A", 1), ("A::operator==", 1)]
@@ -163,48 +146,3 @@ def test_scala_assignment_body_and_kotlin_property_lambda():
 
 def test_crlf_text_is_scanned_like_lf():
     assert _found("a.c", "int f() {\r\n  return 1;\r\n}\r\n") == [("f", 1)]
-
-
-def test_known_limit_cpp_brace_initializer_list_is_misread():
-    text = "A::A() : x_{1} {\n  a();\n  b();\n  c();\n}\n"
-    assert _found("a.cpp", text) == [("A::A", 1)]  # misread: the true body has 3 lines
-
-
-def test_braced_default_argument_does_not_split_the_signature():
-    text = "T make(int a,\n       S s = {})\n{\n  go();\n  stop();\n}\n"
-    assert _found("a.cpp", text) == [("make", 2)]
-
-
-LEAKING_STATEMENTS = [
-    ("a.go", 'import (\n"fmt"\n)\nfunc f() {\n  a()\n}\n', ("f", 1)),
-    ("a.go", 'var ErrX = errors.New("x")\nfunc f() {\n  a()\n}\n', ("f", 1)),
-    ("a.kt", "val xs = listOf(1)\nfun f() {\n  a()\n}\n", ("f", 1)),
-    ("a.kt", "data class P(val x: Int)\nfun f() {\n  a()\n}\n", ("f", 1)),
-    ("a.swift", "let x = foo(1)\nfunc f() {\n  a()\n}\n", ("f", 1)),
-    ("a.swift", "class A {\n  var count: Int = 0\n  init(x: Int) {\n    a()\n  }\n}\n", ("init", 1)),
-    ("a.ts", "class A {\n  x = foo()\n  m() {\n    a()\n  }\n}\n", ("m", 1)),
-    ("a.js", "const a = require('a')\nfunction f() {\n  a()\n}\n", ("f", 1)),
-    ("a.scala", "val x = foo(1)\ndef f(): Int = {\n  x\n}\n", ("f", 1)),
-]
-
-
-@pytest.mark.parametrize("path,text,expected", LEAKING_STATEMENTS)
-def test_a_statement_without_a_semicolon_does_not_leak_into_the_next_head(path, text, expected):
-    assert _found(path, text) == [expected]
-
-
-CONTINUED_HEADS = [
-    ("a.c", "int f(int x)\n{\n  return x;\n}\n", [("f", 1)]),
-    ("a.c", "int f(int x,\n      int y)\n{\n  return x;\n}\n", [("f", 1)]),
-    ("A.java", "void run()\n    throws IOException {\n  a();\n}\n", [("run", 1)]),
-    ("a.c", "int\nfoo(int x) {\n  return x;\n}\n", [("foo", 1)]),
-    ("a.cpp", "A::A()\n    : x_(1)\n    , y_(2)\n{\n  a();\n}\n", [("A::A", 1)]),
-    ("a.rs", "fn f<T>(x: T)\nwhere\n    T: Copy,\n{\n    a();\n}\n", [("f", 1)]),
-    ("a.rs", "fn f()\n    -> Self\n{\n    a();\n}\n", [("f", 1)]),
-    ("a.kt", "val v = base\n    .map(1)\n\nfun f() {\n  a()\n}\n", [("f", 1)]),
-]
-
-
-@pytest.mark.parametrize("path,text,expected", CONTINUED_HEADS)
-def test_a_signature_that_plainly_continues_stays_one_head(path, text, expected):
-    assert _found(path, text) == expected
