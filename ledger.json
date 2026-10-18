@@ -71,10 +71,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "4",
-          "status": "pending",
-          "title": ".h as C++ by content"
+          "model": "sonnet",
+          "status": "running",
+          "title": ".h as C++ by content",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -238,6 +240,11 @@
     {
       "at": "2026-10-18T19:26:08.875338+00:00",
       "event": "task 9/3 done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:26:11.366995+00:00",
+      "event": "task 9/4 running",
       "issue": 9
     }
   ]
