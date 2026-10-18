@@ -84,7 +84,7 @@ material from the MIT-licensed set, `skills/CREDITS.md` names the source and car
 ## File Structure
 
 ```
-skills/<name>/SKILL.md               21 framework skills (list in Tasks 7–11), invoked as apm:<name>
+skills/<name>/SKILL.md               22 framework skills (list in Tasks 7–11), invoked as apm:<name>
 skills/<name>/references/*.md        catalogs, checklists, briefs and before/after examples
 skills/CREDITS.md                    sources and the MIT notice for adapted material
 standard/coverage.json               the coverage inventory (data)
@@ -598,7 +598,7 @@ They may also run alongside Tasks 1 to 6.*
 - Modify: `agents/manager.md`, `agents/auditor.md`, `agents/planner.md`, `agents/implementer.md`, `agents/debugger.md`, `agents/reviewer.md`, `tests/test_agents.py`
 
 **Interfaces:**
-- Consumes: the 21 skill names (Tasks 7–11), the CLI subcommands `metrics`, `debt`, and `coverage` (Tasks 4, 6 and 13).
+- Consumes: the 22 skill names (Tasks 7–11), the CLI subcommands `metrics`, `debt`, and `coverage` (Tasks 4, 6 and 13).
 - Produces: a `## Skills` section in every agent. **Skills are invoked, not remembered**: each agent names the
   `apm:` skills to load at each trigger. For example, the implementer uses `apm:test-first` before any behavior,
   `apm:clean-code` on touching a file, `apm:refactoring` over a limit, `apm:solid` and `apm:object-design`
@@ -707,7 +707,7 @@ They may also run alongside Tasks 1 to 6.*
 ## Structural acceptance criteria (checked before the PR)
 - Every runtime file is at most 200 lines of logic, and every runtime function at most 15, **measured by the
   framework's own tool** (`test_framework_meets_its_own_limits`).
-- 21 skills exist, each passing `test_skills.py`. No `SKILL.md` names a language or a project.
+- 22 skills exist (the Tasks 7–11 lists add up to 22; an earlier "21" here was a miscount), each passing `test_skills.py`. No `SKILL.md` names a language or a project.
 - `docs/coverage.md` ends with `**Gaps: 0**`, and the three `--source` cross-checks report no gaps.
 - `apm debt check` fails on each gaming attempt listed in Review Focus 3.
 - No Plan 1 test was weakened. Any Plan 1 test that changed was changed on purpose for a new rule (for example
