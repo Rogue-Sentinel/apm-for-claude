@@ -7,7 +7,7 @@ import pytest
 
 from apm.cli_parser import build_parser
 from apm.guard import Decision, decide
-from apm.guard_cli import SUBCOMMANDS
+from apm.guard_cli import is_cli_call
 from apm.guard_github import gh_write_reason
 from apm.guard_workers import WORKER_READ_ONLY
 from apm.paths import Project
@@ -29,17 +29,30 @@ def _worker(repo: Path, command: str) -> Decision:
     return _decide(repo, command, agent_id="w1")
 
 
-def _parser_subcommands() -> tuple[str, ...]:
-    action = next(a for a in build_parser()._actions if isinstance(a, argparse._SubParsersAction))
-    return tuple(action.choices)
+def _choices(parser: argparse.ArgumentParser) -> dict:
+    action = next((a for a in parser._actions if isinstance(a, argparse._SubParsersAction)), None)
+    return dict(action.choices) if action else {}
 
 
-@pytest.mark.parametrize("name", [n for n in _parser_subcommands() if n != "debt"])
-def test_every_subcommand_is_classified(git_repo: Path, name: str) -> None:
-    expected = "none" if name in WORKER_READ_ONLY else "deny"
+def _parser_commands() -> list[str]:
+    """Each subcommand, and each action of a subcommand that has actions (`debt check`)."""
+    commands: list[str] = []
+    for name, sub in _choices(build_parser()).items():
+        commands += [f"{name} {action}" for action in _choices(sub)] or [name]
+    return commands
 
-    assert _worker(git_repo, f"apm {name} 1").kind == expected
-    assert _worker(git_repo, f"{CLI} {name} 1").kind == expected
+
+@pytest.mark.parametrize("command", _parser_commands())
+def test_every_subcommand_is_classified(git_repo: Path, command: str) -> None:
+    expected = "none" if command in WORKER_READ_ONLY else "deny"
+
+    assert _worker(git_repo, f"apm {command} 1").kind == expected
+    assert _worker(git_repo, f"{CLI} {command} 1").kind == expected
+
+
+@pytest.mark.parametrize("call", ["debt", "debt --help", "debt -- baseline", "debt prune"])
+def test_debt_is_denied_to_workers_unless_it_is_a_check(git_repo: Path, call: str) -> None:
+    assert _worker(git_repo, f"apm {call}").kind == "deny"
 
 
 def test_debt_baseline_is_denied_and_debt_check_is_allowed(git_repo: Path) -> None:
@@ -52,8 +65,9 @@ def test_the_read_only_set_is_exactly_what_the_plan_names() -> None:
     assert WORKER_READ_ONLY == ("brief", "metrics", "coverage", "audit", "debt check")
 
 
-def test_the_new_subcommands_are_cli_calls() -> None:
-    assert set(NEW_SUBCOMMANDS) <= set(SUBCOMMANDS)
+@pytest.mark.parametrize("name", NEW_SUBCOMMANDS)
+def test_the_new_subcommands_are_cli_calls(name: str) -> None:
+    assert is_cli_call(f"{CLI} {name} 1", ROOT, WINDOWS)
 
 
 @pytest.mark.parametrize("call", ["note 1", "review 1", "github file 1", "github close 3", "init", "gate"])
@@ -119,6 +133,30 @@ GH_DISGUISED = [
     "gh release delete-asset v1 a.zip",
     "gh auth logout",
     "gh codespace create",
+    "gh issue new -t x",
+    "gh pr new",
+    "gh repo new o/r",
+    "gh gist new f.txt",
+    "gh release new v1",
+    "gh ext install o/r",
+    "gh extensions install o/r",
+    "gh cs create",
+    "gh mk",
+    "gh auth token",
+    "gh issue frobnicate 3",
+    "x=$(gh issue create)",
+    "echo `gh pr ready`",
+    "(gh issue create)",
+    "gh pr ready>/dev/null",
+    "gh issue create<body.md",
+    "gh pr merge 3;",
+    "{ gh issue close 3; }",
+    "exec -a gh gh issue create",
+    "sudo -u gh gh pr merge 3",
+    "env X=gh gh issue create",
+    'bash -c "exec -a gh gh issue create"',
+    "gh $(echo issue) create",
+    "gh $CMD create",
 ]
 
 
@@ -146,8 +184,23 @@ GH_READS = [
     "gh -R o/r issue list",
     "ghost issue create",
     "git commit -m 'gh issue create'",
-    "grep -r 'gh issue' docs",
     "ls .github && cat gh.txt",
+    "gh",
+    "gh --version",
+    "gh help issue",
+    "gh issue ls",
+    "gh pr checkout 3",
+    "gh run watch 3",
+    "gh search issues foo",
+    "gh status",
+    "gh config get editor",
+    "gh variable get X",
+    "gh project item-list 1",
+    'gh issue list --search "x y" --json number',
+    "gh pr view $N",
+    "echo $(gh pr view 2)",
+    "x=$(gh issue list)",
+    "gh issue list>out.txt",
 ]
 
 
@@ -169,3 +222,13 @@ def test_a_write_reason_tells_the_worker_to_report_to_the_manager() -> None:
 
 def test_a_read_has_no_reason() -> None:
     assert gh_write_reason("gh issue list") is None
+
+
+TEXT_SEARCHES = ['grep -rn "gh issue create" skills/', "rg gh pr merge docs", "grep -r 'gh issue' docs"]
+
+
+@pytest.mark.parametrize("command", TEXT_SEARCHES)
+def test_a_text_search_for_a_gh_write_is_denied_and_points_to_the_grep_tool(git_repo: Path, command: str) -> None:
+    decision = _worker(git_repo, command)
+
+    assert decision.kind == "deny" and "Grep tool" in decision.reason

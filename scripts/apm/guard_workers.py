@@ -19,10 +19,10 @@ from .profile import WORKER_PROTECTED
 # case, with an optional `--` before the subcommand. `debt baseline` rewrites the ratchet's
 # baseline, so it counts; `debt check` only reads.
 _DASHES = r"""(?:--\s+)?["']?"""
-_BASELINE = r"""debt["']?\s+""" + _DASHES + r"""baseline"""
+_DEBT = r"""debt["']?(?![\w-])(?!\s+""" + _DASHES + r"""check)"""
 _MUTATIONS = (
     _DASHES + r"(?:issue|task|allow|question|resolve|setup|approve|note|review|github|init|gate|"
-    + _BASELINE + r")(?![\w-])"
+    + _DEBT + r")(?![\w-])"
 )
 # The subcommands a worker may run; every other one is denied above. A test walks the parser.
 WORKER_READ_ONLY = ("brief", "metrics", "coverage", "audit", "debt check")
