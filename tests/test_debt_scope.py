@@ -3,8 +3,9 @@ from apm.standard_config import DEFAULT_EXCLUDES, MetricsConfig
 from debt_helpers import file_metric as fm, snap
 
 
-def _scoped(include=(), exclude=DEFAULT_EXCLUDES) -> dict:
-    return snap(fm("a.py"), scope=MetricsConfig(include=tuple(include), exclude=tuple(exclude)))
+def _scoped(include=(), exclude=DEFAULT_EXCLUDES, builtin=True) -> dict:
+    config = MetricsConfig(include=tuple(include), exclude=tuple(exclude), builtin=builtin)
+    return snap(fm("a.py"), scope=config)
 
 
 def _narrowed(base: dict, current: dict) -> bool:
@@ -14,11 +15,11 @@ def _narrowed(base: dict, current: dict) -> bool:
 def test_snapshot_records_the_scope() -> None:
     snapshot = _scoped(include=["src/**"], exclude=["**/gen/**"])
 
-    assert snapshot["scope"] == {"include": ["src/**"], "exclude": ["**/gen/**"]}
+    assert snapshot["scope"] == {"include": ["src/**"], "exclude": ["**/gen/**"], "builtin": True}
 
 
 def test_snapshot_without_a_scope_records_the_default_one() -> None:
-    assert snap(fm("a.py"))["scope"] == {"include": [], "exclude": list(DEFAULT_EXCLUDES)}
+    assert snap(fm("a.py"))["scope"] == {"include": [], "exclude": list(DEFAULT_EXCLUDES), "builtin": True}
 
 
 def test_a_newly_excluded_glob_narrows_the_scope() -> None:
@@ -50,3 +51,14 @@ def test_a_snapshot_without_a_scope_key_counts_as_the_default_scope() -> None:
 
     assert not _narrowed(base, _scoped())
     assert _narrowed(_scoped(include=["src/**"]), base) is False
+
+
+def test_turning_the_built_in_metrics_off_narrows_the_scope() -> None:
+    result = compare(_scoped(), _scoped(builtin=False))
+
+    assert "measurement scope narrowed: built-in metrics turned off" in result.regressions
+
+
+def test_turning_the_built_in_metrics_on_is_fine() -> None:
+    assert not _narrowed(_scoped(builtin=False), _scoped())
+    assert not _narrowed({**_scoped(), "scope": {"include": [], "exclude": list(DEFAULT_EXCLUDES)}}, _scoped())

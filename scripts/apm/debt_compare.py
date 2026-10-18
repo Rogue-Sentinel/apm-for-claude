@@ -144,15 +144,17 @@ def compare_limits(base: Mapping, current: Mapping) -> Findings:
     return Findings(missing + found.regressions, found.improvements, [])
 
 
-def _scope_of(snapshot: Mapping) -> tuple[set[str], set[str]]:
+def _scope_of(snapshot: Mapping) -> tuple[set[str], set[str], bool]:
     scope = snapshot.get("scope") or {"include": [], "exclude": list(DEFAULT_EXCLUDES)}
-    return set(scope.get("include", [])), set(scope.get("exclude", []))
+    return set(scope.get("include", [])), set(scope.get("exclude", [])), scope.get("builtin", True)
 
 
 def compare_scope(base: Mapping, current: Mapping) -> Findings:
     """Measuring less than the base did hides debt. An empty include list means every file."""
-    (old_in, old_out), (now_in, now_out) = _scope_of(base), _scope_of(current)
+    (old_in, old_out, old_builtin), (now_in, now_out, now_builtin) = _scope_of(base), _scope_of(current)
     lines = [f"now excludes {glob}" for glob in sorted(now_out - old_out)]
+    if old_builtin and not now_builtin:
+        lines.append("built-in metrics turned off")
     if now_in and not old_in:
         lines.append("include list is no longer empty (it used to mean every file)")
     elif now_in:

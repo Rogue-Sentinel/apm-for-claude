@@ -3,9 +3,16 @@
 Snapshots are plain dicts so the baseline file stays diff-friendly. Only items over a limit are
 listed, which is why a function that shrinks under the limit simply leaves the snapshot.
 
-Known limit: a cross-file "move" is matched by bare name and a number no larger, so it can hide an
-unlisted same-named function elsewhere that grew past the limit in the same change. The snapshot
-lists only items that are already over the limit, so that function had no number to compare against.
+Accepted limits. The snapshot lists only items already over a limit, and same-named items are matched
+by one greedy pass per bare name across all files (each current item takes the smallest base item that is
+no smaller). Within that rule:
+  * a cross-file "move" can hide an unlisted same-named function that grew past the limit, because it
+    had no number to compare against;
+  * the same name swapping sizes across two files passes as two moves;
+  * a same-named larger function deleted elsewhere can absorb another's growth.
+Each of these needs every current item matched to a distinct base item at least as large, so the total
+count and the total excess lines of functions and files cannot rise, and the totals check still fires if
+they do. A reworded but equivalent glob reads as a narrowed scope, which is the conservative direction.
 """
 from __future__ import annotations
 
@@ -65,7 +72,7 @@ def _totals(functions: Mapping, files: Mapping, classes: Mapping, unmeasured: li
 
 def _scope(scope: MetricsConfig | None) -> dict:
     config = scope or MetricsConfig()
-    return {"include": list(config.include), "exclude": list(config.exclude)}
+    return {"include": list(config.include), "exclude": list(config.exclude), "builtin": config.builtin}
 
 
 def snapshot(report: Report, limits: Limits, sources: Mapping[str, Mapping[str, int]] | None = None,
