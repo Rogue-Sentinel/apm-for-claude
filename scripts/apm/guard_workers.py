@@ -74,12 +74,11 @@ def _github_write(command: str) -> str | None:
 
 
 def _apm_write(command: str, cwd: Path, root: Path) -> str | None:
-    """Each segment is read as written and with its quotes removed, so a path inside `sh -c '...'` is seen."""
+    """A path inside `sh -c '...'` is seen too: `protected_reason` also reads a segment without its quotes."""
     for segment in split_segments(mask_data(command)):
-        for text in (segment, segment.replace('"', "").replace("'", "")):
-            reason = protected_reason(text, WORKER_PROTECTED, cwd, root)
-            if reason:
-                return f"workers do not write .apm/ or the Claude settings; {reason}"
+        reason = protected_reason(segment, WORKER_PROTECTED, cwd, root)
+        if reason:
+            return f"workers do not write .apm/ or the Claude settings; {reason}"
     return None
 
 
