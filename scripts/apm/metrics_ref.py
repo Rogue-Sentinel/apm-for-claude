@@ -16,13 +16,13 @@ class RefError(Exception):
 
 
 def ref_files(root: Path, ref: str, run: Run = subprocess.run) -> list[str]:
-    """The files committed at `ref`, as sorted POSIX paths."""
+    """The files committed at `ref`, as sorted POSIX paths, read NUL-separated so git never quotes a name."""
     done = None if ref.startswith("-") else run(
-        ["git", "ls-tree", "-r", "--name-only", ref], cwd=root, capture_output=True,
+        ["git", "ls-tree", "-r", "-z", "--name-only", ref], cwd=root, capture_output=True,
     )
     if done is None or done.returncode != 0:
         raise RefError(f"unknown ref: {ref}")
-    return sorted(done.stdout.decode("utf-8", errors="replace").splitlines())
+    return sorted(name for name in done.stdout.decode("utf-8", errors="replace").split("\0") if name)
 
 
 def _text_at(root: Path, ref: str, path: str, run: Run) -> str | None:
