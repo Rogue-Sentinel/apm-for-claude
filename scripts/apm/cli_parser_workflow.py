@@ -42,8 +42,14 @@ def _audit(sub) -> None:
     parser.add_argument("--coverage", metavar="PATH", help="a capability inventory to show in the report")
 
 
+def _init(sub) -> None:
+    parser = sub.add_parser("init", help="set the project up from the approved audit in .apm/audit")
+    parser.add_argument("--issue", type=int, required=True, metavar="N", help="the init issue that carries the notes")
+
+
 def add_workflow_parsers(sub) -> None:
     _note(sub)
     _review(sub)
     _github(sub)
     _audit(sub)
+    _init(sub)

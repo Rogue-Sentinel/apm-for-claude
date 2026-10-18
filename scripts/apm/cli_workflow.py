@@ -64,6 +64,12 @@ def audit(project: Project, args: argparse.Namespace) -> int:
     return handle(project, args)
 
 
+def init(project: Project, args: argparse.Namespace) -> int:
+    from apm.cli_init import init as handle  # lazy, like github and audit
+
+    return handle(project, args)
+
+
 WORKFLOW_HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
-    "note": note, "review": review, "github": github, "audit": audit,
+    "note": note, "review": review, "github": github, "audit": audit, "init": init,
 }
