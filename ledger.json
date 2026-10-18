@@ -220,9 +220,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "3 strings bumped (plugin.json, apm VERSION, tutorial example) + manager's profile commit; tests/test_setup.py test_docs.py test_cli.py 70 passed in the worktree and on the branch; git grep finds no 0.3.0 outside plans/specs/platform-notes/tests; debt check nothing worse.",
           "id": "1",
           "model": "haiku",
-          "status": "running",
+          "status": "done",
           "title": "Bump the version to 0.3.1",
           "worker": "implementer"
         },
@@ -912,6 +913,11 @@
     {
       "at": "2026-10-18T22:39:15.694995+00:00",
       "event": "task 17/2 pending",
+      "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:42:07.182690+00:00",
+      "event": "task 17/1 done",
       "issue": 17
     }
   ]
