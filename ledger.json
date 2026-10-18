@@ -217,7 +217,16 @@
       "plan": "docs/plans/2026-10-18-issue-17-release-0.3.1.md",
       "questions": [],
       "status": "building",
-      "tasks": [],
+      "tasks": [
+        {
+          "attempts": 1,
+          "id": "1",
+          "model": "haiku",
+          "status": "running",
+          "title": "Bump the version to 0.3.1",
+          "worker": "implementer"
+        }
+      ],
       "title": "Release apm 0.3.1 with the #9 and #11 fixes",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/17"
     },
@@ -887,6 +896,11 @@
     {
       "at": "2026-10-18T22:39:11.262917+00:00",
       "event": "decision 17 The user's request ('Release a new plugin version with the #9 and #11 fixes...') is taken as approval of the one-task release plan; no decisions were left open.",
+      "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:39:13.457092+00:00",
+      "event": "task 17/1 running",
       "issue": 17
     }
   ]
