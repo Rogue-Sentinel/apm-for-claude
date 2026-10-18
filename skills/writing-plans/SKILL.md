@@ -36,17 +36,24 @@ before you add", for the time this happened).
    and it travels with the plan); the project profile (commands, limits, layer map, protected
    paths, overrides, lanes); the relevant decision records (`apm:adr`); and the code the work will
    touch.
-2. **Measure what you will touch.** Run `<CLI> metrics` (the `apm metrics` command) on those files.
-   Every one already over a limit needs an extraction task first (below).
+2. **Know the numbers of what you will touch.** The planner never runs the CLI. The manager runs
+   `<CLI> metrics` on the files the work will touch and puts the numbers in the planner's brief:
+   each file's lines of logic, and each function over the limit. Every file already over a limit
+   needs an extraction task first (below). If the brief lacks a number you need, say so in your
+   report; do not guess it.
 3. **Check the scope.** If the work covers several independent subsystems, it should have been
    split during design (`apm:design-first`). If it was not, say so in your report and suggest
    separate issues, one plan each. Each plan produces working, tested software on its own.
 4. **Questions only the user can answer** go back to the manager in your report. Never guess an
    answer into the plan.
-5. **Where it goes:** `docs/plans/YYYY-MM-DD-<topic>.md`, unless the profile or the user names
-   another place.
+5. **Where it goes:** `docs/plans/YYYY-MM-DD-<topic>.md`, on the issue's branch, unless the profile
+   or the user names another place.
 
-The planner writes the plan file and nothing else. It never changes production code.
+The planner writes the plan file and nothing else. It never changes production code, and it commits
+nothing: it writes the file in the issue branch's checkout the manager pointed it at, and reports
+its path. **The manager commits the plan** on the issue's branch after reading it, before the user
+sees the summary, and commits every later amendment (rulings, the pre-flight scan, deferred
+findings) the same way.
 
 ## The plan header
 
@@ -155,8 +162,10 @@ from it: unambiguous, not complete.
 
 - **A test step:** the test's name and its assertions, with the design's exact values in them.
 - **A code step:** the exact signature (name, parameters, return type), the file it lives in, and
-  the specific values the design pins. The implementer writes the body. A body appears only for an
-  algorithm the signature and tests do not determine, or for exact text the design fixes.
+  the specific values the design pins. Add one line on the approach when the signature and the tests
+  still leave a choice (which library call, which data structure). The implementer writes the body.
+  A body appears only for an algorithm the signature and tests do not determine, or for exact text
+  the design fixes.
 - **A verification step:** the command to run, and the output that means it passed.
 - **A reference to another task:** that task's Interfaces block says what to use; do not repeat its
   code.
@@ -211,7 +220,8 @@ checkable:
 **When a task touches code already over a limit, a pure-move refactoring task comes first**, as its
 own task with its own commit, verified before the task that adds to it.
 
-- Find them with `<CLI> metrics` before you write the tasks.
+- Find them in the numbers the manager put in your brief (`<CLI> metrics`, run by the manager),
+  before you write the tasks.
 - The extraction task says what moves where, and that the same tests pass on both sides of it
   unchanged. It names the resulting files, and each lands under the file limit; a split into two
   over-limit files fails the debt ratchet. If the parts cannot get under the limit in this work,
@@ -268,7 +278,10 @@ This is a checklist the planner runs itself, not a dispatch.
    transcript. Fix both.
 3. **Type consistency.** The names, signatures and types in later tasks match what earlier tasks
    produce.
-4. **Review focus.** Each line has its test in the owning task.
+4. **Review focus.** For each input class or failure mode the design implies, is there a task whose
+   tests exercise it? The uncovered ones most likely to bite a person (up to five) go in the Review
+   Focus section, and each line there has its test added to the owning task. An empty section means
+   you checked and found none.
 5. **Proportion.** A plan several times longer than its design is a transcript of the program. If
    code is most of the document, replace bodies with signatures, test names and assertions, and
    check each step is still unambiguous.
@@ -286,10 +299,12 @@ Fix what you find inline; there is no need to re-review. Then report the plan to
 The planner returns its structured report (status, files changed, commands run, concerns, found
 elsewhere) with the plan's path and any question only the user can answer.
 
-The manager reads the plan, runs the self-review again quickly, and records it with
+The manager reads the plan, runs the self-review again quickly, commits it, and records it with
 `<CLI> issue N --status awaiting-approval --plan PATH`. Then it shows the user a **plan summary**:
 the goal, the tasks in order, what will be tested, the structural criteria, the risks, the
-allowlisted actions, and a link to the full plan file. The user approves it, edits it, or sends it
+allowlisted actions, and a link to the full plan file. **If the profile declares no merge style**,
+the summary asks for it too, so that plan approval stays the one touchpoint and the merge never
+waits on a second question (`apm:finishing-a-branch`). The user approves it, edits it, or sends it
 back. Only after an explicit approval does the manager record the allowlist with `<CLI> allow` and
 start building with `apm:executing-plans`. There is no choice of how to execute: the framework
 always builds through the manager's workers.

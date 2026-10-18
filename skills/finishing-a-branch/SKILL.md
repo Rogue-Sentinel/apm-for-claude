@@ -63,7 +63,7 @@ cannot be met, **stop and ask** the user. `apm:verification` governs every claim
 
 ## The debt check
 
-Run `<CLI> debt check` (the `apm debt check` command, comparing with `main`) on the merged result.
+Run `<CLI> debt check` (it compares with `main` by default) on the merged result.
 
 - **Exit 0:** no number is worse. If debt was paid down, the manager runs `<CLI> debt baseline` to
   tighten the ratchet, and commits the new baseline on the branch.
@@ -89,21 +89,26 @@ may run the check, but only the manager runs `debt baseline`.
    plan's path; the verification commands you ran and their results; the debt check's output; each
    structural criterion and its evidence; the rulings you made; any existing test that changed, on
    purpose, and why. Report its link to the user.
-4. **Continuous integration is not a gate.** Local verification is. If the forge runs checks and one
-   fails, find out why: a real failure is a bug, and it goes to a debugger before the merge.
+4. **Continuous integration is not a gate.** Local verification is, and a failed check on the forge
+   never blocks the merge by itself. The manager reads it. If it reveals a real bug, that bug follows
+   the path of any bug found mid-task: a debugger finds the cause and fixes it with a regression test,
+   on this branch as its own commit if it belongs to this work, or as a new issue if it does not, and
+   it appears in the next update to the user. A related fix on this branch is verified and reviewed
+   like any other change before the merge.
 
 ## The project's merge style
 
 **Merge the pull request the way the project's profile says.** The merge style is a declared override
 in the profile: for example, merge commits and never squashing, because the individual commits are
-the record; or squash, or rebase, if the project declares it. If the profile declares none, ask the
-user before the first merge (it is their call, not a framework default), and suggest recording it in
-the profile through a pull request.
+the record; or squash, or rebase, if the project declares it. If the profile declares none, the
+style was asked for **at plan approval**, in the plan summary (`apm:writing-plans`), so the merge
+never waits on a second question; use the answer the user gave there, and suggest recording it in the
+profile through a pull request. It is their call, never a framework default.
 
 After the merge:
 
 - confirm `main` holds the merge;
-- record it: `<CLI> issue N --status merged`, and the project log;
+- record it: `<CLI> issue N --status merged` (the CLI writes the project log itself);
 - close the issue, if the merge did not;
 - report to the user: what shipped, the pull request's link, every ruling you made with what it costs
   if wrong, and every deferred item;
@@ -118,11 +123,28 @@ removing a worktree, resetting, cleaning, checking out over changes, dropping a 
 - **It happens only when the user asks for it**, in so many words. Never offer it because they "seem
   done" with the work.
 - **Confirm first, listing exactly what would be lost:** the branch, its commits, the worktree's path,
-  and any uncommitted files. Ask them to confirm by replying `discard`, and wait for exactly that.
-  "Yeah, get rid of it" is not that confirmation.
-- **The guard blocks these commands.** After the confirmation, record the exact command with
-  `<CLI> approve --command "<the exact command>" --reason TEXT` and run it once. A command that
-  changes needs a new approval.
+  and any uncommitted files, **and the exact commands** you will ask the user to approve, each in
+  full, with the directory it will run in:
+
+  ```
+  This will permanently delete:
+  - branch resume-points, with commits a1b2c3d "Price an order", d4e5f6a "Resume from a save point"
+  - the worktree at <path>, with 2 uncommitted files: notes.md, scratch.txt
+  The commands, run from <main checkout>:
+  - git worktree remove --force <path>
+  - git branch -D resume-points
+  Reply `discard` to approve exactly these.
+  ```
+
+  Wait for exactly that reply. "Yeah, get rid of it" is not that confirmation, and the reply covers
+  only the commands listed.
+- **The guard blocks these commands.** After the confirmation, record each one with
+  `<CLI> approve --command "<the exact full command>" --reason TEXT`, then run it once. Run
+  the approve call on its own, with nothing chained to it, from the directory the command will
+  run in (a command approval applies only there), quoting the command in single quotes if it holds
+  double quotes. The approval lasts 10 minutes and covers that exact full command only. If the
+  approve call is itself denied, stop and ask the user to run the command themselves; never rewrite
+  a command to make it approvable. A command that changes needs a new confirmation.
 - **Keeping the branch for later**, if the user asks: report the branch and the worktree's path, and
   leave both in place.
 

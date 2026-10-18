@@ -54,16 +54,29 @@ and stop only for the reasons in "When to stop and ask".
    - anything the plan mandates that the review rubric treats as a defect (a test that asserts
      nothing, a duplicated block of logic).
 
-   "The scan is clean" without those rows is not a scan you ran. Rule on what you find before
-   building (below). The review loop remains the net for conflicts that only appear in the code.
+   "The scan is clean" without those rows is not a scan you ran. **Record the table in the plan
+   file**, in a `## Pre-flight scan` section at its end, and commit it on the issue's branch before
+   Task 1 is dispatched, so a reset does not lose it and reviewers can see it. Rule on what you find
+   before building (below). The review loop remains the net for conflicts that only appear in the
+   code.
 
 **Rulings.** A conflict, an ambiguity or a plan defect that does not change what the user approved
 is yours to settle: the design binds, the plan argues, your judgment settles what neither answers.
-Record each as `Ruling: <what you decided> — <why> — <what it costs if wrong>` on the task it
-affects (`<CLI> task N ID --evidence TEXT`), and carry it into the dispatch of every later task that
-touches the same interface. A deviation without a recorded ruling is a decision made in secret. A
-conflict that would change what gets built, or drop or loosen a structural criterion, is not a
-ruling: it is a question for the user.
+
+- **Record each ruling in the plan file**, as an italic amendment where the decision lives (the
+  task, the interface, the constraint it touches), the way the plan records every change:
+  *Ruling during Task 3: use `savePoint`, as Task 1 produces it; Task 3's brief said `save_point`.
+  Cost if wrong: one rename.* Commit it on the issue's branch. Amendments are added, never edited
+  away, so no ruling is ever overwritten.
+- **Point to it from the task's record:** `<CLI> task N ID --evidence "Ruling: see the plan, Task 3
+  amendment"`. The `--evidence` field is replaced by each later record, so it holds a pointer, never
+  the ruling itself.
+- **Tell the user** in a short line as you make it: what you decided, and what it costs if wrong.
+- **Carry it** into the dispatch of every later task that touches the same interface.
+
+A deviation without a recorded ruling is a decision made in secret. A conflict that would change
+what gets built, or drop or loosen a structural criterion, is not a ruling: it is a question for the
+user.
 
 ## One task at a time
 
@@ -74,7 +87,9 @@ record    <CLI> task N ID --status running --worker implementer --model sonnet
 dispatch  one fresh worker, in its own worktree, with its brief
 report    read it; handle its status
 verify    run the verification yourself, in its worktree; merge; run it again on the branch
-review    a reviewer checks the diff; fix rounds until clean, or stop and ask
+review    a reviewer checks the diff
+          findings: <CLI> task N ID --status failed --evidence "<the findings>", then a fix round
+          (running again), until clean, or stop and ask
 record    <CLI> task N ID --status done --evidence "<the command you ran and its result>"
 next      the next task
 ```
@@ -91,6 +106,9 @@ next      the next task
   with `apm:systematic-debugging`). If related to this work, its fix lands on this branch as its own
   commit; if not, file an issue. Either way it is in your next update. A fix that needs a design
   change, or would break the standard, is a question for the user.
+- **Everything under a report's "found elsewhere"** that belongs outside this task becomes a GitHub
+  issue the manager files (or joins the debt list), never a second branch and never a quiet
+  addition to this one.
 
 **Choosing the model.** Use the least powerful model that can do the job well. The profile's
 `models` gives each role's default (auditor haiku, planner opus, implementer sonnet, debugger opus,
@@ -101,7 +119,8 @@ reviewer opus).
 - Integration and judgment (several files, matching patterns, debugging): the standard tier.
 - Architecture and design, and the final whole-branch review: the most capable tier.
 - Reviewers scale with the diff's size, complexity and risk. A scoped re-review of a small fix can
-  run a tier lower.
+  run a tier lower than the task review, but never below the mid-tier floor below: the floor holds
+  for re-reviews too.
 - Turn count beats token price: the cheapest models often take two or three times the turns on
   multi-step work, and cost more overall. A mid tier is the floor for reviewers and for implementers
   working from prose.
@@ -110,8 +129,10 @@ reviewer opus).
 
 **Waiting on workers.** Never poll with short timeouts, and never sit in one silent, open-ended wait.
 While you have local work (recording, packaging the next review, reading a report), do it; results
-arrive on their own. When you are genuinely idle, wait in bounded stretches, and between them post
-one line of status and check your live workers, chasing any that finished without reporting.
+arrive on their own. When you are genuinely idle, wait in bounded stretches of five to ten minutes,
+and between them post one line of status and check your live workers, chasing any that finished
+without reporting. A bounded wait keeps nearly all of a long wait's efficiency and still notices a
+stuck or lost worker within minutes.
 
 ## Briefing a worker
 
@@ -122,7 +143,7 @@ commit of a task that made several.
 **The brief is the task's own text**, exactly as the plan states it, and it is the single source of
 the worker's requirements. Point the worker at its section of the committed plan file (the path, and
 the `### Task N` heading) with the Global Constraints, or extract that section to a scratch file
-outside the repository. Never make a worker read the whole plan, and never paraphrase the exact
+in the system temp directory. Never make a worker read the whole plan, and never paraphrase the exact
 values: numbers, strings, signatures and test cases appear only in the brief.
 
 The dispatch says:
@@ -141,7 +162,7 @@ A dispatch describes one task, not the session's history. Do not paste summaries
 one real dispatch reached 42,000 characters, nearly all of it pasted history. Everything you paste,
 and everything a worker prints back, stays in your context for the rest of the session, so hand
 artifacts over as files. When a task's evidence will be long, have the worker write its full output
-to a report file outside the tracked tree and return the structured report with that path, kept
+to a report file in the system temp directory and return the structured report with that path, kept
 short; the same file then carries what was tried into every fix round. Note the worker's identity
 from the dispatch result, so a fix round can resume it. The template is
 [references/implementer-brief.md](references/implementer-brief.md).
@@ -151,8 +172,13 @@ changed, commands run with their output, concerns, and found elsewhere.
 
 - **Done, with concerns:** read the concerns first. About correctness or scope: address them before
   review. Observations ("this file is getting large"): note them and go on to review.
-- **Blocked by missing context:** provide it and dispatch again on the same model.
-- **Blocked because the task needs more reasoning:** dispatch again one tier stronger.
+- **Any blocked report is a failed attempt:** record it `--status failed` with the blocker as
+  evidence, and let the retry rule (under "Review after every task") choose the model for the next
+  try. What changes is the brief:
+- **Blocked by missing context:** provide it and dispatch again.
+- **Blocked because the task needs more reasoning:** the retry rule moves it one tier stronger after
+  its second failure; on the second try, give it everything that might help (the cause of its
+  confusion, a narrower slice of the task).
 - **Blocked because the task is too large:** split it. A split that keeps what was approved is a
   ruling; one that changes it goes to the user.
 - **Blocked because the plan is wrong:** rule on the correction and dispatch again with the ruling,
@@ -178,8 +204,9 @@ Before a task is recorded done, all of these hold, with evidence from this sessi
 impression of the diff:
 
 - every test the brief names exists, ran, and you read its output;
-- the report shows the test failing first (its output, and why the failure was expected) and then
-  passing;
+- for a behavior task, the report shows the test failing first (its output, and why the failure was
+  expected) and then passing. **A pure-move refactoring task has no failing test:** its evidence is
+  the unchanged suite passing before the move and after it, with no test edited;
 - your final run passed, and the output is clean: warnings and stray noise are findings;
 - every `Expected:` line in the brief was compared with real output;
 - the touched files are within the limits (`<CLI> metrics`), and `<CLI> debt check` passes;
@@ -225,43 +252,51 @@ task is done: you hold the plan and the cross-task context. A real gap is a fail
 **The fix loop** starts when the review finds a spec gap, any must-fix finding, or a
 cannot-verify item you confirmed as real. Two routes leave it at once:
 
-- **Suggestions** (minor findings) are recorded as deferred on the task
-  (`minor (deferred): <one line>`) and listed for the final review, which decides which must be
-  fixed before merge. A roll-up nobody reads is a silent discard. Suggestions never enter the loop.
+- **Suggestions** are recorded as deferred, in a `## Deferred findings` section at the end of the
+  plan file (`Task N: <one line>`), committed on the issue's branch, and listed for the final review,
+  which decides which must be fixed before merge. A roll-up nobody reads is a silent discard.
+  Suggestions never enter the loop.
 - **A finding that conflicts with the plan's text** (the reviewer flags something the plan mandates)
   is yours to rule on, with the design as the authority. Do not dismiss it because the plan says so,
   and do not dispatch a fix that contradicts the plan without a recorded ruling. If the ruling would
   change what the user approved, ask them.
 
-Everything else enters the loop. **A fix round is one fix dispatch and one scoped re-review.** Each
-round re-dispatches the worker, so it is marked `running` again, which counts an attempt:
+Everything else enters the loop. **A fix round is one fix dispatch and one scoped re-review**, and
+the rounds follow the manager's one retry rule, the same everywhere in this skill:
 
-- **The first two rounds** go to the same worker: resume it with the open findings, verbatim. If it
-  cannot be resumed, dispatch a fresh one on the same model with the brief, its report and the
-  findings.
-- **After two failed rounds**, one round goes to a fresh worker **one tier stronger**
-  (haiku, then sonnet, then opus), told: "A prior worker attempted this task N times; you own it now.
-  Read its report for what was tried." A loop that survives two rounds usually means the worker
-  cannot see its own problem; fresh eyes and more capability, in one move.
-- **If the stronger worker also leaves must-fix findings open**, stop dispatching and bring it to
-  the user (below). Count rounds from the task's `attempts` in the ledger, not from memory.
+1. **A failed review is a failed attempt.** Record it before anything else:
+   `<CLI> task N ID --status failed --evidence "<the open findings>"`. A failed verification is
+   recorded the same way.
+2. **The first try and one fix round run on the same model.** For the fix round, mark the task
+   `running` again (which adds one to `attempts`) and resume the same worker with the open findings,
+   verbatim. If it cannot be resumed, dispatch a fresh worker on the same model with the brief, its
+   report and the findings.
+3. **After two failures, one round goes one tier stronger** (haiku, then sonnet, then opus), to a
+   fresh worker told: "A prior worker attempted this task N times; you own it now. Read its report
+   for what was tried." A loop that survives a fix round usually means the worker cannot see its own
+   problem; fresh eyes and more capability, in one move.
+4. **If that round also fails, stop.** Every must-fix finding still open goes to the user (see
+   "When to stop and ask"). A worker that was already on opus has no stronger tier: it stops and
+   asks after its two failures.
+
+Count failures from the task's `attempts` in the ledger, never from memory, so the rule survives a
+reset.
 
 Every round: the worker fixes, re-runs the tests covering what it changed, and reports what it
 changed, the covering tests, the command and the output. Confirm all three are there before you
 dispatch the re-review, and name the covering test files in the fix message; a one-line fix does not
-need a whole-suite run from the worker (you run the suite yourself when you verify). After each
-round, record it on the task: `fix round R (X addressed, Y open: <one line each>; commits a..b)`.
+need a whole-suite run from the worker (you run the suite yourself when you verify). A structural
+finding (a file over a limit, a layer crossed, a duplicated block) has no failing test to show: the
+re-review confirms it is gone, and an extraction it calls for is proven by the unchanged suite
+passing before and after. Each round's outcome is the evidence of the record that closes it (the
+next `failed`, or the final `done`): `fix round R (X addressed, Y open: <one line each>; commits
+a..b)`. The ledger shows the latest round; the commits in git hold every round's work.
 
-**When the loop stops,** decide each open finding, and record each decision; a silent discard is
-forbidden. Decide only at the stop: deciding earlier to end a loop is pre-judging under another
-name.
-
-- **The reviewer is wrong, or the point is contestable:** record a ruling saying why the code stands.
-  The final review sees both sides, and the user sees the ruling.
-- **Real, but nothing later builds on it:** record it as a deferred finding. The merge gate requires
-  a final review with no unresolved findings, so it is fixed or decided by the user before merge.
-- **Real, and load-bearing** (a later task builds on it, or it reveals a plan defect): bring it to
-  the user before the next task builds on it.
+**Before the stop, only a contestable finding may get a ruling.** If the reviewer is wrong, or the
+point is genuinely contestable, record a ruling saying why the code stands (as an amendment in the
+plan file, like every ruling), tell the user, and let the final review see both sides. A real
+finding is never ruled away and never deferred to end a loop: it is fixed, or it goes to the user at
+the stop. Every decision is recorded; a silent discard is forbidden.
 
 **The final review.** When every task is done, the whole branch gets one review, on the most capable
 model: a package from the merge base with `main` to HEAD, the plan and design paths, the plan's Review
@@ -270,10 +305,15 @@ deferred findings so it can weigh them. Use `apm:code-review` (and `apm:branch-r
 review). Its severity labels are advice; the gate is yours. Re-grade each finding by its effect, by
 what a reasonable person using the software gets if it ships, not by whether the design happened to
 name the input that triggers it. Suggestions are recorded as deferred and listed for the user; they
-are never turned into rulings, because a ruling decides a conflict, not a declined polish. If it
+are never turned into rulings, because a ruling decides a conflict, not a declined polish. **Every
+item the reviewer declined to judge** (a behavior it set aside as outside its brief, or as a matter
+for the plan) becomes a ruling you make and record like any other: what a reasonable person using
+the software gets, and why that stands or is now a finding, with what it costs if wrong. If it
 returns must-fix findings, dispatch **one** fix worker with the complete list (not one worker per
-finding; one real fix wave run that way cost more than all its tasks together). Each fix starts with
-a test that reproduces the finding and is seen failing; a fix without one is not verified. Then one
+finding; one real fix wave run that way cost more than all its tasks together). Each behavior fix
+starts with a test that reproduces the finding and is seen failing; a behavior fix without one is not
+verified. A structural fix is confirmed by the re-review, and an extraction by the unchanged suite
+passing on both sides. Then one
 scoped re-review of the fix. There is no second wave: residual findings go to the user, because
 criterion 3 of the merge gate is a final review with nothing unresolved. Then finish with
 `apm:finishing-a-branch`.
@@ -302,8 +342,10 @@ the task that was running, and the record shows which one it was.
   one to the task's `attempts`, which is what the retry rule counts.
 - After your verification: `<CLI> task N ID --status done --evidence "<command and result>"`, or
   `--status failed` with the failing output. The evidence is the output of commands **you** ran.
-- Rulings and deferred findings go on the task they belong to, as `--evidence` lines, in the same
-  step as the rest of the task's record. Bookkeeping rides along with the work; it never waits for a
+- `--evidence` is replaced by each record, so it never holds the only copy of anything. Rulings
+  live as italic amendments in the plan file, and deferred findings in its `## Deferred findings`
+  section, both committed on the issue's branch; the task's evidence points to them. Bookkeeping
+  rides along with the work, in the same step as the rest of the task's record; it never waits for a
   convenient moment.
 - The issue moves to `integrating` when the last task is done (`<CLI> issue N --status integrating`).
 - Never edit state or the ledger by hand. Workers never run state-changing commands; the guard denies
@@ -312,9 +354,10 @@ the task that was running, and the record shows which one it was.
   stay where they are, and the guard blocks a recursive delete anyway.
 
 When the work is merged, your report to the user lists **every ruling you made**, in order, each
-with what it costs if wrong, and every deferred finding. It is exhaustive: if the record holds a
-ruling, the report holds it. That list is the only place the decisions you took on the user's behalf
-reach them, so they can rework whatever you got wrong.
+with what it costs if wrong, and every deferred finding. Build both lists from the plan file's
+amendments and its `## Deferred findings` section, not from memory or the ledger. It is exhaustive:
+if the plan holds a ruling, the report holds it. That list is the only place the decisions you took
+on the user's behalf reach them, so they can rework whatever you got wrong.
 
 ## When to stop and ask
 
@@ -330,7 +373,9 @@ Stop, and ask the user, for these and only these:
 4. **A decision only the user can make** that the plan did not settle: anything that changes what
    gets built, drops or loosens a structural criterion, raises a limit or accepts a worse debt
    number, or needs a design change.
-5. **A worker that failed after its stronger-model retry**, or a load-bearing finding still open.
+5. **A task that failed under the retry rule:** two failures on its model, then one more on the
+   next tier (or two failures, for a worker already on opus). Every must-fix finding still open goes
+   to the user with it.
 6. **A merge-gate criterion that cannot be met.**
 7. **A plan so broken that every path forward is a guess.**
 
@@ -350,6 +395,7 @@ can be dispatched at all, stop and tell the user: the manager does not build the
 | "Close enough on spec compliance." | A spec gap means not done. Fix it, or stop and ask. |
 | "I'll fix it myself; dispatching is overhead." | Your fixes skip review and fill your context. Send it back. |
 | "One more round will converge." | Past the retry rule, rounds do not converge; the failure is structural. Stop and ask. |
+| "This real finding can be deferred so the loop can end." | Only a contestable finding gets a ruling. A real one is fixed, or goes to the user. |
 | "The reviewer will just find something new anyway." | A scoped re-review verifies fixes and cannot wander. New findings outside the fix are recorded, not looped. |
 | "This finding is obviously wrong; I'll drop it." | You decide only at the stop, and every decision is recorded. Silent discards are forbidden. |
 | "The fix was small; skip the re-review." | Unreviewed fixes are how regressions land. Every round ends with a re-review. |
@@ -365,7 +411,7 @@ can be dispatched at all, stop and tell the user: the manager does not build the
 | "The worker spawned its own reviewer; extra assurance." | Workers cannot dispatch workers. If one tried, that is a defect to report, not rigor. |
 | "I read the diff carefully; the final review is redundant." | Same reader, same blind spots. The final review is the one fresh look at the whole branch. |
 | "Workers are slow and expensive; skip the final review." | One whole-branch review is the floor, not the ceiling. |
-| "The fix is obvious; it doesn't need a failing test first." | The failing test is the only proof the finding was real and is now gone. |
+| "The fix is obvious; it doesn't need a failing test first." | For a behavior fix, the failing test is the only proof the finding was real and is now gone. (A structural fix is confirmed by the re-review; an extraction, by the unchanged suite on both sides.) |
 | "The new test passed straight away, so the task is done." | A test that never failed proves nothing. It goes back to the worker. |
 
 ## An example
@@ -373,33 +419,38 @@ can be dispatched at all, stop and tell the user: the manager does not build the
 ```
 [brief: no tasks done for issue #42; read plan docs/plans/2026-03-02-resume.md and its design]
 [pre-flight: 2 shared-interface rows, 4 self-consistency rows; one finding:
- Task 2 consumes save_point, Task 1 produces savePoint]
-[Ruling: use savePoint, as Task 1 produces it; cost if wrong: one rename. Recorded on Task 2.]
+ Task 2 consumes save_point, Task 1 produces savePoint. Table added to the plan's
+ "## Pre-flight scan" section, committed]
+[Ruling: use savePoint, as Task 1 produces it; cost if wrong: one rename. Written as an italic
+ amendment under Task 2 in the plan, committed; told the user in one line]
 
 Task 1: the save-point store
-[BASE a1b2c3d; task 42 1 --status running --worker implementer --model sonnet]
+[BASE a1b2c3d; <CLI> task 42 1 --status running --worker implementer --model sonnet]
 [dispatch: brief, files owned, report contract]
 worker: done. RED: test_saves_and_loads failed (no such function); GREEN: 6/6 pass.
 [manager: suite in the worktree, 214 pass; merge into the branch; suite again, 214 pass]
 [reviewer: spec compliant; quality approved]
-[task 42 1 --status done --evidence "suite 214 passed, on the branch after merge"]
+[<CLI> task 42 1 --status done --evidence "suite 214 passed, on the branch after merge"]
 
 Task 2: resuming from a save point
-[BASE d4e5f6a; running; dispatch, carrying the savePoint ruling]
+[BASE d4e5f6a; <CLI> task 42 2 --status running ... --evidence "Ruling: see the plan, Task 2
+ amendment"; dispatch, carrying the savePoint ruling]
 worker: done. 9/9 pass.
 [manager: suite green in the worktree and on the branch]
 [reviewer: spec gap, the "resume within one second" limit is not tested; must-fix: a magic number]
-[fix round 1: resume the same worker with both findings]
+[<CLI> task 42 2 --status failed --evidence "spec gap: 1s limit untested; must-fix: magic number"]
+[fix round 1: <CLI> task 42 2 --status running (attempts 2); resume the same worker with both]
 worker: limit test added and failing first, then passing; constant extracted; covering tests 11/11.
 [re-review: both addressed, no new breakage]
 [record: fix round 1 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e); done, with the suite output]
 
 [all tasks done: final review on the most capable model, Review Focus verbatim, rulings listed]
-final reviewer: no must-fix findings; one suggestion, deferred.
-[issue 42 --status integrating; apm:finishing-a-branch]
+final reviewer: no must-fix findings; one suggestion; nothing declined.
+[suggestion added to the plan's "## Deferred findings", committed]
+[<CLI> issue 42 --status integrating; apm:finishing-a-branch]
 
-Report to the user: what shipped, the pull request, rulings made (savePoint; cost: one rename),
-deferred: the suggestion.
+Report to the user, built from the plan's amendments and deferred findings: what shipped, the pull
+request, rulings made (savePoint; cost: one rename), deferred: the suggestion.
 ```
 
 ## References

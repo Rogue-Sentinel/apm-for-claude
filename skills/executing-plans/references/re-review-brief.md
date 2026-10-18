@@ -7,8 +7,8 @@ review already happened.
 ## Dispatch
 
 - `subagent_type: "apm:reviewer"`.
-- `model`: a scoped re-review of a small fix can run a tier lower than the task review; always set
-  it explicitly.
+- `model`: a scoped re-review of a small fix can run a tier lower than the task review, but never
+  below the mid tier, which is the floor for every review; always set it explicitly.
 - No worktree is needed: the re-review is read-only.
 
 ```
@@ -22,8 +22,8 @@ Read the brief: [PLAN_PATH, "### Task N" | BRIEF_FILE]
 
 ## The findings under verification
 
-[FINDINGS: the must-fix and should-fix findings and spec gaps from the previous review,
-copied verbatim, one per line]
+[FINDINGS: the must-fix findings and spec gaps from the previous review, copied
+verbatim, one per line]
 
 ## The fix
 
@@ -43,6 +43,10 @@ Do all of this yourself. If the diff is too large for one pass, review it in pas
 say so.
 
 ## Scope
+
+A structural finding (a file over a limit, a layer crossed, a duplicated block) has no
+failing test to show: confirm from the diff that the defect itself is gone, and for an
+extraction, that the report shows the unchanged suite passing before and after.
 
 Your scope is the findings list and the fix diff. Give every finding a verdict. Check
 the fix diff for new problems the fix itself introduced. Do not re-review code the fix
@@ -67,8 +71,8 @@ For each finding, in order:
   "Attempted" is not addressed: the specific defect must no longer exist.
 
 ### New breakage in the fix diff
-Anything the fix broke or introduced, with its severity (must fix, should fix,
-suggestion) and file:line. "None" if clean.
+Anything the fix broke or introduced, with its severity (must fix or suggestion)
+and file:line. "None" if clean.
 
 ### Out-of-scope observations
 Issues entirely outside the fix diff. Non-blocking; the manager records them for the

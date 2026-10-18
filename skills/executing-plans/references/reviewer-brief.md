@@ -79,7 +79,9 @@ spans tasks) is a "cannot verify" item: report it, do not widen your search.
 
 ## Part 2: quality
 
-- The standard: the limits, test-first (each test seen failing first), no skipped,
+- The standard: the limits, test-first (each behavior test seen failing first; a
+  pure-move refactoring instead shows the unchanged suite passing before and after,
+  with no test edited), no skipped,
   weakened or person-waiting tests, refactor and behavior in separate commits, logic
   that does not move sideways, the project's layer map, American spelling.
 - Code: clean separation of concerns, proper error handling, no duplication without
@@ -97,12 +99,13 @@ otherwise answer with a bare "yes".
 
 ## Calibration
 
-Grade by real severity; not everything is must-fix.
+Grade by real severity; not everything is must-fix. There are two tiers only.
 - Must fix: this task cannot be trusted until it is fixed. Incorrect or fragile
   behavior, a missed requirement, or damage you would block a merge over: a duplicated
   block of logic, a swallowed error, a test that asserts nothing, a broken limit.
-- Should fix: real problems that are not blocking on their own.
-- Suggestion: "coverage could be broader", and polish.
+- Suggestion: everything else worth saying, such as "coverage could be broader", and
+  polish. If you are torn between the two, decide: a problem real enough to block the
+  merge is must-fix; anything less is a suggestion.
 If the plan or brief explicitly mandates something this rubric calls a defect, it is
 still a finding: report it as must-fix, labeled plan-mandated. The plan does not grade
 its own work; the manager rules on it, and the user decides if it changes what was
@@ -123,7 +126,6 @@ line, or a check you ran: no preamble, no narration, no closing summary.
 
 ### Issues
 #### Must fix
-#### Should fix
 #### Suggestions
 For each: file:line, what is wrong, why it matters, how to fix it if not obvious.
 

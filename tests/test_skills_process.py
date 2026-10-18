@@ -1,4 +1,6 @@
 """The design, planning and build process skills carry every heading the coverage inventory anchors to."""
+import re
+
 import pytest
 
 from skill_helpers import SKILLS_DIR, assert_sections, parse_skill
@@ -37,12 +39,19 @@ REFERENCES = {
     "executing-plans": ("implementer-brief.md", "reviewer-brief.md", "re-review-brief.md"),
 }
 NAMED_IN_BODY = {
-    "finishing-a-branch": ("`apm debt check`", "`<CLI> debt check`"),
+    "finishing-a-branch": ("`<CLI> debt check`",),
     "parallel-dispatch": ("`max_workers`",),
-    "executing-plans": ("`<CLI> task",),
+    "executing-plans": ("`<CLI> task", "--status failed"),
     "worktrees": ('`isolation: "worktree"`',),
     "writing-plans": ("`<CLI> allow",),
 }
+
+BARE_CLI = re.compile(r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief)(?!\w)")
+TWO_TIERS_ONLY = ("reviewer-brief.md", "re-review-brief.md")
+
+
+def _skill_texts(name):
+    return [(path, path.read_text(encoding="utf-8")) for path in (SKILLS_DIR / name).rglob("*.md")]
 
 
 @pytest.mark.parametrize("name", sorted(REQUIRED))
@@ -67,3 +76,16 @@ def test_skill_names_the_framework_mechanism_it_relies_on(name):
 def test_credits_name_the_skill(name):
     credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")
     assert f"| `{name}` |" in credits, f"CREDITS.md has no row for {name}"
+
+
+@pytest.mark.parametrize("name", sorted(REQUIRED))
+def test_runnable_commands_use_the_cli_placeholder(name):
+    bare = [f"{path.name}: {m}" for path, text in _skill_texts(name) for m in BARE_CLI.findall(text)]
+    assert not bare, f"{name} names the CLI as bare apm: {bare}"
+
+
+@pytest.mark.parametrize("file_name", TWO_TIERS_ONLY)
+def test_review_briefs_use_two_severity_tiers(file_name):
+    text = (SKILLS_DIR / "executing-plans" / "references" / file_name).read_text(encoding="utf-8")
+    assert "must fix" in text.lower() and "suggestion" in text.lower()
+    assert "should fix" not in text.lower(), f"{file_name} still has a should-fix tier"
