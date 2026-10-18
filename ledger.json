@@ -3,11 +3,12 @@
   "issues": {
     "9": {
       "allowlist": [],
+      "branch": "issue-9-brace-wide-classes",
       "concerns": [],
       "decisions": [],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "metrics reports 0 wide classes for C++ (and every brace language): only Python classes are counted",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/9"
@@ -17,6 +18,11 @@
     {
       "at": "2026-10-18T18:29:13.675801+00:00",
       "event": "filed 9 https://github.com/Rogue-Sentinel/apm-for-claude/issues/9",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T18:29:25.198417+00:00",
+      "event": "issue 9 status planning",
       "issue": 9
     }
   ]
