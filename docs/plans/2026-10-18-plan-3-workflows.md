@@ -635,6 +635,20 @@ suite" line, in `skills/test-first/references/cycle-steps.md`, is swept in Task 
 
 ### Task 13: Release 0.3.0: live checks, one review, one gate, the PR
 
+*Changed after the final review (M3): the steps below commit in the wrong order for the gate. The gate fails a dirty
+tree and a review not recorded at HEAD. The new order:
+1. The final fix wave and its scoped re-review.
+2. One commit with the version bump, `docs/platform-notes.md`, and this repo's `.apm/profile.json` `workflow` key
+   (it must declare `commands.test`), after setup is re-run so `.gitignore` gains `.apm/tmp/`.
+3. Any `debt baseline` tightening, committed.
+4. `<CLI> review 4 ... --criteria-met` at that HEAD.
+5. `<CLI> gate 4`, the one full-suite run.
+6. Push and open the PR. No commit comes after the gate.
+
+The guard's live check runs through the hook entry script with a synthetic worker event, not a plugin reinstall,
+so the guard is not swapped under running workers. `/apm:setup` and the install lines are checked live after the
+merge.*
+
 **Files:**
 - Modify: `scripts/apm/__init__.py`, `.claude-plugin/plugin.json` (both `0.3.0`), `tests/test_manifest.py`
   if it pins the version, `docs/platform-notes.md`, `.apm/profile.json` (this repo's own `workflow` key:
@@ -656,6 +670,7 @@ None. No task writes a protected path, deletes a file, or runs a destructive com
 edit in Task 13 is the manager's own, under no protected path.
 
 ## Structural acceptance criteria (checked before the PR)
+- `README.md` and `docs/tutorial.md` exist and pass `tests/test_docs.py`, and `commands/setup.md` exists (Task 14; moved here after the final review, so the gate checks it).
 - Every runtime file is at most 200 lines of logic, and every runtime function at most 15
   (`test_framework_meets_its_own_limits`).
 - `<CLI> debt check` passes against `main`.
@@ -787,3 +802,13 @@ a new session. The README and tutorial show only what the user types in chat (th
 `/apm:setup`, and plain requests); every command block is labeled as what the manager runs. `tests/test_docs.py`
 fails if either document tells the user to run a command. Whether `${CLAUDE_PLUGIN_ROOT}` expands inside a plugin
 command's text is a platform fact checked live in Task 13, with the plugin cache path as the stated fallback.*
+
+*Rulings after the final review. One fix wave fixes M1, M2, M4, M5 and M6, plus the two queued fixes (A1, the audit
+listing, and Q1, protected paths in a quoted shell string) and the cheap suggestions S1, S2, S3, S4, S5 and S6. M3
+is a Task 13 ordering fix, amended there. S8 is done: the Task 14 criterion now sits in the criteria section. Left for later, and listed in the PR:
+- S7: writing-plans should ask for promised documents as paths;
+- S9: `lane_for` and `needs_task_review` have no runtime caller yet;
+- S10: make `ledger.issue` public, and move a skill test out of `test_docs.py`;
+- S12: the gate checks the local base; fetch first.
+
+Every deferred finding the review ruled "leave" stays in the list above.*
