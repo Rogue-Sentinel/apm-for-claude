@@ -82,7 +82,14 @@ def test_worker_cannot_change_apm_state_behind_a_wrapper(git_repo: Path, command
 
 
 # An `apm` word followed by a state subcommand is denied anywhere, so these text mentions are denied on purpose.
-TEXT_MENTIONS = ["echo apm note", "echo env apm note 1", "ls apm note", "grep apm issue docs"]
+TEXT_MENTIONS = [
+    "echo apm note",
+    "echo env apm note 1",
+    "ls apm note",
+    "grep apm issue docs",
+    "echo apm issue",
+    'bash -c "echo apm issue"',
+]
 
 
 @pytest.mark.parametrize("command", TEXT_MENTIONS)
