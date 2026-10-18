@@ -65,6 +65,9 @@ UNLISTED_RUNNERS = [
     "/usr/local/bin/apm debt baseline",
     "python -m apm_cli note 1",
     "cd scripts && python -m apm_cli note 1",
+    # apm_cli.py puts its own folder on sys.path, so the dotted module runs the CLI too.
+    "python -m scripts.apm_cli note 1",
+    "python -m scripts.apm_cli debt baseline",
 ]
 # Brace expansion builds the words at run time: `{gh,} issue create` runs `gh issue create`.
 BRACE_EXPANSIONS = [
@@ -180,6 +183,8 @@ WRAPPED_READS = [
     "apm brief && echo note",
     "env FOO=apm echo note",
     "cat apm_cli.py.bak note",
+    "python -m scripts.apm_cli metrics",
+    "python -m scripts.apm_cli debt check",
 ]
 
 
