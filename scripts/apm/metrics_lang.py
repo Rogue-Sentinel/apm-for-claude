@@ -61,7 +61,7 @@ def _plain(
     return Language(name, "plain", line, block, _PLAIN_QUOTES)
 
 
-_PYTHON = Language("Python", "python", ("#",), (), ('"""', "'''", '"', "'"))
+PYTHON = Language("Python", "python", ("#",), (), ('"""', "'''", '"', "'"))
 _LANGUAGE_EXTENSIONS: tuple[tuple[Language, str], ...] = (
     (_brace("C", preprocessor=True), "c h"),
     (_brace("C++", preprocessor=True), "cc cpp cxx hpp hh"),
@@ -77,7 +77,7 @@ _LANGUAGE_EXTENSIONS: tuple[tuple[Language, str], ...] = (
     (_brace("Scala", _TEXT_BLOCK_QUOTES, raw=_RAW_BLOCK), "scala"),
     (_brace("PHP", line=("//", "#")), "php"),
     (_brace("Dart", ('"""', "'''", '"', "'")), "dart"),
-    (_PYTHON, "py"),
+    (PYTHON, "py"),
     (_plain("Shell"), "sh bash"),
     (_plain("PowerShell", block=(("<#", "#>"),)), "ps1"),
     (_plain("Ruby"), "rb"),

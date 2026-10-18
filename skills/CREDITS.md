@@ -1,0 +1,91 @@
+# Credits
+
+The framework's skills are its own wording, written from the sources below. Where a skill adapts
+substantial material from an MIT-licensed source, that source is named here and its license notice
+is reproduced in full, as the license requires.
+
+## Sources
+
+### helmedeiros/clean-code-skills
+
+[helmedeiros/clean-code-skills](https://github.com/helmedeiros/clean-code-skills), at commit
+`b9805c9`, by Helio Medeiros. MIT License (notice below).
+
+Adapted, in the framework's own words and with language-neutral examples, into:
+
+| Framework skill | Adapted from |
+|-----------------|--------------|
+| `clean-code` | `clean-code-boy-scout-rule` (and its improvement checklist), `refactor-rename` (its naming conventions) |
+| `code-smells` | `clean-code-detect-smells` (and its smell catalog) |
+| `refactoring` | `refactor-extract-method` (and its extraction heuristics), `refactor-rename`, `refactor-replace-conditional-with-polymorphism` (and its before-and-after examples) |
+| `test-first` | `tdd-test-first` (and its checklist), `tdd-red-green-refactor` (and its cycle steps), `tdd-arrange-act-assert` (and its patterns) |
+
+### obra/superpowers
+
+[obra/superpowers](https://github.com/obra/superpowers), version 7.0.0, by Jesse Vincent. MIT License
+(notice below).
+
+| Framework skill | Adapted from |
+|-----------------|--------------|
+| `test-first` | `test-driven-development` (and its guide to writing good tests) |
+
+### The user's own working agreement
+
+The limits and the definition of a line of logic, "extract before you add", "logic does not move
+sideways", "refactor and behavior never share a commit", the rules against skipped, waiting and
+weakened tests, and the decision-record practice come from the working agreement and decision records
+of the user's own earlier project. They carry no third-party license.
+
+## License notices
+
+### helmedeiros/clean-code-skills
+
+```
+MIT License
+
+Copyright (c) 2025 Helio Medeiros
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### obra/superpowers
+
+```
+MIT License
+
+Copyright (c) 2025 Jesse Vincent
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
