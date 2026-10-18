@@ -64,7 +64,8 @@
         {
           "attempts": 0,
           "id": "4",
-          "status": "pending"
+          "status": "pending",
+          "title": ".h as C++ by content"
         },
         {
           "attempts": 0,
@@ -175,6 +176,11 @@
     {
       "at": "2026-10-18T19:16:26.771198+00:00",
       "event": "task 9/3 updated",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:29.010532+00:00",
+      "event": "task 9/4 updated",
       "issue": 9
     }
   ]
