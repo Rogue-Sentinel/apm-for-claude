@@ -10,7 +10,7 @@ from pathlib import Path
 from apm.guard_paths import matches_any
 from apm.metrics_braces import measure_braces
 from apm.metrics_cpp import with_cpp_classes
-from apm.metrics_lang import language_for, measure_plain
+from apm.metrics_lang import language_for, language_of, measure_plain
 from apm.metrics_model import (
     CLASS_LANGUAGES, CLASSLESS_LANGUAGES, ClassMetric, FileMetric, FunctionMetric, classes_measured,
 )
@@ -20,7 +20,7 @@ from apm.standard_config import Limits, MetricsConfig
 
 def measure_text(path: str, text: str) -> FileMetric | None:
     """Measure one file's text by its language family; None when the language is unknown."""
-    language = language_for(path)
+    language = language_of(path, text)
     if language is None:
         return None
     if language.family == "python":
