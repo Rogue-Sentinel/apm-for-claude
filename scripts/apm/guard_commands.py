@@ -200,6 +200,17 @@ def check_command(
     command = mask_data(command)
     if _PIPED_DELETE.search(command):
         return f"destructive command (piped recursive delete): {command}"
-    segments = (g for g in split_segments(command) if not _is_exempt(g, allowed_prefixes))
-    reasons = (destructive_reason(g) or protected_reason(g, globs, cwd, root) for g in segments)
+    return segments_reason(split_segments(command), globs, allowed_prefixes, cwd, root)
+
+
+def segments_reason(
+    segments: Sequence[str],
+    globs: Sequence[str],
+    allowed_prefixes: Sequence[str],
+    cwd: Path | None = None,
+    root: Path | None = None,
+) -> str | None:
+    """Return the reason for the first segment, not covered by an allowed prefix, that is denied."""
+    checked = (g for g in segments if not _is_exempt(g, allowed_prefixes))
+    reasons = (destructive_reason(g) or protected_reason(g, globs, cwd, root) for g in checked)
     return next((reason for reason in reasons if reason), None)
