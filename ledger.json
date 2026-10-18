@@ -368,6 +368,17 @@
       "title": "Shell commands that write outside the project are never checked by the guard",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/20"
     },
+    "21": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "The guard scans commit and PR heredoc bodies, and cat<<'EOF' bodies with no blank, as commands",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/21"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -1235,6 +1246,11 @@
       "at": "2026-10-18T23:37:00.853953+00:00",
       "event": "task 14/fix running",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:37:29.034484+00:00",
+      "event": "filed 21 https://github.com/Rogue-Sentinel/apm-for-claude/issues/21",
+      "issue": 21
     }
   ]
 }
