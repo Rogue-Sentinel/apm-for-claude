@@ -9,6 +9,7 @@ from typing import Any
 
 from .guard_commands import protected_reason, split_segments
 from .guard_data import mask_data
+from .guard_github import gh_write_reason
 from .guard_paths import matches_any
 from .paths import worktree_relative
 from .profile import WORKER_PROTECTED
@@ -19,7 +20,12 @@ from .profile import WORKER_PROTECTED
 # baseline, so it counts; `debt check` only reads.
 _DASHES = r"""(?:--\s+)?["']?"""
 _BASELINE = r"""debt["']?\s+""" + _DASHES + r"""baseline"""
-_MUTATIONS = _DASHES + r"(?:issue|task|allow|question|resolve|setup|approve|" + _BASELINE + r")(?![\w-])"
+_MUTATIONS = (
+    _DASHES + r"(?:issue|task|allow|question|resolve|setup|approve|note|review|github|init|gate|"
+    + _BASELINE + r")(?![\w-])"
+)
+# The subcommands a worker may run; every other one is denied above. A test walks the parser.
+WORKER_READ_ONLY = ("brief", "metrics", "coverage", "audit", "debt check")
 _APM_MUTATION = re.compile(
     r"""(?:^|(?i:\s-\w*c|\s-command|\s/c)\s+)["']?(?:[^\s"']*[/\\])?apm["']?\s+""" + _MUTATIONS
     + r"""|(?<![\w.-])(?i:apm_cli\.py)\\*["']?\s+""" + _MUTATIONS
@@ -33,6 +39,14 @@ def _state_change(command: str) -> str | None:
     return None
 
 
+def _github_write(command: str) -> str | None:
+    for segment in split_segments(mask_data(command)):
+        reason = gh_write_reason(segment)
+        if reason:
+            return reason
+    return None
+
+
 def _apm_write(command: str, cwd: Path, root: Path) -> str | None:
     for segment in split_segments(mask_data(command)):
         reason = protected_reason(segment, WORKER_PROTECTED, cwd, root)
@@ -42,10 +56,13 @@ def _apm_write(command: str, cwd: Path, root: Path) -> str | None:
 
 
 def worker_command_violation(command: str, event: Mapping[str, Any], cwd: Path, root: Path) -> str | None:
-    """Why a worker may not run `command`: it changes APM state or writes `.apm/`. No allowlist lifts this."""
+    """Why a worker may not run `command`: it changes APM state, writes `.apm/` or writes to GitHub.
+
+    No allowlist lifts this.
+    """
     if not event.get("agent_id"):
         return None
-    return _state_change(command) or _apm_write(command, cwd, root)
+    return _state_change(command) or _github_write(command) or _apm_write(command, cwd, root)
 
 
 def worker_file_violation(target: Path, event: Mapping[str, Any]) -> str | None:
