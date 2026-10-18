@@ -9,7 +9,7 @@ from typing import Any, Literal
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
 from .guard_paths import check_write, is_under, same_path
-from .guard_workers import worker_state_change
+from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
 from .profile import Profile
 
@@ -55,7 +55,8 @@ def _file_violation(
     if not isinstance(raw, str):
         return None
     target = to_native_path(raw, Path(event.get("cwd") or project.worktree_root), windows)
-    return check_write(target, project, profile.protected_globs(), allowed_globs, temp_roots)
+    return worker_file_violation(target, event) or check_write(
+        target, project, profile.protected_globs(), allowed_globs, temp_roots)
 
 
 def _state_dir_write(command: str, cwd: Path, project: Project) -> str | None:
@@ -74,7 +75,7 @@ def _command_violation(
 ) -> str | None:
     cwd = _cwd(event, project, windows)
     return (
-        worker_state_change(command, event)
+        worker_command_violation(command, event, cwd, project.worktree_root)
         or _state_dir_write(command, cwd, project)
         or check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
     )
