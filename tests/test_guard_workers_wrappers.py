@@ -100,8 +100,26 @@ def test_a_text_mention_of_an_apm_state_change_is_denied_and_points_to_the_grep_
     assert decision.kind == "deny" and "Grep tool" in decision.reason
 
 
-def test_a_commit_message_that_names_an_apm_state_change_is_allowed(git_repo: Path) -> None:
-    assert _worker(git_repo, 'git commit -m "Workers (apm note) are denied"').kind == "none"
+@pytest.mark.parametrize("command", ['git commit -m "Workers (apm note) are denied"', 'git commit -m "names apm note"'])
+def test_a_commit_message_that_names_an_apm_state_change_is_allowed(git_repo: Path, command: str) -> None:
+    assert _worker(git_repo, command).kind == "none"
+
+
+# A shell takes `-m` as its own option and still runs the `-c` string, so that string is never masked as data.
+SHELL_STRINGS = [
+    ("bash -c -m 'apm note 1'", "APM state"),
+    ("bash -c -m 'gh issue create'", "GitHub"),
+    ("sh -c -m 'echo x > .apm/profile.json'", ".apm/"),
+    ("sh -c 'cp x .apm/profile.json'", ".apm/"),
+]
+
+
+@pytest.mark.parametrize(("command", "reason"), SHELL_STRINGS)
+def test_a_shell_command_string_after_a_message_flag_is_still_checked(
+        git_repo: Path, command: str, reason: str) -> None:
+    decision = _worker(git_repo, command)
+
+    assert decision.kind == "deny" and reason in decision.reason
 
 
 def test_a_commit_message_that_runs_an_apm_state_change_is_denied(git_repo: Path) -> None:
