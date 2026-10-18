@@ -7,6 +7,8 @@ import re
 _BREAK = re.compile(r"[\s()<>{}`;|&$]+")
 # A redirection and its target (`2>&1`, `>/dev/null`, `<body.md`) are not arguments.
 _REDIRECT = re.compile(r"\d*[<>]+&?[^\s()<>{}`;|&$]*")
+# Where a new command can begin inside a segment: a substitution, a group or a subshell.
+_NESTED = re.compile(r"\$\(|[`(){}]")
 
 
 def spellings(segment: str) -> tuple[str, str]:
@@ -20,3 +22,8 @@ def shell_words(text: str) -> list[str]:
 
     Redirections are dropped."""
     return [word for word in _BREAK.split(_REDIRECT.sub(" ", text)) if word]
+
+
+def command_words(text: str) -> list[list[str]]:
+    """The words of each command in `text`; a substitution, a group or a subshell starts a new one."""
+    return [shell_words(piece) for piece in _NESTED.split(text)]
