@@ -65,10 +65,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 4 review: must-fix open: on Git Bash a CR on the end-tag line ends the heredoc but not the mask. See the plan, Task 4 ruling.",
+          "evidence": "guard*/hook* tests on the branch after merge 88ee63a: all pass; fix round 1 (CR end-tag must-fix + git-commit CR + stale comments; commits ba87c8f..edab1e7) re-reviewed clean; metrics 0/15 fn, 0/2 files over; debt check nothing worse.",
           "id": "4",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "cat heredoc is data",
           "worker": "implementer"
         },
@@ -737,6 +737,11 @@
     {
       "at": "2026-10-18T21:01:46.242109+00:00",
       "event": "task 11/4r done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:01:48.722091+00:00",
+      "event": "task 11/4 done",
       "issue": 11
     }
   ]
