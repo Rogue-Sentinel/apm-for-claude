@@ -716,3 +716,4 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
   `"plain": False` on purpose.
 - Task 6: `apm github close` prints a by-hand hint when `gh issue close` fails (not in the brief);
   `--parent` is checked before `gh` is called.
+- Task 4: test_setup_gitignore_without_trailing_newline now also expects `.apm/tmp/` (on purpose). The guard denied a worker's heredoc whose text held `.apm/tmp` as a write to `.apm/` (a Plan 1 false positive; the worker used the Edit tool).
