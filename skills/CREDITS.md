@@ -15,6 +15,8 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 
 | Framework skill | Adapted from |
 |-----------------|--------------|
+| `branch-review` | `branch-review` (and its scoring-evidence guide), and the `branch-review` command |
+| `clean-code-audit` | the `clean-code-audit` command |
 | `clean-code` | `clean-code-boy-scout-rule` (and its improvement checklist), `refactor-rename` (its naming conventions) |
 | `code-smells` | `clean-code-detect-smells` (and its smell catalog) |
 | `refactoring` | `refactor-extract-method` (and its extraction heuristics), `refactor-rename`, `refactor-replace-conditional-with-polymorphism` (and its before-and-after examples) |
