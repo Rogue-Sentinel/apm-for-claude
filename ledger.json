@@ -383,7 +383,8 @@
         {
           "attempts": 0,
           "id": "3",
-          "status": "pending"
+          "status": "pending",
+          "title": "Honest denial remedies"
         },
         {
           "attempts": 0,
@@ -1362,6 +1363,11 @@
     {
       "at": "2026-10-18T23:44:28.476132+00:00",
       "event": "task 19/2 updated",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:44:30.684506+00:00",
+      "event": "task 19/3 updated",
       "issue": 19
     }
   ]
