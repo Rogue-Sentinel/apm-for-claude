@@ -213,6 +213,12 @@
           "status": "running",
           "title": "Failing tests and pins",
           "worker": "implementer"
+        },
+        {
+          "attempts": 0,
+          "id": "2",
+          "status": "pending",
+          "title": "guard_redirects and protected_reason"
         }
       ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
@@ -1050,6 +1056,11 @@
     {
       "at": "2026-10-18T23:02:42.346777+00:00",
       "event": "task 14/1 running",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:02:44.633123+00:00",
+      "event": "task 14/2 pending",
       "issue": 14
     }
   ]
