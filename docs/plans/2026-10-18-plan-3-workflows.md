@@ -589,3 +589,39 @@ edit in Task 13 is the manager's own, under no protected path.
 - No existing test was weakened. Each changed test (the renamed heading, the subcommand lists) is listed in the
   PR with its reason.
 - The version is `0.3.0` in `scripts/apm/__init__.py` and `.claude-plugin/plugin.json`.
+
+## Pre-flight scan
+
+*Recorded by the manager before Task 1, 2026-10-18.*
+
+| Pair or task | Produces → consumes | Found |
+|---|---|---|
+| 1 → 8, 9 | `load_workflow`, `Workflow` | Names agree. |
+| 2 ↔ 5–9 | denylist and `SUBCOMMANDS` vs the new parsers | The classification test walks only the parser's real choices, so it holds at each step. `test_guard_debt` checks a subset only. |
+| 3 ↔ 5 | both modify `cli_parser.py` (`_metrics` vs `build_parser`/`_issue`) | Same file: run in sequence (5, then 3). |
+| 3 → 7, 9 | `measure_at_ref`, `ref_files`, `layer_overlaps` | Names agree. |
+| 4 → 9 | `TMP_IGNORE` (`.apm/tmp/`) | Agree; the gate's clean-tree check ignores it too. |
+| 5 → 6, 8, 9 | `set_parent`, `add_note`, `issue["review"]`, `issue["plan"]`, `REQUIREMENTS` | Agree; `gate: state` in Task 5 matches Task 9's need for the ledger. |
+| 6 → 7 | `list_open_issues`, `GitHubError` | Agree. |
+| 7 → 8 | audit JSON (`mode`, `base`, `in_flight[].id`, `debt_issues`) | Agree. |
+| 10 ↔ 12 | both modify `agents/manager.md` | Same file: run in sequence (10, then 12). |
+| 10 ↔ 11 | new skill directories vs existing skills | Disjoint. |
+| Task 5 | `apm issue N --parent P` | Self-consistent with a ruling (below). |
+| Task 9 | the criteria fixture | Uses Plan 2's real criteria section, copied into `tests/fixtures/`. |
+| Task 13 | live check (c) | Filing "at the start of the build" is impossible before Task 6 exists; see the ruling. |
+| Rubric | — | Nothing the plan mandates is a defect by the review rubric. |
+
+*Ruling before Task 1: build order is 1, 2 and 5 in parallel, then 6, then 3 and 4 beside it, then 7, 8, 9,
+with 10 and 11 beside them, then 12, then 13. Task 5 comes forward so that Task 6's `apm github file` exists
+to file this plan's tracking issue, as the user asked; nothing that was decided changes. Cost if wrong: none.*
+
+*Ruling before Task 1 (Task 5): `apm issue N --parent P` goes through `set_parent`, so the parent is
+validated; it is not passed through `upsert_issue` as a plain field. Cost if wrong: one handler line.*
+
+*Ruling before Task 1 (Task 13, check c): the tracking issue is filed with `apm github file` right after
+Task 6 merges, from this branch's own CLI. Tasks 1, 2 and 5 are recorded under it once it exists. Cost if
+wrong: those three records are written a little late.*
+
+*Ruling before Task 1 (pacing): the user's build instructions and Global Constraints set lean pacing for this
+build, so `apm:executing-plans`' per-task review applies only to Task 2 (safety-critical). Workers run the
+targeted tests; the manager verifies each task with the same tests plus `test_own_limits` and `debt check`.*
