@@ -226,6 +226,17 @@ That is fixed in this round as its own commit, with failing tests first across a
 subcommand may be any later word after the apm program, which also catches `apm $EMPTY note 1`. Cost if wrong:
 more fail-closed false positives.*
 
+*Rulings at the end of Task 2 fix round 2 (verified by the manager: 658 guard tests pass; direct probes deny every
+reported bypass for workers, allow the routine reads, and leave the main session unaffected): (1) the worker also
+changed `_apm_write` to check each segment with its quotes removed, because `sh -c 'cp x .apm/profile.json'` was
+already allowed (one shlex token); kept. `mask_data` looks for a shell command string in the whole command, so a
+commit message beside a `bash -c` loses masking and fails closed; kept. (2) This round's scoped re-review is
+folded into the final whole-branch review, which is pointed at commits 997fd3d, 7a7fbd1 and 69e5b32 with the
+findings list. (3) A bug the worker found, related and safety-relevant: `guard_commands.protected_reason` reads a
+quoted shell string as one token, so in the main session's protected-path check `sh -c 'cp x data/fleet.db'`
+does not match a protected glob. It is fixed in the final fix wave as its own commit, with a failing test first.
+Cost if wrong: one more commit in the final wave.*
+
 ### Task 3: Metrics follow-ups: plain files, a git ref, and files in two layers
 
 **Files:**
