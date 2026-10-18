@@ -106,10 +106,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 4 review (opus): 1 must-fix (CR end-tag line on MSYS bash), 4 suggestions; ruling in the plan.",
+          "evidence": "Scoped re-review: must-fix and both extras addressed, 0 open; 3 deferred (one the manager leans must-fix for the final review).",
           "id": "4r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 4 review",
           "worker": "reviewer"
         },
@@ -732,6 +732,11 @@
     {
       "at": "2026-10-18T20:59:19.901868+00:00",
       "event": "task 11/5r running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:01:46.242109+00:00",
+      "event": "task 11/4r done",
       "issue": 11
     }
   ]
