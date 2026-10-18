@@ -274,3 +274,10 @@ reviewed per task; they are not protected paths.)
 | 3 | self | the gate | consistent |
 
 Rubric check: Task 1 commits red tests on purpose (the plan says so). Tasks 1 and 2 are safety-critical: each gets its own review.
+
+## Deferred findings
+- Task 1 review (S1): the glued-head heredoc pins name no protected path in their body; add `"cat <<'EOF'>body.md
+moved a.md->docs/b.md
+EOF"` (allowed) so the glued-head body masking is pinned.
+- Task 1 review (S2): add operator-run neighbors as smoke pins: `echo x >&2`, `python x.py 1>&2`, a here-string `<<<`, a process substitution `<(...)`.
+- Task 1 review (found elsewhere): `_CAT_HEREDOC` needs a blank between `cat` and `<<`, so `cat<<'EOF'>body.md` bodies are scanned line by line; after Task 2 a glued arrow to a protected path in such a body is denied too (accepted under Risks). Candidate small issue: mask the body when `cat<<'TAG'` has no blank.
