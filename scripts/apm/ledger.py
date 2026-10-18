@@ -10,7 +10,7 @@ from typing import Any
 
 ISSUE_STATUSES = (
     "designing", "planning", "awaiting-approval", "building",
-    "integrating", "merged", "blocked", "queued",
+    "integrating", "merged", "blocked", "queued", "split",
 )
 TASK_STATUSES = ("pending", "running", "done", "failed", "blocked")
 ALLOWLIST_STATUSES = ("building", "integrating")
@@ -29,7 +29,7 @@ def empty_ledger() -> dict[str, Any]:
 def _normalize_issue(key: str, issue: Any) -> None:
     if not isinstance(issue, dict):
         raise LedgerError(f"issue {key} is not an object")
-    for name in ("tasks", "allowlist", "questions"):
+    for name in ("tasks", "allowlist", "questions", "decisions", "concerns"):
         if not isinstance(issue.setdefault(name, []), list):
             raise LedgerError(f"issue {key} field {name!r} is not a list")
 
@@ -78,9 +78,8 @@ def _issue(ledger: dict[str, Any], number: int) -> dict[str, Any]:
 
 def upsert_issue(ledger: dict[str, Any], number: int, **fields: Any) -> dict[str, Any]:
     _check_status(fields, ISSUE_STATUSES, "issue")
-    issue = ledger["issues"].setdefault(
-        str(number), {"status": "queued", "tasks": [], "allowlist": [], "questions": []}
-    )
+    fresh = {"status": "queued", "tasks": [], "allowlist": [], "questions": [], "decisions": [], "concerns": []}
+    issue = ledger["issues"].setdefault(str(number), fresh)
     issue.update(fields)
     return issue
 

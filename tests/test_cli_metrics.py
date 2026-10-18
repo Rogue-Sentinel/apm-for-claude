@@ -153,7 +153,10 @@ def test_a_none_requirement_runs_anywhere(tmp_path: Path, monkeypatch) -> None:
 
 
 def test_the_requirement_table_keeps_plan_one_behavior() -> None:
-    assert apm_cli.REQUIREMENTS == {"setup": "repo", "metrics": "repo", "brief": "profile", "debt": "profile", "coverage": "none"}
+    assert apm_cli.REQUIREMENTS == {
+        "setup": "repo", "metrics": "repo", "brief": "profile", "debt": "profile", "coverage": "none",
+        "audit": "repo", "init": "repo", "github": "state", "gate": "state", "review": "state", "note": "state",
+    }
 
 
 def test_cli_metrics_path_that_does_not_exist_is_an_error(project: Path, capsys) -> None:
