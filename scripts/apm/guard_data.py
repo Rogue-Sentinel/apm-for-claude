@@ -13,6 +13,15 @@ _HEREDOC = re.compile(
     r"(?P<body>.*?)(?P<end>^[ \t]*(?P=tag)[ \t]*$)",
     re.DOTALL | re.MULTILINE,
 )
+# A shell given a command string (`bash -c`, `pwsh -Command`, `cmd /c`): it takes `-m` and the like as its
+# own options and still runs the string, so nothing in such a command is masked. A shell, by path, with
+# `.exe`, in any case, followed later by an option holding a `c` (`-c`, `-lc`, `-Command`), or `cmd` by `/c`,
+# `/k` or `/r` (`//c` from Git Bash). It is looked for in the whole command, quotes removed, so it fails closed.
+_SHELL_STRING = re.compile(
+    r"(?<![\w.-])(?:\S*[/\\])?(?:(?:bash|sh|zsh|dash|ksh|mksh|pwsh|powershell)(?:\.exe)?\s(?:.*?\s)?-[\w-]*c"
+    r"|cmd(?:\.exe)?\s(?:.*?\s)?//?[ckr]\b)",
+    re.IGNORECASE | re.DOTALL,
+)
 
 
 def _expands(text: str) -> bool:
@@ -35,6 +44,9 @@ def _mask_heredoc(found: re.Match[str]) -> str:
 def mask_data(command: str) -> str:
     """Empty the value of each message argument and the heredoc body of `git commit -F -`.
 
-    A value that the shell would expand (`$(...)` or backticks outside single quotes) is code and stays.
+    A value that the shell would expand (`$(...)` or backticks outside single quotes) is code and stays,
+    and so does every value in a command that runs a shell's command string.
     """
+    if _SHELL_STRING.search(command.replace('"', "").replace("'", "")):
+        return command
     return _ARGUMENT.sub(_mask_argument, _HEREDOC.sub(_mask_heredoc, command))

@@ -2,7 +2,7 @@
   "accepted": [],
   "classes": {},
   "files": {
-    "tests/test_guard.py": 243
+    "tests/test_guard.py": 242
   },
   "functions": {
     "tests/test_cli.py::test_mutations_store_fields_and_log_events": 19
@@ -28,7 +28,7 @@
   },
   "sources": {},
   "totals": {
-    "excess_file_lines": 43,
+    "excess_file_lines": 42,
     "excess_function_lines": 4,
     "long_files": 1,
     "long_functions": 1,

@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
-IN_PROGRESS = ("designing", "planning", "awaiting-approval", "building", "integrating")
+from apm.ledger_workflow import parent_progress
+
+IN_PROGRESS = ("designing", "planning", "awaiting-approval", "building", "integrating", "split")
 MERGED_LIMIT = 5
 EMPTY = "No work recorded yet."
 
@@ -44,17 +46,42 @@ def _running(task: dict[str, Any]) -> str:
     return f"  running {task.get('id', '?')}: {worker}{model}"
 
 
-def _progress_entry(key: str, issue: dict[str, Any]) -> list[str]:
+def _head(key: str, issue: dict[str, Any]) -> str:
     tasks = issue.get("tasks", [])
+    if issue["status"] == "split":
+        return f"- {_label(key, issue)} [split]"
     done = sum(1 for task in tasks if task.get("status") == "done")
-    head = f"- {_label(key, issue)} [{issue['status']}] {done}/{len(tasks)} tasks done"
-    return [head] + [_running(t) for t in tasks if t.get("status") == "running"]
+    return f"- {_label(key, issue)} [{issue['status']}] {done}/{len(tasks)} tasks done"
+
+
+def _review(issue: dict[str, Any]) -> list[str]:
+    review = issue.get("review")
+    if not review:
+        return []
+    if review.get("open"):
+        return [f"  final review: {review['open']} open findings"]
+    return [f"  final review: clean at {str(review.get('head', ''))[:7]}"]
+
+
+def _notes(ledger: dict[str, Any], key: str, issue: dict[str, Any]) -> list[str]:
+    lines = []
+    if issue["status"] == "split" and key.isdigit():
+        merged, total = parent_progress(ledger, int(key))
+        lines.append(f"  split: {merged} of {total} sub-issues merged")
+    if issue.get("concerns"):
+        lines.append(f"  open concerns: {len(issue['concerns'])}")
+    return lines + _review(issue)
+
+
+def _progress_entry(ledger: dict[str, Any], key: str, issue: dict[str, Any]) -> list[str]:
+    running = [_running(t) for t in issue.get("tasks", []) if t.get("status") == "running"]
+    return [_head(key, issue)] + running + _notes(ledger, key, issue)
 
 
 def _in_progress(ledger: dict[str, Any]) -> list[str]:
     lines: list[str] = []
     for key, issue in _with_status(ledger, IN_PROGRESS):
-        lines.extend(_progress_entry(key, issue))
+        lines.extend(_progress_entry(ledger, key, issue))
     return lines
 
 

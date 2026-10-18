@@ -34,8 +34,9 @@
 1. Write only enough code to pass the failing test.
 2. Hard-coding, constants and duplication are all acceptable here; the next test or the refactor
    phase removes them.
-3. Run the **whole** suite, with the project's own test command. Everything must be green, and the
-   output clean.
+3. Run the tests covering the change: the one you wrote and the tests for the files you changed,
+   with the project's own test command. Everything must be green, and the output clean. The whole
+   suite is not part of the cycle: it runs once, through `<CLI> gate`, right before the pull request.
 4. If a test that used to pass now fails, fix that before anything else. Fix the code, not the test.
 
 ### Mistakes

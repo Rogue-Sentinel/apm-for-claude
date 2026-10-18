@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from skill_helpers import SKILLS_DIR, assert_sections, parse_skill
+from skill_helpers import SKILLS_DIR, assert_sections, parse_skill, section
 
 REQUIRED = {
     "design-first": (
@@ -18,7 +18,7 @@ REQUIRED = {
     ),
     "executing-plans": (
         "## One task at a time", "## Briefing a worker", "## Verify it yourself",
-        "## Review after every task", "## Re-review after fixes", "## Recording each task",
+        "## When to review", "## Re-review after fixes", "## Recording each task",
         "## When to stop and ask",
     ),
     "parallel-dispatch": (
@@ -46,7 +46,16 @@ NAMED_IN_BODY = {
     "writing-plans": ("`<CLI> allow",),
 }
 
-BARE_CLI = re.compile(r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief)(?!\w)")
+LEAN_PACING_SKILLS = (
+    "executing-plans", "code-review", "test-first", "worktrees", "parallel-dispatch", "writing-plans",
+    "systematic-debugging", "verification",
+)
+BASE_CHECK_FILES = ("worktrees/SKILL.md", "executing-plans/references/implementer-brief.md")
+
+BARE_CLI = re.compile(
+    r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief"
+    r"|note|review|github|init|gate|audit|coverage)(?!\w)"
+)
 TWO_TIERS_ONLY = ("reviewer-brief.md", "re-review-brief.md")
 
 
@@ -72,6 +81,23 @@ def test_skill_names_the_framework_mechanism_it_relies_on(name):
     assert not missing, f"{name} does not name {missing}"
 
 
+@pytest.mark.parametrize("name", LEAN_PACING_SKILLS)
+def test_skill_carries_the_lean_pacing_rule(name):
+    text = "\n".join(text for _, text in _skill_texts(name))
+    assert "`<CLI> gate`" in text, f"{name} does not name the gate as where the full suite runs"
+
+
+def test_no_skill_still_reviews_after_every_task():
+    stale = [str(path) for path in SKILLS_DIR.rglob("*.md") if "Review after every task" in path.read_text(encoding="utf-8")]
+    assert not stale, f"old heading still referenced in {stale}"
+
+
+@pytest.mark.parametrize("relative", BASE_CHECK_FILES)
+def test_worktree_guidance_checks_the_base_is_an_ancestor(relative):
+    text = (SKILLS_DIR / relative).read_text(encoding="utf-8")
+    assert "merge-base --is-ancestor" in text and "--ff-only" in text, f"{relative} has no base check"
+
+
 @pytest.mark.parametrize("name", sorted(REQUIRED))
 def test_credits_name_the_skill(name):
     credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")
@@ -89,3 +115,47 @@ def test_review_briefs_use_two_severity_tiers(file_name):
     text = (SKILLS_DIR / "executing-plans" / "references" / file_name).read_text(encoding="utf-8")
     assert "must fix" in text.lower() and "suggestion" in text.lower()
     assert "should fix" not in text.lower(), f"{file_name} still has a should-fix tier"
+
+
+ROOT = SKILLS_DIR.parent
+ADR_0002 = ROOT / "docs" / "adr" / "0002-guard-threat-model.md"
+SPEC = ROOT / "docs" / "specs" / "2026-10-17-apm-for-claude-design.md"
+GUARD_REVIEW_FILES = (("code-review", "SKILL.md"), ("code-review", "references/reviewer-checklist.md"))
+RE_REVIEW_FILES = (("executing-plans", "SKILL.md"), ("executing-plans", "references/re-review-brief.md"))
+
+
+def _file(name, relative):
+    return (SKILLS_DIR / name / relative).read_text(encoding="utf-8")
+
+
+def test_the_guard_threat_model_is_recorded_and_indexed():
+    assert ADR_0002.is_file(), "docs/adr/0002-guard-threat-model.md is missing"
+    index = (ADR_0002.parent / "README.md").read_text(encoding="utf-8")
+    assert "(0002-guard-threat-model.md)" in index
+    text = ADR_0002.read_text(encoding="utf-8")
+    assert "cooperative worker" in text and "Accepted" in text
+
+
+def test_the_design_spec_points_its_safety_section_at_the_threat_model():
+    spec = SPEC.read_text(encoding="utf-8")
+    assert "ADR 0002" in section(spec, "## 9. Safety (the top anti-goal)")
+
+
+@pytest.mark.parametrize(("name", "relative"), GUARD_REVIEW_FILES)
+def test_a_guard_finding_must_name_how_a_cooperative_worker_would_produce_it(name, relative):
+    text = _file(name, relative)
+    assert "cooperative worker" in text and "ADR 0002" in text and "0002-guard-threat-model.md" in text
+    assert "known limit" in text and "loosens" in text, f"{name}/{relative} has no rule for a guard finding"
+
+
+@pytest.mark.parametrize(("name", "relative"), RE_REVIEW_FILES)
+def test_a_re_review_blocks_only_on_an_unaddressed_finding_or_a_regression(name, relative):
+    text = _file(name, relative)
+    assert "blocks only on" in text and "not addressed" in text and "regression" in text
+    assert "deferred" in text and "looser" in text, f"{name}/{relative} does not route other findings"
+
+
+def test_a_safety_review_focus_states_its_threat_model():
+    text = section(parse_skill("writing-plans")[1], "## Review focus")
+    assert "threat model" in text and "ADR 0002" in text and "any way past" in text
+    assert "realistic shapes" in text

@@ -192,6 +192,10 @@ American spelling, issue forms) become **declared overrides in the profile**.
 5. **Build.** The manager dispatches implementers (at most 3 at once, only on tasks that don't share files),
    each in its own worktree. After each task: the manager runs the verification itself, a reviewer checks
    the diff, failures go back with findings, and state is updated.
+   *Amended by [ADR-0001](../adr/0001-lean-pacing-by-default.md): lean pacing is the default. Tasks are
+   verified with targeted tests, the full suite runs once through the merge gate, one whole-branch review
+   runs at the end, and a per-task review happens only when the user asks, the profile says
+   `"review": "per-task"`, or the task touches a `workflow.safety_critical` path.*
 6. **Integrate.** The manager merges `main` into the branch and runs the **merge gate** (§8). It pushes, opens
    the PR, and merges it with the project's merge style.
 7. **Report.** It tells the user what shipped, closes the issue, and records the result.
@@ -303,6 +307,9 @@ Several layers, because no single rule is enough:
 4. **Deletion is planned, never a side effect.** It happens as a tracked git change. An unplanned deletion
    is flagged and reverted in review.
 5. **Workers build in isolated worktrees**, so a misbehaving worker damages only its own copy.
+
+*The guard defends against a cooperative worker's mistakes, not an adversary's evasions; see
+[ADR 0002](../adr/0002-guard-threat-model.md).*
 
 ## 10. Prior art
 - **APM:** borrow the roles, the shared-file memory, and planning before implementation. Drop the

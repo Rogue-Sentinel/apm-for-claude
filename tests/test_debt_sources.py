@@ -71,3 +71,22 @@ def test_run_source_really_runs_a_command(tmp_path: Path) -> None:
     source = DebtSource("echo", command, {"errors": r"errors: (\d+)"})
 
     assert run_source(source, tmp_path) == {"errors": 3}
+
+
+def test_run_source_passes_its_timeout(tmp_path: Path) -> None:
+    run = _fake(OUTPUT)
+    source = DebtSource("checker", "python tools/check.py", {"n": r"logic: (\d+)"}, timeout=42)
+
+    run_source(source, tmp_path, run)
+
+    assert run.calls[0][1]["timeout"] == 42
+
+
+def test_run_source_timeout_raises(tmp_path: Path) -> None:
+    def hung(command, **kwargs):
+        raise subprocess.TimeoutExpired(command, kwargs["timeout"])
+
+    source = DebtSource("checker", "python tools/check.py", {"n": r"logic: (\d+)"}, timeout=7)
+
+    with pytest.raises(DebtError, match=r"checker: timed out after 7s"):
+        run_source(source, tmp_path, hung)

@@ -35,6 +35,21 @@ CODE = [
     "git commit -F - <<'EOF'\nmsg\nEOF\nrm -rf build",
     "bash -c 'echo -m \"x; rm -rf y; echo \"'",
     'git commit -m "msg" ; git clean -fd',
+    # A shell takes `-m` and the like as its own options and still runs the `-c` string.
+    "bash -c -m 'rm -rf x'",
+    'BASH.EXE -c --title "rm -rf x"',
+    "/bin/sh -lc -m 'rm -rf x'",
+    '"C:/Program Files/Git/bin/bash.exe" -c -m "rm -rf x"',
+    "zsh -c --body 'rm -rf x'",
+    "dash -c -m 'rm -rf x'",
+    "pwsh -Command -m 'Remove-Item x -Recurse'",
+    "powershell.exe -c --message 'Remove-Item x -Recurse'",
+    r'C:\Windows\System32\cmd.exe /c --text "rd /s /q x"',
+    "cmd //c -m 'rd /s /q x'",
+    "env X=1 bash -c -m 'rm -rf x'",
+    "x=$(sh -c -m 'rm -rf x')",
+    "ksh -c -m 'rm -rf x'",
+    "mksh -c --body 'rm -rf x'",
 ]
 
 
@@ -50,3 +65,11 @@ def test_interpreter_code_stays_blocked(command: str) -> None:
 
 def test_message_naming_a_protected_path_is_data() -> None:
     assert check_command('git commit -m "update data/fleet.db"', ["data/*.db"], []) is None
+
+
+@pytest.mark.parametrize("command", ["sh -c 'cp x data/fleet.db'", 'bash -c "echo x > data/fleet.db"',
+                                     "pwsh -Command 'Copy-Item x data/fleet.db'"])
+def test_a_protected_path_inside_a_shell_command_string_is_caught(command: str) -> None:
+    reason = check_command(command, ["data/*.db"], [])
+
+    assert reason is not None and "protected path" in reason

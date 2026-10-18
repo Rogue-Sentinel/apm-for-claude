@@ -133,7 +133,7 @@ Origin: the 15 superpowers skills and their supporting files (version 7.0.0)
 | Skill: finishing-a-development-branch | [skills/finishing-a-branch/SKILL.md ## The core rule](../skills/finishing-a-branch/SKILL.md#the-core-rule) |
 | Skill: receiving-code-review | [skills/code-review/SKILL.md ## Receiving a review](../skills/code-review/SKILL.md#receiving-a-review) |
 | Skill: requesting-code-review | [skills/code-review/SKILL.md ## Requesting a review](../skills/code-review/SKILL.md#requesting-a-review) |
-| Skill: subagent-driven-development | [skills/executing-plans/SKILL.md ## Review after every task](../skills/executing-plans/SKILL.md#review-after-every-task) |
+| Skill: subagent-driven-development | [skills/executing-plans/SKILL.md ## When to review](../skills/executing-plans/SKILL.md#when-to-review) |
 | Skill: systematic-debugging | [skills/systematic-debugging/SKILL.md ## Root cause first](../skills/systematic-debugging/SKILL.md#root-cause-first) |
 | Skill: test-driven-development | [skills/test-first/SKILL.md ## Test first](../skills/test-first/SKILL.md#test-first) |
 | Skill: using-git-worktrees | [skills/worktrees/SKILL.md ## The core rule](../skills/worktrees/SKILL.md#the-core-rule) |
@@ -173,7 +173,7 @@ Origin: the 15 superpowers skills and their supporting files (version 7.0.0)
 | subagent-driven-development: implementer-prompt.md | [skills/executing-plans/references/implementer-brief.md](../skills/executing-plans/references/implementer-brief.md) |
 | subagent-driven-development: re-review-prompt.md | [skills/executing-plans/references/re-review-brief.md](../skills/executing-plans/references/re-review-brief.md) |
 | subagent-driven-development: task-reviewer-prompt.md | [skills/executing-plans/references/reviewer-brief.md](../skills/executing-plans/references/reviewer-brief.md) |
-| subagent-driven-development: scripts/review-package | [skills/executing-plans/SKILL.md ## Review after every task](../skills/executing-plans/SKILL.md#review-after-every-task) |
+| subagent-driven-development: scripts/review-package | [skills/executing-plans/SKILL.md ## When to review](../skills/executing-plans/SKILL.md#when-to-review) |
 | subagent-driven-development: scripts/sdd-workspace | [skills/executing-plans/SKILL.md ## Before the first task](../skills/executing-plans/SKILL.md#before-the-first-task) |
 | subagent-driven-development: scripts/task-brief | [skills/executing-plans/SKILL.md ## Briefing a worker](../skills/executing-plans/SKILL.md#briefing-a-worker) |
 | systematic-debugging: condition-based-waiting-example.ts | [skills/systematic-debugging/references/condition-based-waiting.md](../skills/systematic-debugging/references/condition-based-waiting.md) |

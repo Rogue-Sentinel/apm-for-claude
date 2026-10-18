@@ -1,5 +1,5 @@
 {
-  "framework_version": "0.2.0",
+  "framework_version": "0.3.0",
   "max_workers": 3,
   "models": {
     "auditor": "haiku",
@@ -8,5 +8,18 @@
     "planner": "opus",
     "reviewer": "opus"
   },
-  "protected_paths": []
+  "protected_paths": [],
+  "workflow": {
+    "base": "main",
+    "commands": {
+      "test": "python -m pytest -q"
+    },
+    "merge_style": "merge",
+    "review": "end",
+    "safety_critical": [
+      "scripts/apm/guard*.py",
+      "scripts/hook_*.py",
+      "hooks/**"
+    ]
+  }
 }

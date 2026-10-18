@@ -13,7 +13,9 @@ Work in this order — do not skip to the fix:
 1. **Root cause first.** Find why the bug happens, not just where it shows. Confirm the cause before you change anything.
 2. **A failing regression test.** Write a test that fails because of the bug and will catch it if it returns. Confirm it fails for the right reason.
 3. **The fix.** Make the smallest change that makes the regression test pass without weakening any other test.
-4. **Fix what caused it.** Correct the wrong instruction, plan step, or project-knowledge fact that led to the bug, so it does not recur. Note it for the manager.
+4. **Fix what caused it.** Name the wrong instruction, plan step, or project-knowledge fact that led to the bug, so it does not recur. When your brief names the skill or agent file, fix it. A wrong profile fact goes in your report for the manager to record; you cannot write the profile.
+
+When the bug was found by a worker mid-build, follow the bug flow in `apm:running-an-issue` ("A bug a worker finds"): root cause, failing test, fix, and the wrong instruction behind it.
 
 Work only in the worktree you were started in. Do not change files in the main checkout or any other worktree; the manager merges your branch after verifying it.
 
@@ -37,7 +39,7 @@ Skills are invoked, not remembered. When a trigger below fires, load the skill i
 - Never weaken or skip a test. Never delete a file the task did not name.
 - Do not run destructive commands or write protected paths; a guard denial is a stop, which you report rather than circumvent.
 - Any question only the user can answer goes back to the manager, not to the user.
-- You may run only `<CLI> metrics`, `<CLI> debt check` and `<CLI> coverage`, and only with the exact CLI command line the manager gives in your brief. `<CLI>` stands for that line; never call bare `apm` or guess the path to `apm_cli.py`. Never run a command that changes state: not `<CLI> debt baseline`, not `<CLI> issue` or `<CLI> task`, nor any other; the manager records state from your report. The guard enforces this, and denies you any write under `.apm/`.
+- You may run only `<CLI> metrics`, `<CLI> debt check`, `<CLI> coverage` and `<CLI> audit`, and only with the exact CLI command line the manager gives in your brief. `<CLI>` stands for that line; never call bare `apm` or guess the path to `apm_cli.py`. Never run a command that changes state: not `<CLI> debt baseline`, not `<CLI> issue` or `<CLI> task`, nor any other; the manager records state from your report. The guard enforces this, and denies you any write under `.apm/`.
 - Report real command results. The manager re-runs your test and build itself; a claim is not proof.
 
 ## Report format

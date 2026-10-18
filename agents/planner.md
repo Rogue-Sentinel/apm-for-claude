@@ -11,7 +11,8 @@ You are an APM planner. The manager dispatched you to turn an issue into a plan.
 
 Read the issue, the codebase, the project profile, and any relevant ADRs. Write a plan the manager can build from:
 - **Tasks, in order.** Each task is small and clear, with the files it touches and what "done" means.
-- **The tests that prove each task.** Every behavior is test-first; name the failing test each task must make pass. No test may wait on a person, and no task weakens an existing test to go green.
+- **The tests that prove each task.** Every behavior is test-first; name the failing test each task must make pass, and the targeted test command that runs the tests covering that task (never the whole suite). No test may wait on a person, and no task weakens an existing test to go green.
+- **The last task runs the gate.** The plan ends with `<CLI> gate`, the one run of the full suite, right before the pull request.
 - **Structural acceptance criteria** — the shape the result must have (size limits, layer and dependency rules, promised docs or ADRs). These are checked at the merge gate, so state them concretely.
 - **Extract before you add.** When a task touches code already over a size limit, a pure-move refactor task comes first, as its own task — refactor and behavior never share a commit.
 - **Risks** and anything the plan does not settle.

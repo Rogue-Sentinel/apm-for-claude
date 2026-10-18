@@ -53,6 +53,15 @@ the fix diff for new problems the fix itself introduced. Do not re-review code t
 did not touch: an issue entirely outside the fix diff goes under out-of-scope
 observations, and it does not block this task or extend the loop.
 
+This re-review blocks only on two things: a finding that is not addressed, or a regression
+the fix introduced, including any verdict that got looser (something the base denied that
+the fix now allows). Every other new finding, including a hole the base also has, goes
+under out-of-scope observations, to be deferred or followed up, and never starts another
+round. If the fix touches a guard, a hook or another safety check, a finding must name a
+plausible way a cooperative worker would produce the command (ADR 0002,
+docs/adr/0002-guard-threat-model.md); one that cannot is a known limit, a suggestion. Do
+not search for "any way past" the check.
+
 ## Tests
 
 The worker re-ran the tests covering what it changed, and reported them. Treat the

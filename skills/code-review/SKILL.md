@@ -5,16 +5,21 @@ description: "Use when a task or a feature is finished and needs review, before 
 
 # Code review
 
-The manager requests a review after every task and before every merge, and briefs the reviewer
-with exactly what it needs. Findings that come back are checked against the code before anyone
+The manager requests one whole-branch review before every merge, plus a per-task review in the
+three cases below, and briefs the reviewer with exactly what it needs. Findings that come back are checked against the code before anyone
 agrees with them, acted on one at a time, and answered with facts, not with gratitude.
 
 ## When this applies
 
 **A review is required:**
-- after each task of a plan, before the next task starts;
-- after a feature is complete;
-- before a branch merges to `main` (the final review is criterion 3 of the merge gate).
+- once, on the whole branch, when every task is done and before it merges to `main`. This is the
+  default, and the final review is criterion 3 of the merge gate;
+- after a single task, before the next one starts, only when the user asked for per-task review,
+  when the profile says `"review": "per-task"`, or when the task touches a path in the profile's
+  `workflow.safety_critical`. Otherwise a task's diff is reviewed with the rest of the branch.
+
+The review reads the diff and the manager's evidence; it does not rerun the suite. The full suite
+runs once, through `<CLI> gate`, after the final review's fixes and right before the pull request.
 
 **A review is worth asking for:**
 - when a worker or the manager is stuck and wants a fresh look;
@@ -102,6 +107,20 @@ The full brief, what to check, the calibration rules, the output format and an e
 [references/reviewer-checklist.md](references/reviewer-checklist.md). For a scored review of a whole
 branch, the reviewer also uses `apm:branch-review`; for smells, `apm:code-smells`; for dependency
 direction, `apm:clean-architecture`, with `<CLI> debt check` output as evidence.
+
+## Findings about a guard, a hook or another safety check
+
+A check that reads command text cannot be complete, so a review that asks for "any way past it" never
+ends. The guard defends against a cooperative worker's mistakes, not an adversary's evasions
+(ADR 0002, `docs/adr/0002-guard-threat-model.md`). So, for a finding about a guard, a hook or any
+other safety check:
+
+- **It names the command.** The finding states a plausible way a cooperative worker, or the manager,
+  would produce the command while following its brief. If it cannot, it is a known limit: a
+  suggestion, recorded in the module's known-limits note, and never must-fix.
+- **A loosened verdict is always must-fix.** A change that loosens a verdict, so that something denied
+  before is now allowed, is a regression, whatever else it fixes.
+- **A false positive on routine work is a defect too**, graded by how routine the command is.
 
 ## Receiving a review
 
@@ -245,7 +264,8 @@ If you are about to write "thanks", delete it and state the fix instead.
 
 ## Red flags
 
-- Skipping a review because the change is "simple".
+- Skipping the final whole-branch review because the change is "simple".
+- Reviewing every task on its own, when none of the three triggers fired.
 - Ignoring a must-fix finding, however it was labeled.
 - Starting the next task, or merging, with a must-fix finding unfixed.
 - A suggestion neither fixed nor recorded as deferred.
@@ -262,7 +282,7 @@ If you are about to write "thanks", delete it and state the fix instead.
 |--------|---------|
 | "I'll just review the diff myself instead of dispatching a reviewer." | The manager's context is for driving the work. The diff and its evaluation belong in the reviewer's context; only the findings come back. |
 | "The reviewer needs my whole session to understand the change." | Give it crafted context, never the session. That keeps it on the work product, not your thought process. |
-| "It's a small change; it doesn't need a review." | Small changes break things too, and the merge gate requires the review. |
+| "It's a small change; it doesn't need a review." | Small changes break things too, and the merge gate requires the final review. A small change gets no review of its own only because the whole branch gets one. |
 | "The reviewer is the expert; I'll just do what it says." | A reviewer can lack context. Verify every item first. |
 | "Pushing back looks uncooperative." | Technical correctness beats comfort. Unvoiced disagreement becomes a bug. |
 | "We disagree, so I'll leave that finding out." | Nothing is dropped silently. The manager decides it, or asks the user. |

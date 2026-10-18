@@ -240,7 +240,7 @@ def test_report_json_carries_every_number() -> None:
     assert json.loads(json.dumps(data)) == data
     assert data["limits"] == {"function": 10, "file": 100, "public_methods": 5}
     assert data["files"] == [{
-        "path": "a.py", "language": "Python", "lines": 250, "functions_measured": True, "note": "",
+        "path": "a.py", "language": "Python", "lines": 250, "functions_measured": True, "note": "", "plain": False,
         "functions": [{"name": "f", "line": 3, "lines": 20}],
         "classes": [{"name": "C", "line": 1, "public_methods": 2}],
     }]
@@ -255,3 +255,11 @@ def test_fixtures_measure_through_measure_text(name: str) -> None:
     metric = measure_text(name, (FIXTURES / name).read_text(encoding="utf-8"))
 
     assert metric is not None and metric.functions_measured and metric.functions
+
+
+def test_plain_flag_in_json() -> None:
+    report = Report((measure_text("run.sh", "echo hi\n"), measure_text("a.py", _func("f", 2))))
+
+    files = {f["path"]: f for f in report_json(report, Limits())["files"]}
+
+    assert (files["run.sh"]["plain"], files["a.py"]["plain"]) == (True, False)

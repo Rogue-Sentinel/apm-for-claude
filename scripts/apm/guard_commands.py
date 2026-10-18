@@ -5,7 +5,7 @@ import glob
 import itertools
 import re
 import shlex
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from pathlib import Path
 
 from .guard_data import mask_data
@@ -16,6 +16,9 @@ READ_ONLY_PREFIXES = (
     "git log", "git diff", "git show", "git status", "git blame", "sqlite3 -readonly ",
 )
 _SPLIT = re.compile(r"&&|\|\||;|\||\r?\n|(?<![<>&])&(?![&>])")
+# Only an odd run of escapes continues a line: an escaped pair is a literal character, kept as it is.
+_BACKSLASH_CONTINUATION = re.compile(r"(?<!\\)((?:\\\\)*)\\\r?\n")
+_BACKTICK_CONTINUATION = re.compile(r"(?<!`)((?:``)*)`\r?\n")
 _NO_EXEMPT = ("$(", "`", "<(", ">(")
 # The options git takes before its subcommand. The alternatives are disjoint (a
 # value-taking option never matches the generic one, and a value is either quoted
@@ -77,15 +80,42 @@ _GLOB_CHARS = frozenset("*?[")
 _GLOB_LIMIT = 2000
 
 
-def split_segments(command: str) -> list[str]:
-    """Split a command line on `&&`, `||`, `;`, `|`, `&` and newlines."""
+def split_segments(command: str, *, join: bool = False) -> list[str]:
+    """Split a command line on `&&`, `||`, `;`, `|`, `&` and newlines; with `join`, join continued lines first.
+
+    An odd run of backslashes before a newline joins the lines with a space. An odd run of PowerShell
+    backticks joins them too but its last backtick stays, so a bash backtick substitution that spans lines
+    still blocks an exemption. An even run is literal, so the newline still ends the command.
+    """
+    if join:
+        command = _BACKTICK_CONTINUATION.sub(r"\1` ", _BACKSLASH_CONTINUATION.sub(r"\1 ", command))
     parts = (part.strip() for part in _SPLIT.split(command))
     return [part for part in parts if part]
 
 
+def readings(command: str) -> tuple[list[str], list[str]]:
+    """The two readings of a command: split exactly as `main` splits it, and with continued lines joined.
+
+    A shell may not join a line the joined reading joins (after a comment, an escaped backtick, or a
+    backslash in PowerShell), so a check denies a command when either reading is denied. The joined reading
+    can then only add denials, never lose one the split reading finds.
+    """
+    return split_segments(command), split_segments(command, join=True)
+
+
+def first_denial(command: str, check: Callable[[list[str]], str | None]) -> str | None:
+    """Run `check` on each reading of `command`; the reason from the first reading it denies, or None."""
+    split, joined = readings(command)
+    return check(split) or (check(joined) if joined != split else None)
+
+
+def _unquoted(segment: str) -> str:
+    return segment.replace('"', "").replace("'", "")
+
+
 def destructive_reason(segment: str) -> str | None:
     """Match the raw segment, then the segment with its quotes removed (`rm "-rf" x`)."""
-    unquoted = segment.replace('"', "").replace("'", "")
+    unquoted = _unquoted(segment)
     for pattern, label in DESTRUCTIVE:
         if pattern.search(segment) or pattern.search(unquoted):
             return f"destructive command ({label}): {segment}"
@@ -143,8 +173,8 @@ def _is_read_only(segment: str) -> bool:
 
 
 def all_read_only(command: str) -> bool:
-    """True when every segment of `command` only reads."""
-    return all(_is_read_only(segment) for segment in split_segments(command))
+    """True when every segment of both readings of `command` only reads."""
+    return all(_is_read_only(segment) for reading in readings(command) for segment in reading)
 
 
 def protected_reason(
@@ -155,11 +185,12 @@ def protected_reason(
     A token also counts when any trailing sub-path of it matches, so
     `/repo/data/x.db` and `../data/x.db` hit the glob `data/*.db`. With `cwd`,
     a token holding `*`, `?` or `[` is expanded as the shell would and each
-    match, taken relative to `root`, is tested too.
+    match, taken relative to `root`, is tested too. The segment is read as written and with its quotes
+    removed, so a path inside a shell's command string (`sh -c 'cp x data/x.db'`) is seen.
     """
     if _is_read_only(segment):
         return None
-    for token in _tokens(segment):
+    for token in (*_tokens(segment), *_tokens(_unquoted(segment))):
         if _token_hits(token, globs, cwd, root):
             return f"command touches a protected path ({token}): {segment}"
     return None
@@ -186,6 +217,17 @@ def check_command(
     command = mask_data(command)
     if _PIPED_DELETE.search(command):
         return f"destructive command (piped recursive delete): {command}"
-    segments = (g for g in split_segments(command) if not _is_exempt(g, allowed_prefixes))
-    reasons = (destructive_reason(g) or protected_reason(g, globs, cwd, root) for g in segments)
+    return first_denial(command, lambda segments: segments_reason(segments, globs, allowed_prefixes, cwd, root))
+
+
+def segments_reason(
+    segments: Sequence[str],
+    globs: Sequence[str],
+    allowed_prefixes: Sequence[str],
+    cwd: Path | None = None,
+    root: Path | None = None,
+) -> str | None:
+    """Return the reason for the first segment, not covered by an allowed prefix, that is denied."""
+    checked = (g for g in segments if not _is_exempt(g, allowed_prefixes))
+    reasons = (destructive_reason(g) or protected_reason(g, globs, cwd, root) for g in checked)
     return next((reason for reason in reasons if reason), None)
