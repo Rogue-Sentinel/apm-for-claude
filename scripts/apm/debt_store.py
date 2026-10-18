@@ -29,6 +29,10 @@ def _strings(value: object) -> bool:
     return isinstance(value, list) and all(isinstance(item, str) for item in value)
 
 
+def _str_map(value: object) -> bool:
+    return isinstance(value, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in value.items())
+
+
 def _per_source(value: object) -> bool:
     return isinstance(value, dict) and all(isinstance(k, str) and _int_map(m) for k, m in value.items())
 
@@ -47,6 +51,7 @@ def _scope(value: object) -> bool:
 _SHAPES: dict[str, Callable[[object], bool]] = {
     "limits": _int_map, "totals": _int_map, "functions": _int_map, "files": _int_map, "classes": _int_map,
     "unmeasured": _strings, "sources": _per_source, "accepted": _accepted, "scope": _scope,
+    "class_scanners": _strings, "class_languages": _str_map,
 }
 
 
