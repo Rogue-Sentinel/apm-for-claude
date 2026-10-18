@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from .guard_commands import protected_reason, split_segments
+from .guard_commands import first_denial, protected_reason
 from .guard_data import mask_data
 from .guard_github import gh_write_reason
 from .guard_paths import matches_any
@@ -97,7 +97,7 @@ def worker_command_violation(command: str, event: Mapping[str, Any], cwd: Path, 
     """
     if not event.get("agent_id"):
         return None
-    return worker_segments_violation(split_segments(mask_data(command)), cwd, root)
+    return first_denial(mask_data(command), lambda segments: worker_segments_violation(segments, cwd, root))
 
 
 def worker_file_violation(target: Path, event: Mapping[str, Any]) -> str | None:

@@ -5,7 +5,7 @@ import glob
 import itertools
 import re
 import shlex
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from pathlib import Path
 
 from .guard_data import mask_data
@@ -80,16 +80,33 @@ _GLOB_CHARS = frozenset("*?[")
 _GLOB_LIMIT = 2000
 
 
-def split_segments(command: str) -> list[str]:
-    """Split a command line on `&&`, `||`, `;`, `|`, `&` and newlines, after joining continued lines.
+def split_segments(command: str, *, join: bool = False) -> list[str]:
+    """Split a command line on `&&`, `||`, `;`, `|`, `&` and newlines; with `join`, join continued lines first.
 
     An odd run of backslashes before a newline joins the lines with a space. An odd run of PowerShell
     backticks joins them too but its last backtick stays, so a bash backtick substitution that spans lines
     still blocks an exemption. An even run is literal, so the newline still ends the command.
     """
-    joined = _BACKTICK_CONTINUATION.sub(r"\1` ", _BACKSLASH_CONTINUATION.sub(r"\1 ", command))
-    parts = (part.strip() for part in _SPLIT.split(joined))
+    if join:
+        command = _BACKTICK_CONTINUATION.sub(r"\1` ", _BACKSLASH_CONTINUATION.sub(r"\1 ", command))
+    parts = (part.strip() for part in _SPLIT.split(command))
     return [part for part in parts if part]
+
+
+def readings(command: str) -> tuple[list[str], list[str]]:
+    """The two readings of a command: split exactly as `main` splits it, and with continued lines joined.
+
+    A shell may not join a line the joined reading joins (after a comment, an escaped backtick, or a
+    backslash in PowerShell), so a check denies a command when either reading is denied. The joined reading
+    can then only add denials, never lose one the split reading finds.
+    """
+    return split_segments(command), split_segments(command, join=True)
+
+
+def first_denial(command: str, check: Callable[[list[str]], str | None]) -> str | None:
+    """Run `check` on each reading of `command`; the reason from the first reading it denies, or None."""
+    split, joined = readings(command)
+    return check(split) or (check(joined) if joined != split else None)
 
 
 def _unquoted(segment: str) -> str:
@@ -156,8 +173,8 @@ def _is_read_only(segment: str) -> bool:
 
 
 def all_read_only(command: str) -> bool:
-    """True when every segment of `command` only reads."""
-    return all(_is_read_only(segment) for segment in split_segments(command))
+    """True when every segment of both readings of `command` only reads."""
+    return all(_is_read_only(segment) for reading in readings(command) for segment in reading)
 
 
 def protected_reason(
@@ -200,7 +217,7 @@ def check_command(
     command = mask_data(command)
     if _PIPED_DELETE.search(command):
         return f"destructive command (piped recursive delete): {command}"
-    return segments_reason(split_segments(command), globs, allowed_prefixes, cwd, root)
+    return first_denial(command, lambda segments: segments_reason(segments, globs, allowed_prefixes, cwd, root))
 
 
 def segments_reason(

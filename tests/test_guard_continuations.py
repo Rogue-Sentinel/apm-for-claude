@@ -1,4 +1,8 @@
-"""A line continuation joins two lines into one command, so the guard reads them as one."""
+"""A line continuation joins two lines into one command, so the guard reads them as one.
+
+The guard reads a command twice: split as `main` splits it, and with continued lines joined. Either reading
+denying denies the command, so the joining can never make the guard weaker than `main`.
+"""
 import sys
 from pathlib import Path
 
@@ -10,9 +14,10 @@ from apm.paths import Project
 from apm.profile import Profile
 
 WINDOWS = sys.platform == "win32"
-BACKSLASH_NEWLINE = chr(92) + chr(10)
-BACKSLASH_CRLF = chr(92) + chr(13) + chr(10)
-BACKTICK_NEWLINE = "`" + chr(10)
+BACKSLASH, BACKTICK, NEWLINE = chr(92), chr(96), chr(10)
+BACKSLASH_NEWLINE = BACKSLASH + NEWLINE
+BACKSLASH_CRLF = BACKSLASH + chr(13) + NEWLINE
+BACKTICK_NEWLINE = BACKTICK + NEWLINE
 
 
 def _worker(repo: Path, command: str) -> Decision:
@@ -44,7 +49,7 @@ DESTRUCTIVE_SPLITS = [
     "git push " + BACKSLASH_NEWLINE + "--force origin main",
     "git reset " + BACKSLASH_NEWLINE + "--hard",
     "Remove-Item build " + BACKTICK_NEWLINE + "-Recurse -Force",
-    "Remove-Item build `" + chr(13) + chr(10) + "-Recurse -Force",
+    "Remove-Item build `" + chr(13) + NEWLINE + "-Recurse -Force",
 ]
 
 
@@ -55,42 +60,85 @@ def test_a_destructive_command_split_by_a_continuation_is_denied(command: str) -
     assert reason is not None and "destructive" in reason
 
 
-def test_a_backtick_substitution_across_lines_never_makes_its_contents_exempt() -> None:
-    command = "echo " + BACKTICK_NEWLINE + "rm -rf x" + chr(10) + "`"
+SUBSTITUTION_ACROSS_LINES = "echo " + BACKTICK_NEWLINE + "rm -rf x" + NEWLINE + "`"
 
-    assert check_command(command, [], ["echo"]) is not None
+
+def test_a_backtick_substitution_across_lines_never_makes_its_contents_exempt() -> None:
+    assert check_command(SUBSTITUTION_ACROSS_LINES, [], ["echo"]) is not None
+
+
+HARMLESS_CONTINUATION = "ls -la " + BACKSLASH_NEWLINE + "build"
 
 
 def test_a_continued_line_of_a_harmless_command_is_still_allowed() -> None:
-    assert check_command("ls -la " + BACKSLASH_NEWLINE + "build", [], []) is None
+    assert check_command(HARMLESS_CONTINUATION, [], []) is None
 
 
 # An even run of escapes before a newline is literal: the newline ends the command, and the next line is its own.
-ESCAPED_BACKSLASH_NEWLINE = chr(92) * 2 + chr(10)
-ESCAPED_BACKTICK_NEWLINE = "``" + chr(10)
-
-
-@pytest.mark.parametrize("command", [
+ESCAPED_BACKSLASH_NEWLINE = BACKSLASH * 2 + NEWLINE
+ESCAPED_BACKTICK_NEWLINE = BACKTICK * 2 + NEWLINE
+ESCAPED_NEWLINE_WRITES = [
     "cat x " + ESCAPED_BACKSLASH_NEWLINE + "cp y data/fleet.db",
     "cat x " + ESCAPED_BACKTICK_NEWLINE + "Copy-Item y data/fleet.db",
-])
+]
+
+
+@pytest.mark.parametrize("command", ESCAPED_NEWLINE_WRITES)
 def test_a_protected_write_after_an_escaped_newline_is_denied(command: str) -> None:
     assert check_command(command, ("data/*.db",), ()) is not None
 
 
-def test_a_destructive_command_after_an_escaped_newline_is_not_covered_by_an_allowed_prefix() -> None:
-    command = "npm test " + ESCAPED_BACKSLASH_NEWLINE + "rm -rf build"
+ESCAPED_NEWLINE_DELETE = "npm test " + ESCAPED_BACKSLASH_NEWLINE + "rm -rf build"
 
-    reason = check_command(command, [], ["npm test"])
+
+def test_a_destructive_command_after_an_escaped_newline_is_not_covered_by_an_allowed_prefix() -> None:
+    reason = check_command(ESCAPED_NEWLINE_DELETE, [], ["npm test"])
 
     assert reason is not None and "destructive" in reason
 
 
+ESCAPED_NEWLINE_STATE_WRITE = "cat x " + ESCAPED_BACKSLASH_NEWLINE + "cp y .apm/state/ledger.json"
+
+
 def test_a_worker_state_write_after_an_escaped_newline_is_denied(git_repo: Path) -> None:
-    decision = _worker(git_repo, "cat x " + ESCAPED_BACKSLASH_NEWLINE + "cp y .apm/state/ledger.json")
+    decision = _worker(git_repo, ESCAPED_NEWLINE_STATE_WRITE)
 
     assert decision.kind == "deny" and ".apm/" in decision.reason
 
 
+ODD_RUN_CONTINUATION = "ls -la " + BACKSLASH * 3 + NEWLINE + "build"
+
+
 def test_an_odd_run_of_backslashes_still_continues_a_harmless_command() -> None:
-    assert check_command("ls -la " + chr(92) * 3 + chr(10) + "build", [], []) is None
+    assert check_command(ODD_RUN_CONTINUATION, [], []) is None
+
+
+# Lines that a shell may not join at all; `main` read the second line as its own command, and so must the guard.
+UNJOINED_LINES = [
+    "cat x # n " + BACKSLASH_NEWLINE + "cp y {target}",  # a comment ending in a backslash
+    "cat x " + BACKSLASH + BACKTICK_NEWLINE + "cp y {target}",  # a backslash-escaped backtick
+    "cat x " + BACKSLASH_NEWLINE + "Copy-Item y {target}",  # no continuation in PowerShell
+]
+MAIN_UNJOINED = [shape.format(target="data/fleet.db") for shape in UNJOINED_LINES]
+WORKER_UNJOINED = [shape.format(target=".apm/state/ledger.json") for shape in UNJOINED_LINES]
+CONTINUED_DELETE = "npm test " + BACKSLASH_NEWLINE + "rm -rf build"
+
+
+@pytest.mark.parametrize("command", MAIN_UNJOINED)
+def test_a_protected_write_on_a_line_that_may_not_be_joined_is_denied(command: str) -> None:
+    reason = check_command(command, ("data/*.db",), ())
+
+    assert reason is not None and "protected path" in reason
+
+
+@pytest.mark.parametrize("command", WORKER_UNJOINED)
+def test_a_worker_state_write_on_a_line_that_may_not_be_joined_is_denied(git_repo: Path, command: str) -> None:
+    decision = _worker(git_repo, command)
+
+    assert decision.kind == "deny" and ".apm/" in decision.reason
+
+
+def test_a_continued_delete_is_not_covered_by_the_allowed_prefix_of_the_line_before() -> None:
+    reason = check_command(CONTINUED_DELETE, [], ["npm test"])
+
+    assert reason is not None and "destructive" in reason
