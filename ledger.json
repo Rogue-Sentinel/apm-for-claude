@@ -18,8 +18,9 @@
       "concerns": [],
       "decisions": [],
       "kind": "bug",
+      "plan": "docs/plans/2026-10-18-issue-9-brace-wide-classes.md",
       "questions": [],
-      "status": "planning",
+      "status": "awaiting-approval",
       "tasks": [],
       "title": "metrics reports 0 wide classes for C++ (and every brace language): only Python classes are counted",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/9"
@@ -40,6 +41,11 @@
       "at": "2026-10-18T18:43:28.309700+00:00",
       "event": "filed 10 https://github.com/Rogue-Sentinel/apm-for-claude/issues/10",
       "issue": 10
+    },
+    {
+      "at": "2026-10-18T18:43:55.564890+00:00",
+      "event": "issue 9 status awaiting-approval",
+      "issue": 9
     }
   ]
 }
