@@ -1,7 +1,11 @@
 """The review scorecard and the audit carry every heading, band and format the old ones had."""
+import re
+
 import pytest
 
-from skill_helpers import SKILLS_DIR, assert_sections, parse_skill, section, sections
+from skill_helpers import (
+    SKILLS_DIR, assert_sections, parse_skill, prose_lines, section, sections,
+)
 
 DIMENSIONS = (
     "Type and contract safety", "State management", "Module architecture",
@@ -9,7 +13,9 @@ DIMENSIONS = (
     "External integration", "Accessibility", "Code duplication",
     "Developer experience and maintainability",
 )
-UI_ONLY = ("Entry points and routing", "Styling and presentation", "Accessibility")
+UI_SCOPED = ("Entry points and routing", "Styling and presentation", "Accessibility")
+NO_UI_REASON = "N/A (no user interface)"
+UI_WHERE = "(where there is a user interface)"
 HEAVY = ("Type and contract safety", "Module architecture", "Testing")
 BANDS = ("1-3", "4-6", "7-8", "9-10")
 AUDIT_CATEGORIES = (
@@ -32,6 +38,10 @@ SCORECARD_FORMATS = (
     "**The old code was X/10. The new code is Y/10.**",
     "**The old code was X/10. The previous new code was Y/10. The current new code is Z/10.**",
 )
+_CODE_SPAN = re.compile(r"`([^`\n]+)`")
+# An escape pair, or a bracket expression: an optional ^, an optional leading ], then
+# character classes or any character but ], up to the closing ].
+_ERE_TOKEN = re.compile(r"\\.|(\[\^?\]?(?:\[:[a-z]+:\]|[^\]])*\])")
 
 
 def _reference(name: str) -> str:
@@ -69,10 +79,47 @@ def test_every_dimension_keeps_every_rubric_band(dimension):
     assert not missing, f"{dimension} lacks bands {missing}"
 
 
-@pytest.mark.parametrize("dimension", UI_ONLY)
-def test_ui_dimensions_are_scored_na_with_a_reason_without_a_ui(dimension):
+def _band(text: str, band: str) -> str:
+    return next(line for line in text.splitlines() if line.startswith(f"| {band} |"))
+
+
+def _bad_bracket_expressions(text: str) -> list[str]:
+    """Code spans holding a bracket expression that ends in a backslash.
+
+    In POSIX ERE a backslash inside brackets is literal, so `[a\\]]` is `[a\\]` and then a `]`.
+    """
+    spans = [span for line in prose_lines(text) for span in _CODE_SPAN.findall(line)]
+    found = [(span, token) for span in spans for token in _ERE_TOKEN.findall(span)]
+    return [span for span, token in found if token.endswith("\\]")]
+
+
+@pytest.mark.parametrize("dimension", UI_SCOPED)
+def test_ui_scoped_dimensions_give_na_with_its_reason_without_a_ui(dimension):
     _, body = parse_skill("branch-review")
-    assert "N/A" in section(body, f"### {dimension}"), dimension
+    assert NO_UI_REASON in section(body, f"### {dimension}"), dimension
+
+
+def test_entry_points_are_still_scored_without_a_ui():
+    _, body = parse_skill("branch-review")
+    assert "entry points are still scored" in section(body, "### Entry points and routing")
+
+
+def test_the_profile_ui_key_decides_the_ui_scoped_dimensions():
+    _, review = parse_skill("branch-review")
+    _, audit = parse_skill("clean-code-audit")
+    assert "`standard.ui`" in section(review, "## Gather evidence")
+    assert "`standard.ui`" in section(audit, "## Scan")
+
+
+def test_testing_can_reach_the_top_band_without_a_ui():
+    _, body = parse_skill("branch-review")
+    assert UI_WHERE in _band(section(body, "### Testing"), "9-10")
+    assert UI_WHERE in section(_reference("scoring-evidence-guide.md"), "## Testing")
+
+
+def test_duplication_counts_shared_modules_as_well_as_components():
+    _, body = parse_skill("branch-review")
+    assert "shared components or shared modules" in section(body, "### Code duplication")
 
 
 def test_branch_review_gathers_measured_and_project_evidence():
@@ -114,6 +161,22 @@ def test_evidence_by_language_covers_each_language_and_project_patterns():
     missing = [language for language in LANGUAGES if f"## {language}" not in headings]
     assert not missing, f"evidence by language lacks {missing}"
     assert "`standard.review_patterns`" in text
+
+
+def test_evidence_patterns_have_well_formed_bracket_expressions():
+    bad = _bad_bracket_expressions(_reference("evidence-by-language.md"))
+    assert not bad, bad
+
+
+def test_bracket_check_catches_an_escaped_closing_bracket():
+    text = r"`[a-z\]]!` and `[]a-z]!` and `\[x\]` and `[[:space:]]`"
+    assert _bad_bracket_expressions(text) == [r"[a-z\]]!"]
+
+
+def test_credits_name_both_review_skills():
+    credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")
+    for name in ("branch-review", "clean-code-audit"):
+        assert f"| `{name}` |" in credits, name
 
 
 def test_audit_measures_against_the_profile_limits():
