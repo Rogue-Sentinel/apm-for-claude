@@ -203,6 +203,7 @@
       ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-14-glued-redirect.md",
+      "pr": "https://github.com/Rogue-Sentinel/apm-for-claude/pull/22",
       "questions": [],
       "review": {
         "at": "2026-10-18T23:39:53.065043+00:00",
@@ -211,7 +212,7 @@
         "head": "240f91a4a5074c86f7832ce79dd1761a37302c88",
         "open": 0
       },
-      "status": "integrating",
+      "status": "merged",
       "tasks": [
         {
           "attempts": 1,
@@ -1296,6 +1297,11 @@
     {
       "at": "2026-10-18T23:43:36.431010+00:00",
       "event": "task 14/3 done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:43:48.428484+00:00",
+      "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/22",
       "issue": 14
     }
   ]
