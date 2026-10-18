@@ -61,3 +61,11 @@ None.
 ## Approval (2026-10-18)
 
 *The user asked in chat: "Release a new plugin version with the #9 and #11 fixes so I can keep validating in XP12, then plan #14." The request names the whole of this plan's scope (a version bump, no decisions left open), so the manager takes it as the approval of this one-task plan and says so in its reply.*
+
+## Final review (2026-10-18)
+
+Whole-branch review (sonnet): 0 must-fix; every structural criterion met apart from the gate; the SessionStart notice for a 0.3.0 profile reads "APM version mismatch: project framework 0.3.0, plugin 0.3.1."
+
+## Deferred findings
+- Final review: 0.3.0 added a platform-notes validation section; record the XP12 validation of 0.3.1 in `docs/platform-notes.md` once it has run.
+- Final review (found elsewhere): `hook_session_start._version_line` says "mismatch" on any inequality, also when the project is newer than the plugin; `agents/manager.md` speaks of "plugin is newer".
