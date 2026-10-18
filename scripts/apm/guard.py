@@ -1,29 +1,21 @@
 """The guard's decision: allow or deny a tool call."""
 from __future__ import annotations
 
-import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
 from .guard_cli import is_cli_call
-from .guard_commands import all_read_only, check_command, split_segments
+from .guard_commands import all_read_only, check_command
 from .guard_paths import check_write, is_under, same_path
+from .guard_workers import worker_state_change
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
 from .profile import Profile
 
 PREFIX = "APM guard: "
 _FILE_KEYS = {"Write": "file_path", "Edit": "file_path", "NotebookEdit": "notebook_path"}
 _COMMAND_TOOLS = ("Bash", "PowerShell")
-# A worker never records state; the manager does. Matches `apm issue ...` at the start of a
-# segment, also by path, and `python ".../scripts/apm_cli.py" issue ...` anywhere in it, in any
-# case, with an optional `--` before the subcommand.
-_MUTATIONS = r"""(?:--\s+)?["']?(?:issue|task|allow|question|resolve|setup|approve)(?![\w-])"""
-_APM_MUTATION = re.compile(
-    r"""^["']?(?:[^\s"']*[/\\])?apm["']?\s+""" + _MUTATIONS
-    + r"""|(?<![\w.-])(?i:apm_cli\.py)["']?\s+""" + _MUTATIONS
-)
 _CLI = cli_command(PLUGIN_ROOT)
 _ASK_USER = (
     ". Ask the user in chat; if they approve this exact action, record it with "
@@ -66,15 +58,6 @@ def _file_violation(
     return check_write(target, project, profile.protected_globs(), allowed_globs, temp_roots)
 
 
-def _worker_state_change(command: str, event: Mapping[str, Any]) -> str | None:
-    if not event.get("agent_id"):
-        return None
-    for segment in split_segments(command):
-        if _APM_MUTATION.search(segment):
-            return f"workers do not change APM state; report to the manager instead: {segment}"
-    return None
-
-
 def _state_dir_write(command: str, cwd: Path, project: Project) -> str | None:
     if not is_under(cwd, project.state_dir) or all_read_only(command):
         return None
@@ -91,7 +74,7 @@ def _command_violation(
 ) -> str | None:
     cwd = _cwd(event, project, windows)
     return (
-        _worker_state_change(command, event)
+        worker_state_change(command, event)
         or _state_dir_write(command, cwd, project)
         or check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
     )
