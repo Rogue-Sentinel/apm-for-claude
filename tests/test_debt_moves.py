@@ -60,13 +60,13 @@ def test_growing_inside_a_renumbered_group_names_both_keys() -> None:
 
 
 def test_one_key_is_not_both_shrunk_and_fixed() -> None:
-    base = snap(fm("a.py", 90, [("it", 20), ("it", 25)]))
-    current = snap(fm("a.py", 90, [("it", 18), ("it", 10)]))
+    base = snap(fm("a.py", 90, [("it", 30), ("it", 25)]))
+    current = snap(fm("a.py", 90, [("it", 22), ("it", 10)]))
 
     improvements = compare(base, current).improvements
 
-    assert "shrank: a.py::it (was a.py::it#2) 25 → 18" in improvements
-    assert "fixed: a.py::it (20 lines)" not in improvements
+    assert "shrank: a.py::it (was a.py::it#2) 25 → 22" in improvements
+    assert "fixed: a.py::it (30 lines)" not in improvements
     assert any(line.startswith("fixed: a.py::it ") for line in improvements)
 
 

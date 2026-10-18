@@ -9,7 +9,6 @@ from typing import NamedTuple
 from apm.standard_config import DEFAULT_EXCLUDES
 
 Items = Mapping[str, int]
-Item = tuple[str, str, int]  # (same-file group, key, number)
 
 
 class Findings(NamedTuple):
@@ -30,85 +29,103 @@ def _bare_name(key: str) -> str:
     return re.sub(r"#\d+$", "", key.split("::", 1)[-1])
 
 
-def _group_of(section: str) -> Callable[[str], str]:
-    """The same-file group of a key: all the items that may renumber among themselves."""
-    if section == "files":
-        return lambda key: key
-    return lambda key: f"{key.split('::', 1)[0]}::{_bare_name(key)}"
-
-
 def _bare_of(section: str) -> Callable[[str], str]:
     return posixpath.basename if section == "files" else _bare_name
 
 
-def _items(items: Items, group_of: Callable[[str], str]) -> list[Item]:
-    return sorted(((group_of(key), key, number) for key, number in items.items()),
-                  key=lambda item: (item[0], -item[2], item[1]))
+Entry = tuple[str, int]  # (key, number)
 
 
-def _match(base: list[Item], current: list[Item], fits: Callable[[Item, Item], bool]):
-    """Match each current item (largest first) to the smallest base item that fits; use each once."""
-    pool, matched, left = list(base), [], []
-    for now in sorted(current, key=lambda item: (-item[2], item[1])):
-        options = [old for old in pool if fits(old, now)]
-        if not options:
+def _file_of(section: str) -> Callable[[str], str]:
+    return (lambda key: key) if section == "files" else (lambda key: key.split("::", 1)[0])
+
+
+def _by_bare(items: Items, bare_of: Callable[[str], str]) -> dict[str, list[Entry]]:
+    groups: dict[str, list[Entry]] = {}
+    for key, number in items.items():
+        groups.setdefault(bare_of(key), []).append((key, number))
+    return groups
+
+
+def _rank(now: Entry, file_of: Callable[[str], str]) -> Callable[[Entry], tuple]:
+    """The smallest base item that fits, then one from the same file, then the same key."""
+    return lambda old: (old[1], file_of(old[0]) != file_of(now[0]), old[0] != now[0], old[0])
+
+
+def _greedy(base: list[Entry], current: list[Entry], file_of: Callable[[str], str]):
+    """Give each current item (largest first) the smallest unused base item that is no smaller."""
+    pool, pairs, left = list(base), [], []
+    for now in sorted(current, key=lambda entry: (-entry[1], entry[0])):
+        fits = [old for old in pool if old[1] >= now[1]]
+        if not fits:
             left.append(now)
             continue
-        old = min(options, key=lambda item: (item[2], item[1]))
+        old = min(fits, key=_rank(now, file_of))
         pool.remove(old)
-        matched.append((old, now))
-    return matched, pool, left
+        pairs.append((old, now))
+    return pairs, left, pool
 
 
-def _pair_rest(base: list[Item], current: list[Item]):
-    """Inside each group, pair the largest with the largest; what has no partner is new or gone."""
-    paired, new, gone = [], [], []
-    for group in sorted({item[0] for item in base + current}):
-        old = sorted((i for i in base if i[0] == group), key=lambda i: (-i[2], i[1]))
-        now = sorted((i for i in current if i[0] == group), key=lambda i: (-i[2], i[1]))
-        paired += list(zip(old, now))
-        gone += old[len(now):]
-        new += now[len(old):]
-    return paired, new, gone
+def _grew(left: list[Entry], pool: list[Entry], file_of: Callable[[str], str]):
+    """Every leftover base item is smaller than every leftover current item of its name."""
+    grew, new = [], []
+    for now in left:
+        same = [old for old in pool if file_of(old[0]) == file_of(now[0])]
+        if not same:
+            new.append(now)
+            continue
+        old = max(same, key=lambda entry: (entry[1], entry[0] == now[0], entry[0]))
+        pool.remove(old)
+        grew.append((old, now))
+    return grew, new, pool
 
 
-def _same_place(old: Item, now: Item) -> bool:
-    return old[0] == now[0] and old[2] == now[2]
+def _match_section(base: Items, current: Items, section: str):
+    """One greedy pass per bare name across all files: pairs, grown, new and fixed items."""
+    bare_of, file_of = _bare_of(section), _file_of(section)
+    old_groups, new_groups = _by_bare(base, bare_of), _by_bare(current, bare_of)
+    pairs, grew, new, fixed = [], [], [], []
+    for bare in sorted(old_groups.keys() | new_groups.keys()):
+        found, left, pool = _greedy(old_groups.get(bare, []), new_groups.get(bare, []), file_of)
+        more_grew, more_new, pool = _grew(left, pool, file_of)
+        pairs += found
+        grew += more_grew
+        new += more_new
+        fixed += pool
+    return pairs, grew, new, fixed
 
 
-def _same_bare(bare_of: Callable[[str], str], numbers: Callable[[int, int], bool]):
-    """A fit test: the same bare name, and old and new numbers that `numbers` accepts."""
-    return lambda old, now: bare_of(old[1]) == bare_of(now[1]) and numbers(old[2], now[2])
+def _name(old: Entry, now: Entry) -> str:
+    return now[0] if old[0] == now[0] else f"{now[0]} (was {old[0]})"
 
 
-def _changes(paired: list[tuple[Item, Item]]) -> Findings:
-    def name(old: Item, now: Item) -> str:
-        return now[1] if old[1] == now[1] else f"{now[1]} (was {old[1]})"
-    grew = [f"grew: {name(o, n)} {o[2]} → {n[2]}" for o, n in paired if n[2] > o[2]]
-    shrank = [f"shrank: {name(o, n)} {o[2]} → {n[2]}" for o, n in paired if n[2] < o[2]]
-    return Findings(grew, shrank, [])
+def _paired(pairs: list, file_of: Callable[[str], str], unit: str):
+    """A pair across files is a move. In one file only a smaller number is reported."""
+    shrank, moves = [], []
+    for old, now in pairs:
+        if file_of(old[0]) != file_of(now[0]):
+            moves.append(f"moved: {old[0]} → {now[0]} ({now[1]} {unit})")
+        elif now[1] < old[1]:
+            shrank.append(f"shrank: {_name(old, now)} {old[1]} → {now[1]}")
+    return shrank, moves
 
 
-def _fixed(gone: list[Item], unit: str, present: Items) -> list[str]:
+def _fixed(gone: list[Entry], unit: str, present: Items) -> list[str]:
     plain = "fixed: {} ({} {})"
     reused = "fixed: {} (was {} {}; the name is now numbered differently)"
-    return [(reused if key in present else plain).format(key, n, unit) for _, key, n in gone]
+    return [(reused if key in present else plain).format(key, n, unit) for key, n in gone]
 
 
 def compare_items(base: Mapping, current: Mapping, kind: tuple[str, str, str]) -> Findings:
     section, label, unit = kind
-    group_of, bare_of = _group_of(section), _bare_of(section)
     now_items = current.get(section, {})
-    old, now = _items(base.get(section, {}), group_of), _items(now_items, group_of)
-    _, old, now = _match(old, now, _same_place)  # unchanged, whatever the numbering
-    exact, old, now = _match(old, now, _same_bare(bare_of, lambda o, n: o == n))
-    paired, new, gone = _pair_rest(old, now)
-    later, gone, new = _match(gone, new, _same_bare(bare_of, lambda o, n: o >= n))
-    grew, shrank, _ = _changes(paired)
+    pairs, grew, new, fixed = _match_section(base.get(section, {}), now_items, section)
+    shrank, moves = _paired(pairs, _file_of(section), unit)
     return Findings(
-        grew + [f"new {label}: {key} ({n} {unit})" for _, key, n in new],
-        shrank + _fixed(gone, unit, now_items),
-        [f"moved: {o[1]} → {n[1]} ({n[2]} {unit})" for o, n in exact + later],
+        [f"grew: {_name(o, n)} {o[1]} → {n[1]}" for o, n in grew]
+        + [f"new {label}: {key} ({n} {unit})" for key, n in new],
+        shrank + _fixed(fixed, unit, now_items),
+        moves,
     )
 
 
