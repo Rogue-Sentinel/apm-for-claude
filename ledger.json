@@ -219,6 +219,12 @@
           "id": "2",
           "status": "pending",
           "title": "guard_redirects and protected_reason"
+        },
+        {
+          "attempts": 0,
+          "id": "3",
+          "status": "pending",
+          "title": "Merge gate"
         }
       ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
@@ -1061,6 +1067,11 @@
     {
       "at": "2026-10-18T23:02:44.633123+00:00",
       "event": "task 14/2 pending",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:02:46.903503+00:00",
+      "event": "task 14/3 pending",
       "issue": 14
     }
   ]
