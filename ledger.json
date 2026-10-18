@@ -34,6 +34,13 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-11-guard-approve.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-18T21:22:24.939446+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch review (opus) cc82b1d..8f0d2fb, fix wave 583e576..bc83c84 re-reviewed: 0 open findings; every structural criterion met apart from the gate; deferred findings decided and recorded in the plan.",
+        "head": "84d41bdd50b7cb561458bbb12345c9cc2977348b",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -818,6 +825,11 @@
     {
       "at": "2026-10-18T21:22:22.386670+00:00",
       "event": "task 11/review done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:22:24.939464+00:00",
+      "event": "review 11 0 open at 84d41bd",
       "issue": 11
     }
   ]
