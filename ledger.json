@@ -14,6 +14,7 @@
     },
     "11": {
       "allowlist": [],
+      "branch": "issue-11-guard-approve",
       "concerns": [
         {
           "at": "2026-10-18T19:36:23.388384+00:00",
@@ -23,7 +24,7 @@
       "decisions": [],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/11"
@@ -380,6 +381,11 @@
       "at": "2026-10-18T20:05:24.136453+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/12",
       "issue": 9
+    },
+    {
+      "at": "2026-10-18T20:06:52.294822+00:00",
+      "event": "issue 11 status planning",
+      "issue": 11
     }
   ]
 }
