@@ -90,9 +90,13 @@ def split_segments(command: str) -> list[str]:
     return [part for part in parts if part]
 
 
+def _unquoted(segment: str) -> str:
+    return segment.replace('"', "").replace("'", "")
+
+
 def destructive_reason(segment: str) -> str | None:
     """Match the raw segment, then the segment with its quotes removed (`rm "-rf" x`)."""
-    unquoted = segment.replace('"', "").replace("'", "")
+    unquoted = _unquoted(segment)
     for pattern, label in DESTRUCTIVE:
         if pattern.search(segment) or pattern.search(unquoted):
             return f"destructive command ({label}): {segment}"
@@ -162,11 +166,12 @@ def protected_reason(
     A token also counts when any trailing sub-path of it matches, so
     `/repo/data/x.db` and `../data/x.db` hit the glob `data/*.db`. With `cwd`,
     a token holding `*`, `?` or `[` is expanded as the shell would and each
-    match, taken relative to `root`, is tested too.
+    match, taken relative to `root`, is tested too. The segment is read as written and with its quotes
+    removed, so a path inside a shell's command string (`sh -c 'cp x data/x.db'`) is seen.
     """
     if _is_read_only(segment):
         return None
-    for token in _tokens(segment):
+    for token in (*_tokens(segment), *_tokens(_unquoted(segment))):
         if _token_hits(token, globs, cwd, root):
             return f"command touches a protected path ({token}): {segment}"
     return None
