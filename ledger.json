@@ -97,6 +97,14 @@
           "status": "running",
           "title": "Task 2 review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "4r",
+          "model": "opus",
+          "status": "running",
+          "title": "Task 4 review",
+          "worker": "reviewer"
         }
       ],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
@@ -624,6 +632,11 @@
     {
       "at": "2026-10-18T20:42:50.694832+00:00",
       "event": "task 11/2r running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:44:18.740899+00:00",
+      "event": "task 11/4r running",
       "issue": 11
     }
   ]
