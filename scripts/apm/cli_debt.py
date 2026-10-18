@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+from pathlib import Path
 
 from apm.cli_errors import DebtError
 from apm.debt import Comparison, accept, compare
@@ -60,17 +61,21 @@ def _loosened(root, current: dict, ref: str) -> str:
             "A baseline may be loosened only through `apm debt baseline --accept REASON`.")
 
 
-def check(project: Project, standard: Standard, args: argparse.Namespace) -> int:
-    root = project.worktree_root
+def check_result(root: Path, standard: Standard, base: str) -> tuple[bool, str]:
+    """(passed, text): whether the code is no worse than the baseline, and the report to show."""
     recorded = load_baseline(root / DEBT_FILE)
     if recorded is None:
         raise DebtError(f"no baseline at {DEBT_FILE}; run `apm debt baseline` to record one")
     result = compare(recorded, current_snapshot(root, standard))
-    loosened = _loosened(root, recorded, args.base)
-    print(render_comparison(result))
-    if loosened:
-        print(loosened)
-    return 1 if result.worse or loosened else 0
+    loosened = _loosened(root, recorded, base)
+    text = "\n".join([render_comparison(result), *([loosened] if loosened else [])])
+    return not (result.worse or loosened), text
+
+
+def check(project: Project, standard: Standard, args: argparse.Namespace) -> int:
+    passed, text = check_result(project.worktree_root, standard, args.base)
+    print(text)
+    return 0 if passed else 1
 
 
 ACTIONS = {"baseline": baseline, "check": check}
