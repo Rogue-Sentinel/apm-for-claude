@@ -35,7 +35,10 @@ def _project(needs_state: bool) -> Project:
 
 # What each subcommand needs before it runs: none (anywhere), repo (a git repository), profile (an
 # initialized project), or state (an initialized project with its state branch). The default is state.
-REQUIREMENTS = {"setup": "repo", "metrics": "repo", "brief": "profile", "debt": "profile", "coverage": "none"}
+REQUIREMENTS = {
+    "setup": "repo", "metrics": "repo", "brief": "profile", "debt": "profile", "coverage": "none",
+    "audit": "repo", "init": "repo", "github": "state", "gate": "state", "review": "state", "note": "state",
+}
 
 
 def project_for(requirement: str) -> Project | None:

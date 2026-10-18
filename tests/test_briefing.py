@@ -1,4 +1,5 @@
 from apm.briefing import render_briefing
+from apm.ledger_workflow import add_note, record_review, set_parent
 from apm.ledger import (
     add_question, append_log, empty_ledger, update_task, upsert_issue,
 )
@@ -92,3 +93,39 @@ def test_untitled_issue_and_running_task_without_worker() -> None:
     update_task(ledger, 5, "t1", status="running")
     text = render_briefing(ledger, None)
     assert "- #5 [planning] 0/1 tasks done" in text and "running t1: unassigned" in text
+
+
+def _split_ledger() -> dict:
+    ledger = empty_ledger()
+    upsert_issue(ledger, 10, title="Big", status="split")
+    upsert_issue(ledger, 11, title="Part one", status="merged")
+    upsert_issue(ledger, 12, title="Part two", status="building")
+    set_parent(ledger, 11, 10)
+    set_parent(ledger, 12, 10)
+    return ledger
+
+
+def test_briefing_shows_split_progress_and_review() -> None:
+    ledger = _split_ledger()
+    now = _at(3)
+    record_review(ledger, 12, head="abc1234def5", open_findings=0, criteria_met=True, evidence="e", now=now)
+    record_review(ledger, 10, head="fff0000aaa1", open_findings=2, criteria_met=False, evidence="e", now=now)
+
+    lines = render_briefing(ledger, None).splitlines()
+
+    assert "- #10 Big [split]" in lines
+    assert "  split: 1 of 2 sub-issues merged" in lines
+    assert "  final review: clean at abc1234" in lines
+    assert "  final review: 2 open findings" in lines
+
+
+def test_briefing_counts_concerns_and_omits_none() -> None:
+    ledger = _split_ledger()
+    add_note(ledger, 12, "concern", "slow", _at(3))
+    add_note(ledger, 12, "concern", "flaky", _at(3))
+    add_note(ledger, 12, "decision", "use sqlite", _at(3))
+
+    lines = render_briefing(ledger, None).splitlines()
+
+    assert lines.count("  open concerns: 2") == 1
+    assert not any("decision" in line for line in lines)

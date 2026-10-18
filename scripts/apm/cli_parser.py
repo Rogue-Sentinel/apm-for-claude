@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 
+from apm.cli_parser_workflow import add_workflow_parsers
+
 KINDS = ("feature", "bug", "debt")
 
 
@@ -13,6 +15,7 @@ def _issue(sub) -> None:
     parser.add_argument("--kind", choices=KINDS)
     for name in ("lane", "status", "branch", "plan"):
         parser.add_argument(f"--{name}")
+    parser.add_argument("--parent", type=int, metavar="P", help="make this a sub-issue of issue P")
 
 
 def _task(sub) -> None:
@@ -85,4 +88,5 @@ def build_parser() -> argparse.ArgumentParser:
     _metrics(sub)
     _debt(sub)
     _coverage(sub)
+    add_workflow_parsers(sub)
     return parser

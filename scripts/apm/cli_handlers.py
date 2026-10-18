@@ -11,7 +11,9 @@ from typing import Any
 from apm import ledger as lg
 from apm.briefing import render_briefing
 from apm.cli_standard import HANDLERS as STANDARD_HANDLERS
+from apm.cli_workflow import WORKFLOW_HANDLERS
 from apm.cli_workflow import mutate as _mutate
+from apm.ledger_workflow import set_parent
 from apm.paths import Project, to_native_path
 from apm.setup import setup_project
 from apm.state_store import load_state
@@ -38,6 +40,8 @@ def issue(project: Project, args: argparse.Namespace) -> None:
 
     def apply(ledger: dict) -> str:
         lg.upsert_issue(ledger, args.number, **fields)
+        if args.parent is not None:
+            set_parent(ledger, args.number, args.parent)
         status = fields.get("status")
         return f"issue {args.number} status {status}" if status else f"issue {args.number} updated"
 
@@ -100,5 +104,5 @@ def setup(project: Project, args: argparse.Namespace) -> None:
 HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
     "brief": brief, "issue": issue, "task": task, "allow": allow, "approve": approve,
     "question": question, "resolve": resolve, "setup": setup,
-    **STANDARD_HANDLERS,
+    **STANDARD_HANDLERS, **WORKFLOW_HANDLERS,
 }
