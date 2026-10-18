@@ -74,9 +74,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Targeted run on the branch after merge 8f0d2fb (approve_instructions, guard*, hook*, agents, skills*): all pass; per-task review clean; metrics 0/27 fn, 0/3 files over; debt check nothing worse.",
           "id": "5",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Approve instructions",
           "worker": "implementer"
         },
@@ -748,6 +749,11 @@
     {
       "at": "2026-10-18T21:03:38.500987+00:00",
       "event": "task 11/5r done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:03:40.900361+00:00",
+      "event": "task 11/5 done",
       "issue": 11
     }
   ]
