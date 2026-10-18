@@ -32,6 +32,12 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 | Framework skill | Adapted from |
 |-----------------|--------------|
 | `test-first` | `test-driven-development` (and its guide to writing good tests) |
+| `design-first` | `brainstorming` (and its builder-check prompt, and the idea of its visual companion) |
+| `writing-plans` | `writing-plans` |
+| `executing-plans` | `subagent-driven-development` (and its implementer, task-reviewer and re-review prompts, and the ideas of its helper scripts), `executing-plans` (and the ideas of its helper scripts) |
+| `parallel-dispatch` | `dispatching-parallel-agents` |
+| `worktrees` | `using-git-worktrees` |
+| `finishing-a-branch` | `finishing-a-development-branch` |
 
 ### The user's own working agreement
 
@@ -40,7 +46,8 @@ sideways", "refactor and behavior never share a commit", the rules against skipp
 weakened tests, the decision-record practice, the architecture rule that keeps frameworks and input
 and output at the edges so the core is tested without them, and the idioms that absence is a typed
 value and the clock is a parameter come from the working agreement and decision records of the
-user's own earlier project. They carry no third-party license.
+user's own earlier project. So do the rules to merge `main` in before every pull request, to keep one
+branch open per lane, and to merge in the project's declared style. They carry no third-party license.
 
 ## License notices
 
