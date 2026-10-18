@@ -13,9 +13,13 @@ SUBCOMMANDS = (
     "audit", "init", "github", "gate", "review", "note",
 )
 _INTERPRETER = re.compile(r"(?:python(?:3(?:\.\d+)?)?|py)(?:\.exe)?", re.IGNORECASE)
-# Escapes, expansions and line breaks make bash quoting hard to read, so they rule the exemption out.
-_UNSAFE = ("\\", "$", "`", "\n", "\r")
-_QUOTED = re.compile(r""""[^"]*"|'[^']*'""")
+# Expansions and line breaks make bash quoting hard to read, so they rule the exemption out. A backslash is read
+# exactly: with no `\"` or `\\` inside double quotes (the regex below) and none outside quotes (checked in
+# `_single_command`), every quote ends where bash ends it, so what is left outside quotes is what bash reads outside
+# quotes. Any other backslash is literal to bash, in double quotes and in single quotes, and `shlex.split` reads the
+# same arguments.
+_UNSAFE = ("$", "`", "\n", "\r")
+_QUOTED = re.compile(r""""(?:[^"\\]|\\[^"\\])*"|'[^']*'""")
 _OPERATORS = frozenset(";&|<>()#")
 _PLUGIN_CLI = PLUGIN_ROOT / "scripts" / "apm_cli.py"
 
@@ -25,7 +29,7 @@ def _single_command(command: str) -> bool:
     if any(marker in command for marker in _UNSAFE):
         return False
     bare = _QUOTED.sub(" ", command)
-    return not (_OPERATORS & set(bare) or '"' in bare or "'" in bare)
+    return not (_OPERATORS & set(bare) or any(mark in bare for mark in "\\\"'"))
 
 
 def _name(token: str) -> str:
