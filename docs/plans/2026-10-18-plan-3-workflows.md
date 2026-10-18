@@ -843,3 +843,26 @@ the main session's CLI exemption; and the test strings carry a harness path arti
 Follow-up issue (not fixed here): the quoted or attached `python -m` module form (`python -m 'apm_cli' note 1`,
 `python -mapm_cli note 1`); a command substitution after a read-only prefix; read-only prefixes `ls` and `dir`
 without a word boundary; and the quote-blind segment split.*
+
+### Task 15: The guard's threat model, and review rules that stop the loop
+
+*Added 2026-10-18 at the user's request, after diagnosing the review loop. Root cause: the guard had no stated
+threat model, so Review Focus items 1 and 2 and the re-review briefs sent reviewers on an unbounded hunt for
+"any way past the guard". A text-matching guard over a full shell language cannot be complete, so every review
+found something. No worker ever tried to evade the guard in this build; every finding was a constructed input,
+and patching those inputs caused real regressions.*
+
+**Files:**
+- Create: `docs/adr/0002-guard-threat-model.md`
+- Modify: `docs/adr/README.md` (index row), `docs/specs/2026-10-17-apm-for-claude-design.md` (§9: one italic
+  note pointing at ADR 0002), `skills/code-review/SKILL.md` and `skills/code-review/references/reviewer-checklist.md`
+  (the plausible-worker bar for guard findings), `skills/executing-plans/SKILL.md` and
+  `skills/executing-plans/references/re-review-brief.md` (a re-review blocks only on a regression or a broken fix),
+  `skills/writing-plans/SKILL.md` (a safety Review Focus states its threat model and realistic shapes),
+  `tests/test_skills_process.py` and `tests/test_skills_quality.py` (pin the new rules), `standard/coverage.json`
+  and `docs/coverage.md` only if an anchor moves.
+
+- [ ] Pin the rules in tests first and see them fail; write the ADR and the edits; `apm coverage` shows `Gaps: 0`.
+- [ ] Commit `"Give the guard a threat model, and bound guard reviews by it"`.
+
+*Structural acceptance criterion added: `docs/adr/0002-guard-threat-model.md` exists.*
