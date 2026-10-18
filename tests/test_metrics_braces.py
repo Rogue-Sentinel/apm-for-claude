@@ -166,11 +166,45 @@ def test_crlf_text_is_scanned_like_lf():
 
 
 def test_known_limit_cpp_brace_initializer_list_is_misread():
-    names = [n for n, _ in _found("a.cpp", "A::A() : x_{1} {\n  y();\n}\n")]
-    assert names != ["A::A"] or True  # documented limit: the result is unspecified
-    assert _measure("a.cpp", "A::A() : x_{1} {\n  y();\n}\n").functions_measured
+    text = "A::A() : x_{1} {\n  a();\n  b();\n  c();\n}\n"
+    assert _found("a.cpp", text) == [("A::A", 1)]  # misread: the true body has 3 lines
 
 
 def test_braced_default_argument_does_not_split_the_signature():
     text = "T make(int a,\n       S s = {})\n{\n  go();\n  stop();\n}\n"
     assert _found("a.cpp", text) == [("make", 2)]
+
+
+LEAKING_STATEMENTS = [
+    ("a.go", 'import (\n"fmt"\n)\nfunc f() {\n  a()\n}\n', ("f", 1)),
+    ("a.go", 'var ErrX = errors.New("x")\nfunc f() {\n  a()\n}\n', ("f", 1)),
+    ("a.kt", "val xs = listOf(1)\nfun f() {\n  a()\n}\n", ("f", 1)),
+    ("a.kt", "data class P(val x: Int)\nfun f() {\n  a()\n}\n", ("f", 1)),
+    ("a.swift", "let x = foo(1)\nfunc f() {\n  a()\n}\n", ("f", 1)),
+    ("a.swift", "class A {\n  var count: Int = 0\n  init(x: Int) {\n    a()\n  }\n}\n", ("init", 1)),
+    ("a.ts", "class A {\n  x = foo()\n  m() {\n    a()\n  }\n}\n", ("m", 1)),
+    ("a.js", "const a = require('a')\nfunction f() {\n  a()\n}\n", ("f", 1)),
+    ("a.scala", "val x = foo(1)\ndef f(): Int = {\n  x\n}\n", ("f", 1)),
+]
+
+
+@pytest.mark.parametrize("path,text,expected", LEAKING_STATEMENTS)
+def test_a_statement_without_a_semicolon_does_not_leak_into_the_next_head(path, text, expected):
+    assert _found(path, text) == [expected]
+
+
+CONTINUED_HEADS = [
+    ("a.c", "int f(int x)\n{\n  return x;\n}\n", [("f", 1)]),
+    ("a.c", "int f(int x,\n      int y)\n{\n  return x;\n}\n", [("f", 1)]),
+    ("A.java", "void run()\n    throws IOException {\n  a();\n}\n", [("run", 1)]),
+    ("a.c", "int\nfoo(int x) {\n  return x;\n}\n", [("foo", 1)]),
+    ("a.cpp", "A::A()\n    : x_(1)\n    , y_(2)\n{\n  a();\n}\n", [("A::A", 1)]),
+    ("a.rs", "fn f<T>(x: T)\nwhere\n    T: Copy,\n{\n    a();\n}\n", [("f", 1)]),
+    ("a.rs", "fn f()\n    -> Self\n{\n    a();\n}\n", [("f", 1)]),
+    ("a.kt", "val v = base\n    .map(1)\n\nfun f() {\n  a()\n}\n", [("f", 1)]),
+]
+
+
+@pytest.mark.parametrize("path,text,expected", CONTINUED_HEADS)
+def test_a_signature_that_plainly_continues_stays_one_head(path, text, expected):
+    assert _found(path, text) == expected

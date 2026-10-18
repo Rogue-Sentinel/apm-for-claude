@@ -23,11 +23,11 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from apm.metrics_heads import function_name, keeps_head
+from apm.metrics_heads import continues, function_name, keeps_head
 from apm.metrics_lang import Language, count_logic, strip_code
 from apm.metrics_model import FileMetric, FunctionMetric
 
-_STRUCTURAL = re.compile(r"[{}();]")
+_STRUCTURAL = re.compile(r"[{}();\n]")
 
 
 @dataclass
@@ -88,6 +88,8 @@ class _Scanner:
             self._end_statement(top, at)
         elif char == "{":
             self._open(top, at)
+        elif char == "\n":
+            self._end_line(top, at)
         elif len(self.stack) > 1:
             self._pop(at)
         else:
@@ -96,6 +98,12 @@ class _Scanner:
 
     def _end_statement(self, top: _Scope, at: int) -> None:
         if not top.paren and not keeps_head(self.code[top.head_start:at]):
+            top.head_start = at + 1
+
+    def _end_line(self, top: _Scope, at: int) -> None:
+        """A newline ends a statement unless the statement plainly continues."""
+        head = self.code[top.head_start:at]
+        if not top.paren and head.strip() and not continues(head, self.code[at + 1:]):
             top.head_start = at + 1
 
     def _open(self, top: _Scope, at: int) -> None:

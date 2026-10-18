@@ -123,3 +123,12 @@ def _name_of(text: str, call: re.Match[str] | None) -> str:
         return re.sub(r"\s+", "", call.group(1))
     found = _ASSIGNED.search(text) or _PROPERTY.search(text)
     return found.group(1) if found else "<anonymous>"
+
+
+_LINE_END = re.compile(r"(?:->|=>|[=+\-*/%&|^?:,(.]|\b(?:where|throws|extends|implements))\s*$")
+_LINE_START = re.compile(r"\s*(?:[{.)\]:,=?&|+]|->|=>|\b(?:throws|where|extends|implements)\b)")
+
+
+def continues(head: str, rest: str) -> bool:
+    """Whether the statement in `head` goes on in the text after its newline."""
+    return bool(_LINE_END.search(head) or _LINE_START.match(rest))
