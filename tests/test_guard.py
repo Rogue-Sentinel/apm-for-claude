@@ -173,7 +173,8 @@ def test_main_session_may_change_apm_state(git_repo: Path, command: str) -> None
     assert _decide(_command(git_repo, command), git_repo).kind == "none"
 
 
-@pytest.mark.parametrize("command", ["apm brief", "echo apm issue", "apmx issue 1", "apm issues"])
+@pytest.mark.parametrize("command", ["apm brief", "echo apm issue", "apmx issue 1", "apm issues", 'bash -c "apm brief"',
+     'bash -c "echo apm issue"'])
 def test_worker_may_read_apm_state(git_repo: Path, command: str) -> None:
     assert _decide(_command(git_repo, command, agent_id="a1"), git_repo).kind == "none"
 
@@ -321,6 +322,15 @@ CLI_MUTATIONS = [
     'python "C:/x/Scripts/Apm_Cli.py" approve --command x --reason r',
     "python scripts/apm_cli.py -- task 1 t1 --status done",
     "apm -- issue 1 --title x",
+    f'bash -c "python {PLUGIN_CLI} issue 1 --title x"',
+    f"sh -c 'python3 \"{PLUGIN_CLI}\" task 1 t1 --status done'",
+    'sh -c "apm task 1 t1"',
+    "bash -c 'apm issue 1 --status merged'",
+    'bash -lc "apm approve --command x --reason r"',
+    'sh -c "echo hi; apm task 1 t1"',
+    'powershell -Command "apm issue 1 --title x"',
+    'cmd /c "apm task 1 t1"',
+    f'bash -c "python \\"{PLUGIN_CLI}\\" issue 1 --title x"',
 ]
 
 
