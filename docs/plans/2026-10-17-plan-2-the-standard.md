@@ -198,7 +198,16 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
   - **Name:** the identifier (with any `Type::` qualifier) before the first parenthesized group that is
     preceded by a non-keyword identifier. For an arrow function or lambda with no such group, the name is
     the variable before `=`. Otherwise it's `<anonymous>`.
-  - Inside a function, nested braces are part of its body: a lambda's lines count in its parent, and it
+  - *Amended after the Task 3 review:* a head is only the **last statement** before the `{`. A newline at
+    paren depth 0 also ends a statement unless the statement plainly continues: the next line opens with
+    `{`, `.`, `)`, `->`, `:`, `=>`, `throws`, `where` and the like, or the line ends with an operator, `,` or
+    `(`. Without this, a Go `import (...)` block, a Kotlin `val`, or a JS line with no semicolon would leak
+    into the next function's head. Allman braces (`)\n{`) and multi-line signatures still work.
+  - *Amended after the Task 3 review:* a **callback passed as a call argument** at file level, or inside
+    another such callback, is a function **named after its callee** (`describe`, `it`, `app.get`). Its
+    lines leave out the callbacks nested in it as call arguments, and each of those is reported on its own.
+    So a test suite is many small functions, not one large one.
+  - Inside a named function, nested braces are part of its body: a lambda's lines count in its parent, and it
     isn't reported on its own. Every other scope (class, struct, namespace, impl, object literal, control
     block at file level) is declarative, so the functions inside it are found.
   - `lines` is `count_logic` of the body between the braces.
@@ -244,8 +253,13 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
   - `@dataclass(frozen=True) class DebtSource: name: str; command: str; numbers: Mapping[str, str]` (metric name to regex with one group)
   - `@dataclass(frozen=True) class Standard: limits: Limits; metrics: MetricsConfig; sources: tuple[DebtSource, ...]; adr_dir: str = "docs/adr/"; review_patterns: Mapping[str, tuple[str, ...]] = {}`
     (`adr_dir` and `review_patterns` are named by the `adr` and `branch-review` skills. *Added after the Task 7 review.*)
+    It also has `ui: bool | None = None`: whether the project has a user interface. `None` means the reviewer
+    decides from the code. `review_patterns` maps a scorecard dimension name to grep patterns. *Added after Task 9.*
+    It also has `layers: tuple[Mapping[str, Any], ...] = ()`, the layer map that the `clean-architecture` skill
+    reads. Each entry is `{"name", "paths": [globs], "may_import": [layer names]}`. The loader checks that shape. *Added after Task 8.*
   - `load_standard(profile: Profile | None) -> Standard`. It reads `profile.extra["standard"]`
-    (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`), uses the defaults when there's no profile or no key, and raises
+    (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`, `ui`, `layers`; `review_patterns` is
+    checked for shape only, and an unknown dimension name is left for the review to report), uses the defaults when there's no profile or no key, and raises
     `ProfileError` for a non-positive limit, a non-string glob, a source without a name or command, or a
     regex that doesn't compile or doesn't have exactly one group. A profile's `metrics.exclude` replaces the
     defaults, and a profile may add to them with `metrics.extra_exclude`.
@@ -321,6 +335,8 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
   - `test_growing_an_over_limit_function_is_a_regression`: 18 lines to 19.
   - `test_new_over_limit_function_is_a_regression`
   - `test_pure_move_to_another_file_is_not_a_regression`: `a.py::load` 30 moves to `b.py::load` 30.
+  - `test_reordering_same_named_functions_is_not_a_regression`: `it` 20 and `it#2` 25 swap places
+    (added after the Task 3 review).
   - `test_move_that_grows_is_a_regression`: 30 moves to 31.
   - `test_splitting_a_file_into_two_over_limit_files_is_a_regression` (totals `long_files` rose). The skill
     and the manager prompt say what to do: split further, or ask the user.
