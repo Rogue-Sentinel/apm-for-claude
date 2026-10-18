@@ -204,6 +204,13 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-14-glued-redirect.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-18T23:39:53.065043+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch review (opus) 0d49048..990bfe7, fix 990bfe7..240f91a re-reviewed: 0 open findings; every structural criterion met apart from the gate.",
+        "head": "240f91a4a5074c86f7832ce79dd1761a37302c88",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -1266,6 +1273,11 @@
     {
       "at": "2026-10-18T23:39:50.839715+00:00",
       "event": "task 14/review done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:39:53.065067+00:00",
+      "event": "review 14 0 open at 240f91a",
       "issue": 14
     }
   ]
