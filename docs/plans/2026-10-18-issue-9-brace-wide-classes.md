@@ -558,3 +558,38 @@ stays, read-only; function-pointer members are not methods and nested classes ar
 
 Rubric check: Task 1 commits a red test on purpose (the plan says so; the manager verifies the failure reasons).
 No test asserts nothing; no duplicated logic is mandated.
+
+## Final review (2026-10-18)
+
+Whole-branch review, opus, range 0d03ee9..88f7b6a: spec compliant apart from one must-fix; quality good;
+scorecard 8/10 old and new; ready to merge with fixes.
+
+- **M1 (must fix):** `metrics_cpp_heads.py` matches "operator" as a substring (`_drop_angles`, `_is_data_member`),
+  so `std::function<void(int)> on_operator_change;` and `int operator_id = f();` count as methods. Confirmed by
+  the manager. Goes to the fix wave.
+
+*Rulings by the manager on the suggestions, graded by effect on a person using the result:*
+- *S1, arrays of function pointers (`void (*handlers[4])(int);`) count as methods: fix in the wave. It breaks
+  the user's ruling that function-pointer members are not methods. Cost if wrong: one regex.*
+- *S2, `__attribute__((...))` on a class head makes the class vanish: fix in the wave. A silently missed class
+  is the failure issue 9 exists to remove. Cost if wrong: one more strip in `tidy_head`.*
+- *S3, `operator std::vector<int>() const;` is not counted although the plan counts conversion operators: fix
+  in the wave. A `requires` clause before an inline body: record as a known limit in both scanner
+  docstrings, as the plan's Risks promised. Cost if wrong: one missed method in C++20 constraint code.*
+- *S4, a hand-relabeled `class_languages` can hide a known class's growth from the branch-versus-main check:
+  fix in the wave (a key the base already lists was measured by the base), with a test. Under ADR 0002 it is
+  a known limit, but the fix is one line and closes it. Cost if wrong: none.*
+- *S5, the clean-code reference overstates coverage for a marker-less C++ header: fix in the wave, one
+  clause matching ADR 0004.*
+- *S6, `_BASE_COLON` and the key-to-path split are duplicated: fix in the wave as its own refactoring commit.*
+
+*Rulings on what the reviewer declined to judge:*
+- *Marker-less C++ headers read as C: stands; the user chose the content check, and ADR 0004 records the cost.*
+- *`signals:`/`slots:` keep the previous access: stands; parity with the XP12 checker (Task 6 ruling).*
+- *A C++-only tree whose every file has unbalanced braces prints `: 0`: stands. Those files are listed under
+  "could not be measured", so the output does not read as clean. Cost if wrong: a follow-up wording change.*
+- *A `.h` is stripped up to three times: stands; no limit on speed, and `metrics_braces.py` may not change.*
+- *Task 4's naming of `C`/`CPP` shares its behavior commit, and the Qt fix shares tests and code: stands; the
+  plan prescribed Task 4's single commit, and tests with their behavior is this repo's convention.*
+- *`public::std::string f();` misread: stands; pathological formatting, no plausible source.*
+- *Long source lines: stands; the profile sets no line-length limit.*
