@@ -205,7 +205,16 @@
       "plan": "docs/plans/2026-10-18-issue-14-glued-redirect.md",
       "questions": [],
       "status": "building",
-      "tasks": [],
+      "tasks": [
+        {
+          "attempts": 1,
+          "id": "1",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Failing tests and pins",
+          "worker": "implementer"
+        }
+      ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/14"
     },
@@ -1036,6 +1045,11 @@
     {
       "at": "2026-10-18T23:02:40.115458+00:00",
       "event": "issue 14 status building",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:02:42.346777+00:00",
+      "event": "task 14/1 running",
       "issue": 14
     }
   ]
