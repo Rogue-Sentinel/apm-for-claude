@@ -47,9 +47,16 @@ def _init(sub) -> None:
     parser.add_argument("--issue", type=int, required=True, metavar="N", help="the init issue that carries the notes")
 
 
+def _gate(sub) -> None:
+    parser = sub.add_parser("gate", help="run the merge gate for an issue: build, tests, debt, review and plan criteria")
+    parser.add_argument("number", type=int)
+    parser.add_argument("--base", metavar="REF", help="the ref that must be merged in (default: the profile's base)")
+
+
 def add_workflow_parsers(sub) -> None:
     _note(sub)
     _review(sub)
     _github(sub)
     _audit(sub)
     _init(sub)
+    _gate(sub)

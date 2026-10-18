@@ -70,6 +70,12 @@ def init(project: Project, args: argparse.Namespace) -> int:
     return handle(project, args)
 
 
+def gate(project: Project, args: argparse.Namespace) -> int:
+    from apm.cli_gate import run_gate  # lazy, like github and audit
+
+    return run_gate(project, args)
+
+
 WORKFLOW_HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
-    "note": note, "review": review, "github": github, "audit": audit, "init": init,
+    "note": note, "review": review, "github": github, "audit": audit, "init": init, "gate": gate,
 }
