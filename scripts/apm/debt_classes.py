@@ -25,7 +25,7 @@ def project_classes(base: Mapping, current: dict) -> tuple[dict, list[str], list
     """`current` without the wide classes the base never measured, the regressions, and the notes."""
     scanned, languages, classes = _scanners(base), current.get("class_languages", {}), current.get("classes", {})
     missing = [f"class scanner missing: {name}" for name in sorted(scanned - _scanners(current))]
-    newly = {key: _unmeasured_language(key, languages, scanned) for key in classes}
+    newly = {key: _unmeasured_language(key, languages, scanned) for key in classes if key not in base.get("classes", {})}
     newly = {key: language for key, language in newly.items() if language}
     notes = [f"newly measured: {key} ({classes[key]} public methods; the baseline did not measure {language} classes)"
              for key, language in sorted(newly.items())]
