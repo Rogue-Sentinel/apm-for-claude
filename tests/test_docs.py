@@ -97,6 +97,23 @@ def test_the_readme_states_what_the_plugin_needs_and_how_to_install_it():
         assert needed in text, needed
 
 
+@pytest.mark.parametrize(
+    "path, heading", [(README, "## Install"), (TUTORIAL, HEADINGS[0])], ids=["README.md", "tutorial.md"]
+)
+def test_the_install_says_to_remove_an_old_local_marketplace_first(path, heading):
+    install = section(_text(path), heading)
+    remove = "/plugin marketplace remove rogue-sentinel"
+    assert remove in install
+    assert "claude plugin marketplace remove rogue-sentinel" in install
+    assert install.index(remove) < install.index("/plugin marketplace add")
+
+
+def test_troubleshooting_explains_a_failed_marketplace_add():
+    troubleshooting = section(_text(TUTORIAL), HEADINGS[9])
+    assert "Failed to add marketplace." in troubleshooting
+    assert "/plugin marketplace remove rogue-sentinel" in troubleshooting
+
+
 def test_the_example_profile_loads_and_uses_only_keys_that_exist(tmp_path):
     block = _JSON_FENCE.search(section(_text(TUTORIAL), HEADINGS[8]))
     assert block, "no json block under the settings section"
