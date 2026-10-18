@@ -57,6 +57,12 @@ def _metrics(sub) -> None:
     parser.add_argument("paths", nargs="*", metavar="PATH", help="measure only these files or directories")
 
 
+def _coverage(sub) -> None:
+    parser = sub.add_parser("coverage", help="check that the standard covers every item of the old one")
+    parser.add_argument("--source", action="append", default=[], metavar="ID=DIR", help="also scan an old source folder")
+    parser.add_argument("--table", action="store_true", help="print the coverage table")
+
+
 def _debt(sub) -> None:
     parser = sub.add_parser("debt", help="the debt ratchet: record a baseline and check the code against it")
     actions = parser.add_subparsers(dest="action", required=True)
@@ -78,4 +84,5 @@ def build_parser() -> argparse.ArgumentParser:
     _questions(sub)
     _metrics(sub)
     _debt(sub)
+    _coverage(sub)
     return parser
