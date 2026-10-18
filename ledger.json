@@ -217,10 +217,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 2 review must-fix M1: PowerShell '*>' / '*>>' (e.g. 'git fetch origin *>$null') is split so '*' is glob-expanded against protected globs; fix: op group [&*]?[<>][<>&]* with a unit case and decide-level pins.",
+          "evidence": "guard*/hook*/own_limits on the branch after merge 990bfe7: all pass (worktree targeted run 1165 passed); fix round 1 (PowerShell *>; commit 0a04baa) re-reviewed clean; metrics 0 over; debt check nothing worse.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "guard_redirects and protected_reason",
           "worker": "implementer"
         },
@@ -1197,6 +1197,11 @@
     {
       "at": "2026-10-18T23:30:54.033641+00:00",
       "event": "task 14/2r done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:30:56.665267+00:00",
+      "event": "task 14/2 done",
       "issue": 14
     }
   ]
