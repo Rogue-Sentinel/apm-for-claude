@@ -12,6 +12,17 @@
       "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/10"
     },
+    "11": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/11"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -56,6 +67,11 @@
       "at": "2026-10-18T18:43:57.752400+00:00",
       "event": "concern 9 Planner: apm audit has the same '0 when never measured' problem (audit_report._totals prints wide classes 0); not covered by this plan, follow-up.",
       "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:15:20.006524+00:00",
+      "event": "filed 11 https://github.com/Rogue-Sentinel/apm-for-claude/issues/11",
+      "issue": 11
     }
   ]
 }
