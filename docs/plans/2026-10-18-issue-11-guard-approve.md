@@ -451,3 +451,10 @@ ADR 0002 read as 'never allow a command that does what the guard must stop', rec
 
 Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task review applies to Tasks 1–5
 (safety-critical). No test asserts nothing; no duplicated logic is mandated.
+
+## Deferred findings
+- Task 1 review: pin the single-quoted chained approve call, `CLI approve --command '<WIN_TARGET>' --reason ok && <WIN_TARGET>` (deny).
+- Task 1 review: ADR 0005 claims a pin for "a heredoc not on the first line" that does not exist; add `"cd docs\ncat > body.md <<'EOF'\nrm -rf build\nEOF"` (deny) or reword.
+- Task 1 review: pin an unquoted heredoc tag whose body quotes a command in backticks (deny).
+- Task 1 review: ADR 0005's `cat` rule omits the unquoted `[\w./:~-]` target and the end-at-first-tag-line limit; its Context drops "the XP12 cause is not proven".
+- Task 1 review: `tests/test_guard_cli.py` defines `CLI` after the tests; move it up beside `CALL`.
