@@ -57,6 +57,15 @@ def _metrics(sub) -> None:
     parser.add_argument("paths", nargs="*", metavar="PATH", help="measure only these files or directories")
 
 
+def _debt(sub) -> None:
+    parser = sub.add_parser("debt", help="the debt ratchet: record a baseline and check the code against it")
+    actions = parser.add_subparsers(dest="action", required=True)
+    baseline = actions.add_parser("baseline", help="record the current numbers; refuses to loosen without --accept")
+    baseline.add_argument("--accept", metavar="REASON", help="record why a worse number is accepted")
+    check = actions.add_parser("check", help="exit 1 when anything is worse than the baseline")
+    check.add_argument("--base", default="main", metavar="REF", help="the ref whose baseline may not be loosened")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="apm", description="Record and report project state.")
     sub = parser.add_subparsers(dest="subcommand", required=True)
@@ -68,4 +77,5 @@ def build_parser() -> argparse.ArgumentParser:
     _approve(sub)
     _questions(sub)
     _metrics(sub)
+    _debt(sub)
     return parser

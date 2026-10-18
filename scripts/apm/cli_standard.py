@@ -7,6 +7,7 @@ import os
 from collections.abc import Callable
 from pathlib import Path
 
+from apm.cli_debt import run_debt
 from apm.cli_errors import UsageError
 from apm.guard_paths import is_under
 from apm.metrics import measure_tree, render_text, report_json
@@ -40,4 +41,8 @@ def metrics(project: Project, args: argparse.Namespace) -> int:
     return 0
 
 
-HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {"metrics": metrics}
+def debt(project: Project, args: argparse.Namespace) -> int:
+    return run_debt(project, _standard(project), args)
+
+
+HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {"metrics": metrics, "debt": debt}

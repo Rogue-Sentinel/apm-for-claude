@@ -108,10 +108,42 @@ def _unsupported(base: dict, current: dict) -> tuple[str, ...]:
     return tuple(f"{who} version {version} is not supported" for who, version in bad if version != VERSION)
 
 
+# (section, limit, total of its count, total of its excess lines or None, whether the limit itself is over)
+_LIMITED = (
+    ("functions", "function", "long_functions", "excess_function_lines", False),
+    ("files", "file", "long_files", "excess_file_lines", False),
+    ("classes", "public_methods", "wide_classes", None, True),
+)
+
+
+def _project(current: dict, old_limits: Mapping, spec: tuple) -> dict:
+    """`current` seen at the base's looser limit, for one section, when the limit was tightened."""
+    section, name, count, excess, inclusive = spec
+    old, now = old_limits.get(name), current.get("limits", {}).get(name)
+    if not (isinstance(old, int) and isinstance(now, int) and now < old):
+        return current
+    kept = {key: n for key, n in current.get(section, {}).items() if n > old - inclusive}
+    totals = {**current.get("totals", {}), count: len(kept)}
+    if excess:
+        totals[excess] = sum(n - old for n in kept.values())
+    return {**current, section: kept, "totals": totals}
+
+
+def project_onto(base: dict, current: dict) -> dict:
+    """Keep only what is over the base's limits where `current` tightened them.
+
+    Code that was fine under the old limit is not new debt. The limits themselves stay as recorded.
+    """
+    for spec in _LIMITED:
+        current = _project(current, base.get("limits", {}), spec)
+    return current
+
+
 def compare(base: dict, current: dict) -> Comparison:
     """Everything in `current` that is worse than `base`, and everything that got better."""
     if _unsupported(base, current):
         return Comparison(_unsupported(base, current), ())
+    current = project_onto(base, current)
     parts = [compare_limits(base, current), compare_scope(base, current), compare_totals(base, current),
              compare_unmeasured(base, current), compare_sources(base, current),
              *(compare_items(base, current, kind) for kind in KINDS)]
