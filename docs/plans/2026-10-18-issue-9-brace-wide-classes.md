@@ -483,6 +483,8 @@ branch's code, not the installed plugin.
 - [ ] **Step 3:** record both results in `docs/platform-notes.md` (check, result, evidence: the counts, and each
   difference with its reason). **Commit** `"Record the issue 9 parity check against the XP12 tree"`.
 
+*Ruling during Task 6: the parity run found 8 Qt classes counted as 0, a difference outside the four listed, so per Step 1 it went back to Task 3's code: a debugger (opus) added two failing inline tests (macros before `public:` and before `private:`) and fixed `access_label` to read the access word that ends the head, as the XP12 checker does; `signals:` and `slots:` are not labels, as in the checker. Rerun: 30 of 30. Step 2 had no XP12 baseline to run against (XP12's `origin/main` has no `.apm/`), so the manager recorded one with apm 0.3.0 in the scratch export and ran this branch's `debt check` against it: exit 0, 48 newly measured. The Risks line on Qt is amended below. Cost if wrong: none; it matches the checker on the real tree.*
+
 ### Task 7: Run the merge gate
 
 - [ ] **Step 1: Run** `<CLI> gate 9`. Expected: PASS: the full suite once, `<CLI> debt check` passing, and every
@@ -513,6 +515,7 @@ branch's code, not the installed plugin.
 None. Task 6 runs two read-only commands in the XP12 repository and writes nothing there.
 
 ## Risks
+- *Amended after Task 6: Qt macros with no `;` (`Q_OBJECT`, `Q_PROPERTY(...)`) run into the next member's head; the access label is the access word that ends the head, and tests cover macros before `public:` and before `private:`. A macro before an ordinary member still joins that member's head, as in the XP12 checker.*
 - **The heuristics are a scanner, not a compiler.** Macros that expand to members (`DECLARE_X(Foo)`), Qt's
   `signals:` / `public slots:`, C++20 `requires` clauses, raw strings (`strip_code`'s known limit) and
   `#ifdef` arms that each open a class can miscount. `metrics_cpp.py` lists these in its docstring as the

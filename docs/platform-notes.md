@@ -92,3 +92,13 @@ release.
   (`/apm:setup`) is unverified. The fallback is the plugin cache path. Both are to be checked live after the
   merge. The exact install line, `/plugin marketplace add Rogue-Sentinel/apm-for-claude`, is also still to
   be checked live.
+
+## Issue 9 live check (2026-10-18)
+
+Run by the manager with this branch's CLI on a read-only export of the XP12 repo's `origin/main` (17dddbc),
+taken with `git archive` into a scratch folder. Nothing was run or written in the XP12 repository itself.
+
+| # | Check | Result | Evidence |
+|---|---|---|---|
+| 9a | Wide classes against XP12's `tools/check_clean_code.py`, `metrics src` | PASS after one fix | First run: 22 of 30 matched on path, line, name and count; 8 Qt classes in `src/companion_qt/` came out with 0 public methods. Qt macros with no `;` (`Q_OBJECT`, `Q_PROPERTY(...)`) ran into the `public:` label's head, so the label went unread. Fixed on this branch (access label is the access word that ends the head) with two inline tests. Rerun: 30 of 30 identical to the checker, e.g. `src/db/database.h:81 Database -- 7`, `src/ui/map_screen.h:36 MapScreen -- 8`, `src/companion_qt/nav_bridge.h:23 NavBridge -- 7`. None of the four deliberate differences showed up on this tree. |
+| 9b | `debt check` against a baseline recorded by apm 0.3.0 | PASS | In the export, `debt baseline` from the installed 0.3.0 wrote `wide_classes: 0` with no `class_scanners`. This branch's `debt check --base master` exited 0 with `nothing worse than the baseline`, listed 48 classes (in `src/` and `tests/`) under `newly measured, not new debt:`, and printed the hint to run `apm debt baseline`. |
