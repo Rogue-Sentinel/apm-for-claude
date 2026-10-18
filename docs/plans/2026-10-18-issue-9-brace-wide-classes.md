@@ -593,3 +593,13 @@ scorecard 8/10 old and new; ready to merge with fixes.
   plan prescribed Task 4's single commit, and tests with their behavior is this repo's convention.*
 - *`public::std::string f();` misread: stands; pathological formatting, no plausible source.*
 - *Long source lines: stands; the profile sets no line-length limit.*
+
+Scoped re-review of the fix wave (opus, 280ead1..0a5e673): M1 and S1–S6 all addressed; no regression and no
+looser verdict in the fix diff; open findings 0; ready to merge, subject to the gate.
+
+## Deferred findings
+- Final review: `skills/clean-code/references/class-scanners-by-language.md` still opens with "read as C, which has
+  no classes to count" just before the sentence saying such classes are missed; one clause could be reworded.
+- Final review: a conversion operator to a type whose last name matches the class (`struct Handle { operator
+  ns::Handle() const; };`) is read as a constructor and not counted. Rare.
+- Final review: the `newly = {...}` line in `scripts/apm/debt_classes.py` is past 120 characters (no limit set).
