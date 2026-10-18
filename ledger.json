@@ -143,9 +143,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Fix wave (M1 CR: mask nothing; M2 ADR 0005 + pin; guard_cli known limit): 930 passed in the worktree; guard*/hook*/docs/approve on the branch after merge cf02403 all pass; metrics 0/20 fn, 0/3 files over; debt check nothing worse.",
           "id": "fix",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix wave",
           "worker": "implementer"
         }
@@ -807,6 +808,11 @@
     {
       "at": "2026-10-18T21:19:17.012300+00:00",
       "event": "task 11/review running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:21:02.439798+00:00",
+      "event": "task 11/fix done",
       "issue": 11
     }
   ]
