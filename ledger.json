@@ -108,10 +108,12 @@
           "title": "XP12 parity check (manual)"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "7",
-          "status": "pending",
-          "title": "Merge gate"
+          "model": "opus",
+          "status": "running",
+          "title": "Merge gate",
+          "worker": "manager"
         },
         {
           "attempts": 2,
@@ -360,6 +362,11 @@
     {
       "at": "2026-10-18T20:01:20.807153+00:00",
       "event": "issue 9 status integrating",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T20:04:32.354089+00:00",
+      "event": "task 9/7 running",
       "issue": 9
     }
   ]
