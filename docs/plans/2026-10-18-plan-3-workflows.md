@@ -605,6 +605,12 @@ task"; the two worktree files carry the ancestor check). Cost if wrong: one extr
 - [ ] **Step 3: Edit the agents.** **Step 4: Run** it. Expected: PASS.
 - [ ] **Step 5: Commit** `"Point the agents at the workflows and lean pacing"`.
 
+*Ruling during Task 12: `tests/test_agents.py` would have reached 239 lines of logic (over the file limit), so the
+new workflow tests live in `tests/test_agents_workflow.py`. The manager's Skills line "after every task" now reads
+as the whole-branch review. `test_manager_follows_the_process_skills_until_the_workflows_ship` was replaced by
+`test_manager_points_at_the_workflows_instead_of_waiting_for_them` (on purpose; listed in the PR). The last "whole
+suite" line, in `skills/test-first/references/cycle-steps.md`, is swept in Task 14. Cost if wrong: one test file.*
+
 ### Task 13: Release 0.3.0: live checks, one review, one gate, the PR
 
 **Files:**
