@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from apm.guard import Decision, decide
+from apm.guard_commands import destructive_reason, protected_reason
 from apm.paths import Project
 from apm.profile import Profile
 
@@ -49,3 +50,18 @@ def test_a_protected_write_is_denied_with_the_whole_command(git_repo: Path) -> N
 def test_a_worker_denial_ends_with_the_command_as_typed(git_repo: Path, command: str) -> None:
     decision = _decide(git_repo, command, agent_id="w1")
     assert decision.kind == "deny" and decision.reason.endswith(": " + command)
+
+
+def test_a_check_names_what_it_found_without_echoing() -> None:
+    assert destructive_reason("rm -rf build") == "destructive command (recursive rm)"
+    assert protected_reason("cp x data/fleet.db", ["data/*.db"]) == (
+        "command touches a protected path (data/fleet.db)")
+
+
+def test_the_state_directory_denial_reads_as_before(git_repo: Path) -> None:
+    project = Project(main_root=git_repo, worktree_root=git_repo)
+    project.state_dir.mkdir(parents=True)
+    event = {"tool_name": "Bash", "cwd": str(project.state_dir), "tool_input": {"command": "touch x"}}
+    decision = decide(event, project, Profile(framework_version="0.3.0"), [], [], WINDOWS, [])
+    assert decision.reason.startswith(
+        "APM guard: command runs inside the APM state directory: touch x. Ask the user in chat")

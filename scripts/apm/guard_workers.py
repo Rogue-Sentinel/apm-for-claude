@@ -60,14 +60,14 @@ def _runs_apm_state_change(words: list[str]) -> bool:
 def _state_change(segments: Sequence[str]) -> str | None:
     for segment in segments:
         if any(_runs_apm_state_change(shell_words(text)) for text in spellings(segment)):
-            return f"{_STATE_REASON}: {segment}"
+            return _STATE_REASON
     return None
 
 
 def _unreadable(segments: Sequence[str]) -> str | None:
     for segment in segments:
         if unreadable_braces(segment):
-            return f"workers may not run a brace expansion too large for the guard to read: {segment}"
+            return "workers may not run a brace expansion too large for the guard to read"
     return None
 
 
