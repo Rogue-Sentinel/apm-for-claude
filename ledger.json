@@ -46,7 +46,8 @@
         {
           "attempts": 0,
           "id": "1",
-          "status": "pending"
+          "status": "pending",
+          "title": "Reproduce the bug as failing tests"
         },
         {
           "attempts": 0,
@@ -157,6 +158,11 @@
     {
       "at": "2026-10-18T19:16:19.754454+00:00",
       "event": "task 9/7 pending",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:22.091060+00:00",
+      "event": "task 9/1 updated",
       "issue": 9
     }
   ]
