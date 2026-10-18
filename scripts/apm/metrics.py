@@ -80,24 +80,30 @@ class Report:
         return sorted((f for f in self.files if _is_plain(f)), key=lambda f: -f.lines)
 
 
-def _under(name: str, prefixes: Sequence[str]) -> bool:
-    return any(p == "." or name == p or name.startswith(p + "/") for p in prefixes)
+def under_paths(names: Sequence[str], paths: Sequence[str] | None) -> list[str]:
+    """The names at or under any of `paths`; all of them when `paths` is empty."""
+    prefixes = [posixpath.normpath(p) for p in paths or ()]
+    if not prefixes:
+        return list(names)
+    return [name for name in names if any(p == "." or name == p or name.startswith(p + "/") for p in prefixes)]
+
+
+def decode_text(data: bytes) -> str:
+    """File bytes as text: UTF-8 with a BOM dropped, bad bytes replaced, and newlines normalized."""
+    text = data.decode("utf-8-sig", errors="replace")
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def _read(path: Path) -> str | None:
     try:
-        text = path.read_bytes().decode("utf-8-sig", errors="replace")
+        return decode_text(path.read_bytes())
     except OSError:
         return None
-    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def measure_tree(root: Path, config: MetricsConfig, paths: Sequence[str] | None = None) -> Report:
     """Measure the selected files of the git tree at `root`, optionally only under `paths`."""
-    names = select_files(tracked_files(root), config)
-    prefixes = [posixpath.normpath(p) for p in paths or ()]
-    if prefixes:
-        names = [name for name in names if _under(name, prefixes)]
+    names = under_paths(select_files(tracked_files(root), config), paths)
     texts = ((name, _read(root / name)) for name in names)
     measured = (measure_text(name, text) for name, text in texts if text is not None)
     return Report(tuple(metric for metric in measured if metric is not None))
