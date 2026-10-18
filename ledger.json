@@ -41,7 +41,7 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-9-brace-wide-classes.md",
       "questions": [],
-      "status": "awaiting-approval",
+      "status": "building",
       "tasks": [],
       "title": "metrics reports 0 wide classes for C++ (and every brace language): only Python classes are counted",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/9"
@@ -81,6 +81,11 @@
     {
       "at": "2026-10-18T19:16:01.530193+00:00",
       "event": "decision 9 User approved the plan: .h by content check (option B); keep read-only Task 6 parity check on XP12; function pointers not methods and Outer::Inner naming accepted.",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:03.870671+00:00",
+      "event": "issue 9 status building",
       "issue": 9
     }
   ]
