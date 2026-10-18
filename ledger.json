@@ -46,6 +46,13 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-9-brace-wide-classes.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-18T20:01:18.571811+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch review (opus) 0d03ee9..88f7b6a, fix wave 280ead1..0a5e673 re-reviewed: 0 open findings; every structural criterion met apart from the gate itself; 3 deferred findings recorded in the plan.",
+        "head": "1418ef467ec3ffaf992dd0e4d69838878a993a11",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -343,6 +350,11 @@
     {
       "at": "2026-10-18T20:01:16.323930+00:00",
       "event": "task 9/review done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T20:01:18.571836+00:00",
+      "event": "review 9 0 open at 1418ef4",
       "issue": 9
     }
   ]
