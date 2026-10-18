@@ -394,9 +394,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 1 review (opus): 1 must-fix (worktree-slug pin only runs from the main checkout, so it passes either way); S1-S3 ruled into Tasks 2-3; S4-S5 deferred.",
           "id": "1r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 1 review",
           "worker": "reviewer"
         }
@@ -1387,6 +1388,11 @@
     {
       "at": "2026-10-18T23:47:39.244748+00:00",
       "event": "task 19/1r running",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:51:37.862789+00:00",
+      "event": "task 19/1r done",
       "issue": 19
     }
   ]
