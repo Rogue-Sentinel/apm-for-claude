@@ -216,6 +216,13 @@
       "kind": "feature",
       "plan": "docs/plans/2026-10-18-issue-17-release-0.3.1.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-18T22:43:09.480626+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch review (sonnet): 0 open; all structural criteria met apart from the gate; 2 deferred in the plan.",
+        "head": "2e3a6e7631eebdca2a9980cfd11892518c598778",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -937,6 +944,11 @@
     {
       "at": "2026-10-18T22:43:07.001631+00:00",
       "event": "task 17/review done",
+      "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:43:09.480645+00:00",
+      "event": "review 17 0 open at 2e3a6e7",
       "issue": 17
     }
   ]
