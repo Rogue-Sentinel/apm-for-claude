@@ -183,11 +183,12 @@
     },
     "14": {
       "allowlist": [],
+      "branch": "issue-14-glued-redirect",
       "concerns": [],
       "decisions": [],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/14"
@@ -974,6 +975,11 @@
       "at": "2026-10-18T22:46:49.970656+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/18",
       "issue": 17
+    },
+    {
+      "at": "2026-10-18T22:47:02.337571+00:00",
+      "event": "issue 14 status planning",
+      "issue": 14
     }
   ]
 }
