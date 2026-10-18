@@ -521,3 +521,33 @@ None. Task 6 runs two read-only commands in the XP12 repository and writes nothi
   project hits it.
 - **Newly measured classes sit outside the ratchet until `debt baseline` runs.** The check prints the hint; the
   manager's tighten-on-better habit should cover it, but nothing forces it.
+
+## Approval (2026-10-18)
+
+*Approved by the user in chat: "Approved: content check for .h, keep the read-only Task 6 parity check against
+XP12, and the two differences from the XP12 checker are fine." So: option B (content check) for `.h`; Task 6
+stays, read-only; function-pointer members are not methods and nested classes are named `Outer::Inner`.*
+
+## Pre-flight scan
+
+| Tasks | Shared file or interface | Producer vs consumer | Found |
+|---|---|---|---|
+| 1 ↔ 3, 4 | the `classes` JSON shape | Task 1 asserts `{"name", "line", "public_methods"}`; `report_json` emits `asdict(ClassMetric)` with exactly those fields | agrees |
+| 1 ↔ 3, 4 | the text flag line | Task 1 asserts `database.h:1 Database -- 7 public methods`; `_class_section` prints `{p}:{c.line} {c.name} -- {c.public_methods} public methods` | agrees |
+| 2 ↔ 3 | `metrics_model.CLASS_LANGUAGES` | Task 2 creates it as `{"Python"}`; Task 3 adds `"C++"` | agrees, sequential |
+| 2 ↔ 3 | `Report.classes_unscanned` | Task 2 produces it; Task 3's `test_cpp_files_no_longer_count_as_class_unmeasured` consumes it | agrees |
+| 2, 3, 4 | `scripts/apm/metrics.py` | Task 2: class sections and JSON key; Task 3: `measure_text` brace branch; Task 4: `measure_text` language lookup | same file, run in order |
+| 3 ↔ 4 | `measure_text` and the language name | Task 3's `with_cpp_classes` checks `language.name == "C++"`; Task 4's `language_of` returns `CPP` (the C++ table entry, named `"C++"`) | agrees |
+| 2 ↔ 4 | `classes_unscanned` and `.h` | Task 2 reads `metric.language`, so a `.h` that Task 4 makes C++ leaves the unscanned list; a C `.h` is in `CLASSLESS_LANGUAGES` | agrees |
+| 3 ↔ 5 | `CLASS_LANGUAGES` | Task 5 consumes `{"C++", "Python"}` for `class_scanners` | agrees |
+| 4 ↔ 5 | `docs/adr/README.md` | each adds one row (0004 in Task 4, 0003 in Task 5) | same file, run in order; rows sorted by number |
+| 1 | self | 4 tests, all failing for the defect; the commit is red on purpose | consistent |
+| 2 | self | the three header forms and the section are all pinned by tests; Python-only output unchanged | consistent |
+| 3 | self | files created (`metrics_cpp*.py`) match those it tests; the counting table matches the test list | consistent |
+| 4 | self | `language_for` stays path-only, as `test_language_for_still_reads_h_as_c` pins | consistent |
+| 5 | self | the snapshot fields it produces are the ones its validators and tests name | consistent |
+| 6 | self | manual and read-only in XP12; it writes only `docs/platform-notes.md` here | consistent |
+| 7 | self | the gate | consistent |
+
+Rubric check: Task 1 commits a red test on purpose (the plan says so; the manager verifies the failure reasons).
+No test asserts nothing; no duplicated logic is mandated.
