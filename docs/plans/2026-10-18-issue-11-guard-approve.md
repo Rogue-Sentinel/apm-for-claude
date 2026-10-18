@@ -458,3 +458,4 @@ Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task r
 - Task 1 review: pin an unquoted heredoc tag whose body quotes a command in backticks (deny).
 - Task 1 review: ADR 0005's `cat` rule omits the unquoted `[\w./:~-]` target and the end-at-first-tag-line limit; its Context drops "the XP12 cause is not proven".
 - Task 1 review: `tests/test_guard_cli.py` defines `CLI` after the tests; move it up beside `CALL`.
+- Task 1 re-review: ADR 0005 states the literal reading of rule 2 twice (Context and Decision); could be trimmed to one place.
