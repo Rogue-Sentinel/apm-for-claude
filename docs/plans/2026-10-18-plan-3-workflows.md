@@ -662,3 +662,12 @@ so it describes the finished commands; Task 13's PR includes it.*
 - [ ] **Step 5: Commit** `"Add a README and a short tutorial"`.
 
 *Structural acceptance criterion added: `README.md` and `docs/tutorial.md` exist and pass `tests/test_docs.py`.*
+
+*Ruling during Tasks 1, 2 and 5 (found in the build): the platform's `isolation: "worktree"` cut all three
+workers' worktrees from `main`'s tip, not from the feature branch, so none could see this plan. All three
+stopped as briefed, changing nothing; each was resumed with `git merge --ff-only claude/plan-3-apm-workflows-57bbf0`.
+The instruction behind it was wrong: `apm:worktrees` and the implementer brief assume a native worktree starts
+from the session's branch. Task 11 (which already edits both files) adds: a native worktree may start from the
+default branch, so the worker checks that the recorded BASE is an ancestor of HEAD, and if it is not,
+fast-forwards to the feature branch (`--ff-only`) and reports if that refuses. Task 13 records the platform fact
+in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
