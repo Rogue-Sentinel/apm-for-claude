@@ -97,7 +97,7 @@ Ready to build Task <N>
 - **The manager never removes one on its own judgment.** Stale worktrees and branches are reported to
   the user, never removed, unless the user approves removing that specific one in chat. Only then is
   the exact command recorded with `<CLI> approve --command "<the exact full command>" --reason TEXT`
-  and run once. Run the approve call on its own, with nothing chained to it, from the directory the
+  and run once. Run the approve call with the Bash tool, on its own, with nothing chained to it, from the directory the
   command will run in (a command approval applies only there), quoting the command in single
   quotes if it holds double quotes. The approval lasts 10 minutes and covers that exact full command only. If the
   approve call is itself denied, stop and ask the user to run the command themselves; never rewrite

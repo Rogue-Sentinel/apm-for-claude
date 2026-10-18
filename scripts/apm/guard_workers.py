@@ -31,7 +31,8 @@ WORKER_READ_ONLY = ("brief", "metrics", "coverage", "audit", "debt check")
 _APM_PROGRAMS = frozenset({"apm", "apm_cli.py", "apm_cli"})
 _STATE_REASON = (
     "workers do not change APM state; report to the manager instead "
-    "(to search for the text, use the Grep tool: it does not go through the shell)"
+    "(to search for the text, use the Grep tool, and to write it to a file, the Write or Edit tool: "
+    "neither goes through the shell)"
 )
 
 
