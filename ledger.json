@@ -140,6 +140,14 @@
           "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Final review fix wave",
+          "worker": "implementer"
         }
       ],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
@@ -789,6 +797,11 @@
     {
       "at": "2026-10-18T21:11:54.660607+00:00",
       "event": "task 11/review failed",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:11:57.034414+00:00",
+      "event": "task 11/fix running",
       "issue": 11
     }
   ]
