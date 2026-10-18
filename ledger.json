@@ -54,10 +54,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "3",
-          "status": "pending",
-          "title": "Echo the typed command"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Echo the typed command",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -597,6 +599,11 @@
     {
       "at": "2026-10-18T20:39:09.070600+00:00",
       "event": "task 11/2 running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:39:11.603709+00:00",
+      "event": "task 11/3 running",
       "issue": 11
     }
   ]
