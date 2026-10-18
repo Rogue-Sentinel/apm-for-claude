@@ -95,22 +95,38 @@ def _section(title: str, rows: list[str]) -> list[str]:
     return [title, *(f"  {row}" for row in rows)]
 
 
+def _function_section(report: Report, limits: Limits) -> list[str]:
+    over = report.over_functions(limits)
+    total = sum(len(f.functions) for f in report.files)
+    return _section(f"Functions over {limits.function} lines of logic: {len(over)} of {total}",
+                    [f"{p}:{fn.line} {fn.name} -- {fn.lines} lines" for p, fn in over])
+
+
+def _file_section(report: Report, limits: Limits) -> list[str]:
+    over = report.over_files(limits)
+    return _section(f"Files over {limits.file} lines of logic: {len(over)} of {len(report.files)}",
+                    [f"{f.path} -- {f.lines} lines" for f in over])
+
+
+def _class_section(report: Report, limits: Limits) -> list[str]:
+    wide = report.wide_classes(limits)
+    return _section(f"Review flags -- classes with {limits.public_methods}+ public methods: {len(wide)}",
+                    [f"{p}:{c.line} {c.name} -- {c.public_methods} public methods" for p, c in wide])
+
+
+def _unmeasured_section(report: Report) -> list[str]:
+    bad = report.unmeasured()
+    return _section(f"Files whose functions could not be measured: {len(bad)}",
+                    [f"{f.path} -- {f.note or PLAIN_NOTE}" for f in bad])
+
+
 def render_text(report: Report, limits: Limits) -> str:
     """Counts of what is over the limits, each item on a line, then the review flags."""
-    functions = report.over_functions(limits)
-    total = sum(len(f.functions) for f in report.files)
-    lines = _section(f"Functions over {limits.function} lines of logic: {len(functions)} of {total}",
-                     [f"{p}:{fn.line} {fn.name} -- {fn.lines} lines" for p, fn in functions])
-    files = report.over_files(limits)
-    lines += _section(f"Files over {limits.file} lines of logic: {len(files)} of {len(report.files)}",
-                      [f"{f.path} -- {f.lines} lines" for f in files])
-    wide = report.wide_classes(limits)
-    lines += _section(f"Review flags -- classes with {limits.public_methods}+ public methods: {len(wide)}",
-                      [f"{p}:{c.line} {c.name} -- {c.public_methods} public methods" for p, c in wide])
-    bad = report.unmeasured()
-    lines += _section(f"Files whose functions could not be measured: {len(bad)}",
-                      [f"{f.path} -- {f.note or PLAIN_NOTE}" for f in bad])
-    return "\n".join(lines)
+    sections = (
+        _function_section(report, limits), _file_section(report, limits),
+        _class_section(report, limits), _unmeasured_section(report),
+    )
+    return "\n".join(line for section in sections for line in section)
 
 
 def _file_json(metric: FileMetric) -> dict:
