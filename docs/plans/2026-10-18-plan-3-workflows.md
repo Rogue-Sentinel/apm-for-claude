@@ -779,3 +779,11 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
   closed).
 - Task 9: `promised_paths` counts any backticked `.md` token, so prose such as "No `SKILL.md` names a language" (Plan 2's criteria) becomes a promised root file and would fail criterion 4; requiring a `/` would miss a root `README.md`. A plan with no criteria section passes criterion 4 with "0 criteria". A `DebtError` becomes a failing criterion 2 check, not exit 2. The final review decides.
 - Task 14 (manager's read): README says `gh` writes are denied "to the manager unless you approve in chat"; the manager files and closes issues freely, only workers are denied `gh` writes. Fix in the final wave. Install uses `/plugin marketplace add Rogue-Sentinel/apm-for-claude`, not live-checked in that exact form.
+
+*Changed after Task 14, at the user's request (2026-10-18): "why does a user have to run python commands these
+should be done from chat." The user never runs a command-line command. Setup becomes a plugin slash command,
+`/apm:setup` (`commands/setup.md`), that has Claude run the setup script from chat and then tells the user to open
+a new session. The README and tutorial show only what the user types in chat (the two `/plugin` install lines,
+`/apm:setup`, and plain requests); every command block is labeled as what the manager runs. `tests/test_docs.py`
+fails if either document tells the user to run a command. Whether `${CLAUDE_PLUGIN_ROOT}` expands inside a plugin
+command's text is a platform fact checked live in Task 13, with the plugin cache path as the stated fallback.*
