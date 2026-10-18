@@ -69,7 +69,8 @@
         {
           "attempts": 0,
           "id": "6",
-          "status": "pending"
+          "status": "pending",
+          "title": "Merge gate"
         }
       ],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
@@ -522,6 +523,11 @@
     {
       "at": "2026-10-18T20:26:08.062529+00:00",
       "event": "task 11/5 updated",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:26:10.779344+00:00",
+      "event": "task 11/6 updated",
       "issue": 11
     }
   ]
