@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .guard_data import mask_data
 from .guard_paths import matches_any
+from .guard_redirects import space_redirects
 
 READ_ONLY_PREFIXES = (
     "cat ", "head ", "tail ", "less ", "ls", "dir", "stat ", "file ", "wc ", "grep ", "rg ",
@@ -186,11 +187,13 @@ def protected_reason(
     `/repo/data/x.db` and `../data/x.db` hit the glob `data/*.db`. With `cwd`,
     a token holding `*`, `?` or `[` is expanded as the shell would and each
     match, taken relative to `root`, is tested too. The segment is read as written and with its quotes
-    removed, so a path inside a shell's command string (`sh -c 'cp x data/x.db'`) is seen.
+    removed, so a path inside a shell's command string (`sh -c 'cp x data/x.db'`) is seen. It is also read
+    with each unquoted redirect set apart, so the target of `cat>docs/x.md` is a token of its own.
     """
     if _is_read_only(segment):
         return None
-    for token in (*_tokens(segment), *_tokens(_unquoted(segment))):
+    texts = (segment, _unquoted(segment), space_redirects(segment))
+    for token in itertools.chain.from_iterable(_tokens(text) for text in texts):
         if _token_hits(token, globs, cwd, root):
             return f"command touches a protected path ({token})"
     return None
