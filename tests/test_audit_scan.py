@@ -120,6 +120,40 @@ def test_worktree_dirty_and_missing(git_repo: Path) -> None:
     assert all(item.kind == "worktree" for item in found.values())
 
 
+def test_the_apm_state_branch_is_not_in_flight_work(git_repo: Path) -> None:
+    add_origin(git_repo)
+    run_git(git_repo, "checkout", "-b", "apm/state")
+    commit(git_repo, "ledger.txt")
+    run_git(git_repo, "push", "origin", "apm/state")
+    run_git(git_repo, "checkout", "main")
+
+    assert scan_branches(git_repo, "origin/main", no_gh) == []
+
+
+def test_the_state_worktree_and_the_base_checkout_are_not_in_flight_work(git_repo: Path) -> None:
+    for name in ("feat", "apm/state", "other"):
+        run_git(git_repo, "worktree", "add", str(git_repo.parent / name.replace("/", "-")), "-b", name)
+
+    found, _ = audit(git_repo.parent / "feat", "main", with_gh("[]"))
+
+    assert [item.title for item in found.in_flight if item.kind == "worktree"] == ["other"]
+
+
+def test_a_fetch_that_hangs_becomes_a_note_and_never_prompts(git_repo: Path) -> None:
+    seen = {}
+
+    def run(argv, **kwargs):
+        if argv[1:2] != ["fetch"]:
+            return subprocess.run(argv, **kwargs)
+        seen.update(kwargs)
+        raise subprocess.TimeoutExpired(argv, kwargs.get("timeout"))
+
+    _, notes = resolve_base(git_repo, None, run)
+
+    assert notes == ["could not fetch origin: timed out after 60 seconds"]
+    assert (seen["env"]["GIT_TERMINAL_PROMPT"], seen["timeout"]) == ("0", 60)
+
+
 def test_docs_found() -> None:
     files = ["docs/plans/a.md", "docs/specs/b.md", "plans/c.md", "docs/plans/x.txt", "docs/guide.md", "src/plans/d.py"]
 

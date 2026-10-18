@@ -4,6 +4,7 @@ Worktrees and branches are reported, never removed. Anything the scan cannot rea
 """
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from collections.abc import Callable, Sequence
@@ -16,6 +17,7 @@ from apm.metrics import Report
 from apm.metrics_lang import language_for
 from apm.metrics_ref import RefError, measure_at_ref, ref_files
 from apm.standard_config import MetricsConfig
+from apm.state_store import STATE_BRANCH
 
 Run = Callable[..., subprocess.CompletedProcess]
 BASES = ("origin/main", "main", "origin/master", "master")
@@ -23,6 +25,7 @@ DEBT_LABELS = ("debt", "tech-debt")
 _DOC = re.compile(r"(?:^|/)(plans|specs)/[^/]+\.md$")
 _DOC_KINDS: dict[str, Literal["plan", "spec"]] = {"plans": "plan", "specs": "spec"}
 _REF_PREFIXES = (("refs/heads/", "local"), ("refs/remotes/origin/", "origin"))
+FETCH_TIMEOUT = 60
 
 
 @dataclass(frozen=True)
@@ -50,8 +53,18 @@ def _exists(root: Path, ref: str, run: Run) -> bool:
     return _git(root, run, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}").returncode == 0
 
 
+def _fetch(root: Path, run: Run) -> subprocess.CompletedProcess:
+    """Fetch without ever prompting for credentials, and give up after a minute."""
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    return run(["git", "fetch", "origin"], cwd=root, capture_output=True, text=True, encoding="utf-8",
+               env=env, timeout=FETCH_TIMEOUT)
+
+
 def _fetch_note(root: Path, run: Run) -> list[str]:
-    done = _git(root, run, "fetch", "origin")
+    try:
+        done = _fetch(root, run)
+    except subprocess.TimeoutExpired:
+        return [f"could not fetch origin: timed out after {FETCH_TIMEOUT} seconds"]
     if done.returncode == 0:
         return []
     reason = (done.stderr or "").strip().splitlines()
@@ -104,7 +117,7 @@ def scan_branches(root: Path, base: str, run: Run) -> list[InFlight]:
     items = []
     for name, where in sorted(_branch_refs(root, run).items()):
         ahead = max(_ahead(root, base, ref, run) for ref in where.values())
-        if ahead and name != base.removeprefix("origin/"):
+        if ahead and name not in (base.removeprefix("origin/"), STATE_BRANCH):
             items.append(InFlight(f"branch:{name}", "branch", name, _branch_detail(ahead, where)))
     return items
 
@@ -126,14 +139,19 @@ def _worktree_detail(root: Path, path: str, run: Run) -> str:
     return "uncommitted changes" if changes else "clean"
 
 
-def scan_worktrees(root: Path, run: Run) -> list[InFlight]:
-    """Every worktree but the current one, with its state. Nothing is removed."""
+def _is_work(block: dict[str, str], root: Path, skipped: tuple[str, ...]) -> bool:
+    path = block.get("worktree", "")
+    branch = block.get("branch", "").removeprefix("refs/heads/")
+    return bool(path) and "bare" not in block and not _same_folder(path, root) and branch not in skipped
+
+
+def scan_worktrees(root: Path, run: Run, base: str = "") -> list[InFlight]:
+    """Every worktree but the current one, the base branch's and APM's state, with its state. Nothing is removed."""
+    skipped = (STATE_BRANCH, base.removeprefix("origin/")) if base else (STATE_BRANCH,)
     items = []
-    for block in _worktree_blocks(root, run):
-        path = block.get("worktree", "")
-        if path and "bare" not in block and not _same_folder(path, root):
-            title = block.get("branch", "detached").removeprefix("refs/heads/")
-            items.append(InFlight(f"worktree:{path}", "worktree", title, _worktree_detail(root, path, run)))
+    for block in (block for block in _worktree_blocks(root, run) if _is_work(block, root, skipped)):
+        path, title = block["worktree"], block.get("branch", "detached").removeprefix("refs/heads/")
+        items.append(InFlight(f"worktree:{path}", "worktree", title, _worktree_detail(root, path, run)))
     return items
 
 
@@ -164,7 +182,7 @@ def scan_issues(root: Path, run: Run) -> tuple[list[InFlight], list[int], list[s
 
 def _in_flight(root: Path, base: str, files: Sequence[str], run: Run) -> list[InFlight]:
     branches = scan_branches(root, base, run) if base else []
-    return [*branches, *scan_worktrees(root, run), *scan_docs(files)]
+    return [*branches, *scan_worktrees(root, run, base), *scan_docs(files)]
 
 
 def audit(
