@@ -8,6 +8,11 @@ _QUOTED = r""""(?:\\.|[^"\\])*"|'[^']*'"""
 # A quoted string that follows no data option, or an escaped character, is consumed whole, so a
 # data option written inside a string of code (`bash -c '... -m "x; rm -rf y"'`) is never read.
 _ARGUMENT = re.compile(r"(?P<option>" + _OPTION + r")(?P<value>" + _QUOTED + r")|\\.|" + _QUOTED, re.DOTALL)
+# A run of quoted strings, escapes and characters that end no command, or any one other character: the
+# pieces cover the whole command, and a piece starts after each unquoted `;`, `&`, `|` or newline.
+_SEGMENT = re.compile(r"(?:" + _QUOTED + r"""|\\.|[^"'\\;&|\r\n])+|.""", re.DOTALL)
+# A short `-m`/`-am` is a message only when the program is git: `python -m apm_cli` names code to run.
+_GIT = re.compile(r"""\s*["']?(?:\S*[/\\])?git(?:\.exe)?["']?\s""", re.IGNORECASE)
 _HEREDOC = re.compile(
     r"""(?P<head>^[^\n]*\bgit\b[^\n]*\bcommit\b[^\n]*\s-F\s+-(?=\s)[^\n]*?<<-?\s*(?P<quote>['"]?)(?P<tag>\w+)(?P=quote)[^\n]*\n)"""
     r"(?P<body>.*?)(?P<end>^[ \t]*(?P=tag)[ \t]*$)",
@@ -28,11 +33,18 @@ def _expands(text: str) -> bool:
     return "$(" in text or "`" in text
 
 
-def _mask_argument(found: re.Match[str]) -> str:
+def _mask_argument(found: re.Match[str], is_git: bool) -> str:
     value = found.group("value")
     if value is None or (value[0] == '"' and _expands(value)):
         return found.group(0)
+    if not (is_git or found.group("option").startswith("--")):
+        return found.group(0)
     return found.group("option") + value[0] * 2
+
+
+def _mask_segment(segment: str) -> str:
+    is_git = bool(_GIT.match(segment))
+    return _ARGUMENT.sub(lambda found: _mask_argument(found, is_git), segment)
 
 
 def _mask_heredoc(found: re.Match[str]) -> str:
@@ -44,9 +56,11 @@ def _mask_heredoc(found: re.Match[str]) -> str:
 def mask_data(command: str) -> str:
     """Empty the value of each message argument and the heredoc body of `git commit -F -`.
 
-    A value that the shell would expand (`$(...)` or backticks outside single quotes) is code and stays,
-    and so does every value in a command that runs a shell's command string.
+    A long option (`--message`, `--title` and the like) is a message in any command; a short `-m`/`-am` only
+    in a command whose program is git. A value that the shell would expand (`$(...)` or backticks outside
+    single quotes) is code and stays, and so does every value in a command that runs a shell's command string.
     """
     if _SHELL_STRING.search(command.replace('"', "").replace("'", "")):
         return command
-    return _ARGUMENT.sub(_mask_argument, _HEREDOC.sub(_mask_heredoc, command))
+    pieces = _SEGMENT.finditer(_HEREDOC.sub(_mask_heredoc, command))
+    return "".join(_mask_segment(piece.group(0)) for piece in pieces)
