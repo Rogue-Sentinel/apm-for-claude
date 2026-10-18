@@ -156,7 +156,7 @@ def render_text(report: Report, limits: Limits) -> str:
 def _file_json(metric: FileMetric) -> dict:
     return {
         "path": metric.path, "language": metric.language, "lines": metric.lines,
-        "functions_measured": metric.functions_measured, "note": metric.note,
+        "functions_measured": metric.functions_measured, "note": metric.note, "plain": _is_plain(metric),
         "functions": [asdict(fn) for fn in metric.functions],
         "classes": [asdict(c) for c in metric.classes],
     }
