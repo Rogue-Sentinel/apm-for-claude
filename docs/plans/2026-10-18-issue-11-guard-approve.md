@@ -459,5 +459,5 @@ Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task r
 - Task 1 review: ADR 0005's `cat` rule omits the unquoted `[\w./:~-]` target and the end-at-first-tag-line limit; its Context drops "the XP12 cause is not proven".
 - Task 1 review: `tests/test_guard_cli.py` defines `CLI` after the tests; move it up beside `CALL`.
 - Task 1 re-review: ADR 0005 states the literal reading of rule 2 twice (Context and Decision); could be trimmed to one place.
-- Task 2 review (known limit): a script path starting with a backslash (`python '\c\Users\...pm_cli.py' note x`) maps through `_windows_form` to C:/ and counts as the plugin CLI while Windows Python opens <current drive>:\c\...; no cooperative manager types it. Record in guard_cli's known limits, or refuse a script token starting with \.
+- Task 2 review (known limit): a script path starting with a backslash (`python '\c\Users\...\apm_cli.py' note x`) maps through `_windows_form` to C:/ and counts as the plugin CLI while Windows Python opens <current drive>:\c\...; no cooperative manager types it. Record in guard_cli's known limits, or refuse a script token starting with \.
 - Task 2 review: pin the accepted shapes verified only empirically: an apostrophe inside double quotes, a trailing \ inside single quotes, adjacent mixed quoting.
