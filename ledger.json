@@ -134,10 +134,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Final review (opus) cc82b1d..8f0d2fb: 2 must-fix: (1) CR + git commit heredoc + unmatched -m quote now allowed, base denied: return the command whole on CR; (2) ADR 0005 misdescribes the cat rule and claims a missing pin. 23 deferred findings decided (see the review in the plan).",
+          "evidence": "Final review + fix wave + scoped re-review: 0 open; deferred findings decided by the final reviewer, recorded in the plan.",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -813,6 +813,11 @@
     {
       "at": "2026-10-18T21:21:02.439798+00:00",
       "event": "task 11/fix done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:22:22.386670+00:00",
+      "event": "task 11/review done",
       "issue": 11
     }
   ]
