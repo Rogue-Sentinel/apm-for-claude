@@ -80,6 +80,7 @@ def close(project: Project, args: argparse.Namespace) -> int:
         return f"shipped in {args.pr}"
 
     mutate(project, args.number, apply)
+    print(f"closed #{args.number}: shipped in {args.pr}")
     return 0
 
 

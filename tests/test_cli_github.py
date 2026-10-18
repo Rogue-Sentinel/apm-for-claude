@@ -111,6 +111,15 @@ def test_cli_close_logs_and_prompts_parent(repo: Path, gh: FakeGh, capsys) -> No
     assert "all sub-issues of #1 are merged; close #1 too" in capsys.readouterr().out
 
 
+def test_cli_close_says_what_it_closed(repo: Path, gh: FakeGh, capsys) -> None:
+    apm_cli.main(["issue", "3", "--title", "B", "--status", "integrating"])
+    capsys.readouterr()
+
+    apm_cli.main(["github", "close", "3", "--pr", "https://x/pull/3"])
+
+    assert capsys.readouterr().out.splitlines() == ["closed #3: shipped in https://x/pull/3"]
+
+
 def test_cli_close_stays_quiet_while_siblings_are_open(repo: Path, gh: FakeGh, capsys) -> None:
     apm_cli.main(["issue", "1", "--title", "Epic", "--status", "split"])
     apm_cli.main(["issue", "2", "--title", "A", "--status", "building", "--parent", "1"])

@@ -52,7 +52,10 @@ LEAN_PACING_SKILLS = (
 )
 BASE_CHECK_FILES = ("worktrees/SKILL.md", "executing-plans/references/implementer-brief.md")
 
-BARE_CLI =re.compile(r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief)(?!\w)")
+BARE_CLI = re.compile(
+    r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief"
+    r"|note|review|github|init|gate|audit|coverage)(?!\w)"
+)
 TWO_TIERS_ONLY = ("reviewer-brief.md", "re-review-brief.md")
 
 
