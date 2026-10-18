@@ -73,10 +73,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "5",
-          "status": "pending",
-          "title": "Approve instructions"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Approve instructions",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -708,6 +710,11 @@
       "at": "2026-10-18T20:54:48.228827+00:00",
       "event": "filed 14 https://github.com/Rogue-Sentinel/apm-for-claude/issues/14",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T20:54:56.490205+00:00",
+      "event": "task 11/5 running",
+      "issue": 11
     }
   ]
 }
