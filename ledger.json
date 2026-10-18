@@ -403,6 +403,14 @@
           "status": "done",
           "title": "Task 1 review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "2r",
+          "model": "opus",
+          "status": "running",
+          "title": "Task 2 review",
+          "worker": "reviewer"
         }
       ],
       "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
@@ -1426,6 +1434,11 @@
     {
       "at": "2026-10-18T23:53:25.430087+00:00",
       "event": "task 19/2 running",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:59:45.426115+00:00",
+      "event": "task 19/2r running",
       "issue": 19
     }
   ]
