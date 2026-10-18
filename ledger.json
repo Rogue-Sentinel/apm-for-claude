@@ -95,9 +95,9 @@
         },
         {
           "attempts": 0,
-          "evidence": "Parity on XP12 origin/main 17dddbc (exported to scratch, nothing run in the XP12 repo): 22 of 30 match path, line and count exactly; 8 Qt classes in src/companion_qt are found with 0 public methods (e.g. nav_bridge.h:23 NavBridge, checker 7). Cause: un-terminated Qt macros (Q_OBJECT, QML_ELEMENT, Q_PROPERTY(...)) and the signals: label. Back to Task 3 code via the debugger.",
+          "evidence": "Manager ran it on a read-only export of XP12 origin/main 17dddbc: wide classes 30/30 identical to tools/check_clean_code.py after the Qt fix; debt check vs a 0.3.0 baseline exit 0, 48 newly measured. Recorded in docs/platform-notes.md (Issue 9 live check), commit 88f7b6a. Ruling: see the plan, Task 6 amendment.",
           "id": "6",
-          "status": "failed",
+          "status": "done",
           "title": "XP12 parity check (manual)"
         },
         {
@@ -290,6 +290,11 @@
     {
       "at": "2026-10-18T19:44:28.878999+00:00",
       "event": "task 9/3 done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:44:54.110006+00:00",
+      "event": "task 9/6 done",
       "issue": 9
     }
   ]
