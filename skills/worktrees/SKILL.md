@@ -57,8 +57,17 @@ Only if no native mechanism exists, fall back to git:
 3. **Create it** with `git worktree add <path> -b <branch>`.
 4. If the sandbox refuses, say so in your report and do not work around it.
 
-**Set it up and check the baseline.** Run the profile's setup command if it declares one, then its
-test command. If the baseline fails, report the failures; whether to proceed is the manager's call,
+**Check where it started.** A native worktree may be cut from the default branch, not from the
+feature branch the manager is building on, and then it lacks the plan and the earlier tasks. The
+manager hands the worker the recorded BASE and the feature branch's name. The worker checks that
+BASE is an ancestor of HEAD (`git merge-base --is-ancestor <BASE> HEAD`). If it is not, the worker
+fast-forwards to the feature branch with `git merge --ff-only <feature-branch>` and checks again. If
+the fast-forward refuses, the worker stops and reports; it never merges any other way, and never
+builds on the wrong base.
+
+**Set it up and check the baseline.** Run the profile's setup command if it declares one, then the
+targeted tests for the files the task will change (the full suite waits for `<CLI> gate`). If the
+baseline fails, report the failures; whether to proceed is the manager's call,
 or the user's through the manager. A dirty baseline makes every later failure ambiguous. If it
 passes, report it ready:
 
@@ -77,6 +86,7 @@ Ready to build Task <N>
 | The worktree directory is not ignored | ignore it and commit that first |
 | The sandbox refuses | report it; do not work around it |
 | The baseline fails | report it; the manager decides |
+| BASE is not an ancestor of HEAD | fast-forward to the feature branch; if it refuses, stop and report |
 
 ## Never remove a worktree yourself
 
@@ -105,8 +115,9 @@ Ready to build Task <N>
 
 When a worker reports done, the manager:
 
-1. **verifies in the worktree:** runs the tests, the full suite and the profile's checkers there, and
-   reads the output;
+1. **verifies in the worktree:** runs the targeted tests (the task's own and those for the files it
+   changed) and the profile's checkers there, and reads the output; the full suite runs once, later,
+   through `<CLI> gate`;
 2. **merges the worktree's branch into the feature branch** with a merge, never a rebase, so the
    worker's commits stay the record;
 3. **verifies again on the feature branch**, because a clean task can break once merged with others;

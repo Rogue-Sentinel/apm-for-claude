@@ -18,7 +18,7 @@ REQUIRED = {
     ),
     "executing-plans": (
         "## One task at a time", "## Briefing a worker", "## Verify it yourself",
-        "## Review after every task", "## Re-review after fixes", "## Recording each task",
+        "## When to review", "## Re-review after fixes", "## Recording each task",
         "## When to stop and ask",
     ),
     "parallel-dispatch": (
@@ -46,7 +46,13 @@ NAMED_IN_BODY = {
     "writing-plans": ("`<CLI> allow",),
 }
 
-BARE_CLI = re.compile(r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief)(?!\w)")
+LEAN_PACING_SKILLS = (
+    "executing-plans", "code-review", "test-first", "worktrees", "parallel-dispatch", "writing-plans",
+    "systematic-debugging", "verification",
+)
+BASE_CHECK_FILES = ("worktrees/SKILL.md", "executing-plans/references/implementer-brief.md")
+
+BARE_CLI =re.compile(r"`apm (?:metrics|debt|task|issue|allow|approve|question|resolve|brief)(?!\w)")
 TWO_TIERS_ONLY = ("reviewer-brief.md", "re-review-brief.md")
 
 
@@ -70,6 +76,23 @@ def test_skill_names_the_framework_mechanism_it_relies_on(name):
     _, body = parse_skill(name)
     missing = [term for term in NAMED_IN_BODY[name] if term not in body]
     assert not missing, f"{name} does not name {missing}"
+
+
+@pytest.mark.parametrize("name", LEAN_PACING_SKILLS)
+def test_skill_carries_the_lean_pacing_rule(name):
+    text = "\n".join(text for _, text in _skill_texts(name))
+    assert "`<CLI> gate`" in text, f"{name} does not name the gate as where the full suite runs"
+
+
+def test_no_skill_still_reviews_after_every_task():
+    stale = [str(path) for path in SKILLS_DIR.rglob("*.md") if "Review after every task" in path.read_text(encoding="utf-8")]
+    assert not stale, f"old heading still referenced in {stale}"
+
+
+@pytest.mark.parametrize("relative", BASE_CHECK_FILES)
+def test_worktree_guidance_checks_the_base_is_an_ancestor(relative):
+    text = (SKILLS_DIR / relative).read_text(encoding="utf-8")
+    assert "merge-base --is-ancestor" in text and "--ff-only" in text, f"{relative} has no base check"
 
 
 @pytest.mark.parametrize("name", sorted(REQUIRED))

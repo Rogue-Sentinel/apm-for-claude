@@ -10,9 +10,23 @@ user, never run state-changing commands, the structured report). This brief adds
 - `model`: chosen per "Choosing the model" in `apm:executing-plans`, and always set explicitly. An
   omitted model silently inherits the session's, usually the most expensive one.
 - `isolation: "worktree"`, always, alone or in parallel.
+- Fill BASE and FEATURE_BRANCH in Step 0 of the brief below.
 
 ```
 You are implementing Task N: [task name], for issue #[N].
+
+## Step 0: put your worktree on the feature branch (do this first)
+
+A native worktree may start from the default branch, not from the feature branch, so you
+could be missing the plan and the earlier tasks. In your own worktree:
+1. Run `git rev-parse --show-toplevel`. It must be your own new worktree. If it is the
+   manager's checkout or the repository root, stop and report "blocked: not in my own
+   worktree"; never build there.
+2. Check that BASE ([BASE]) is an ancestor of HEAD:
+   `git merge-base --is-ancestor [BASE] HEAD && echo ok`.
+3. If it is not, run `git merge --ff-only [FEATURE_BRANCH]`, then check again. If the
+   fast-forward refuses, stop and report; do not merge any other way.
+Report the outputs as BASE.
 
 ## Your task
 
@@ -47,10 +61,13 @@ stop and return "needs decision" with what you found and the question, rather th
 guessing and building on the guess. Commit nothing half-done; say in the report where
 you stopped.
 
-Then run the project's test command once in your worktree, before you change anything,
-and report the result. If the baseline already fails, stop and report the failures:
-whether to proceed is the manager's call. A dirty baseline makes every later failure
-ambiguous.
+Then run the targeted tests once in your worktree, before you change anything (the tests
+for the files you will change), and report the result. If the baseline already fails,
+stop and report the failures: whether to proceed is the manager's call. A dirty baseline
+makes every later failure ambiguous.
+
+Run targeted tests only, throughout. Do not run the whole suite: the manager runs it
+exactly once, through `<CLI> gate`, right before the pull request.
 
 ## Your job
 
@@ -62,8 +79,9 @@ Load apm:test-first before you start; it governs every step below.
    move the code without changing any test, and run it again. The evidence is the same
    tests passing on both sides.)
 3. Refactor if needed, in a separate commit. Refactor and behavior never share a commit.
-4. Run the project's full suite once before you commit, not after every edit; while
-   iterating, run the focused test for what you are changing.
+4. Before you commit, run the task's own tests and the tests for the files you changed,
+   once, not after every edit; while iterating, run the focused test for what you are
+   changing.
 5. Commit, using the brief's commit message.
 6. Review your own work (below), then report.
 
@@ -126,7 +144,8 @@ Return the structured report and nothing else:
   doubts under concerns; never silently hand over work you are unsure about)
 - files changed
 - commands run, with their actual output, including:
-  - BASELINE: the test command run before any change, and its result
+  - BASE: the worktree path and the ancestor check from Step 0
+  - BASELINE: the targeted test command run before any change, and its result
   - RED: the command, the failing output, and why that failure was expected
   - GREEN: the command and the passing output
   - for a pure-move refactoring, instead of RED and GREEN: the suite before and after
