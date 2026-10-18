@@ -247,6 +247,14 @@
           "status": "done",
           "title": "Task 2 review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "review",
+          "model": "opus",
+          "status": "running",
+          "title": "Final whole-branch review",
+          "worker": "reviewer"
         }
       ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
@@ -1202,6 +1210,11 @@
     {
       "at": "2026-10-18T23:30:56.665267+00:00",
       "event": "task 14/2 done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:30:58.867499+00:00",
+      "event": "task 14/review running",
       "issue": 14
     }
   ]
