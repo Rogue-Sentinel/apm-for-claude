@@ -34,6 +34,11 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 | Framework skill | Adapted from |
 |-----------------|--------------|
 | `test-first` | `test-driven-development` (and its guide to writing good tests) |
+| `systematic-debugging` | `systematic-debugging` (and its root-cause tracing, defense-in-depth and condition-based-waiting references, its waiting helpers and its polluter search) |
+| `verification` | `verification-before-completion` |
+| `code-review` | `requesting-code-review` (and its code-reviewer brief), `receiving-code-review` |
+| `writing-skills` | `writing-skills` (and its guides to testing skills with subagents, authoring best practices and persuasion principles, its instruction-file testing example, and its diagram conventions) |
+| `session-diagnosis` | `diagnosing-superpowers` (and its analyst prompts, references and templates), retargeted to APM sessions |
 
 ### The user's own working agreement
 
