@@ -128,5 +128,5 @@ def gh_write_reason(segment: str) -> str | None:
     """Why a worker may not run `segment`: it runs `gh` with anything but a verb known to read."""
     for text in spellings(segment):
         if any(_writes(shell_words(found.group("rest"))) for found in _GH.finditer(text)):
-            return f"{_REASON}: {segment}"
+            return _REASON
     return None

@@ -118,7 +118,7 @@ def destructive_reason(segment: str) -> str | None:
     unquoted = _unquoted(segment)
     for pattern, label in DESTRUCTIVE:
         if pattern.search(segment) or pattern.search(unquoted):
-            return f"destructive command ({label}): {segment}"
+            return f"destructive command ({label})"
     return None
 
 
@@ -192,7 +192,7 @@ def protected_reason(
         return None
     for token in (*_tokens(segment), *_tokens(_unquoted(segment))):
         if _token_hits(token, globs, cwd, root):
-            return f"command touches a protected path ({token}): {segment}"
+            return f"command touches a protected path ({token})"
     return None
 
 
@@ -216,7 +216,7 @@ def check_command(
     """Return the reason for the first violating segment, or None. Message arguments are data."""
     command = mask_data(command)
     if _PIPED_DELETE.search(command):
-        return f"destructive command (piped recursive delete): {command}"
+        return "destructive command (piped recursive delete)"
     return first_denial(command, lambda segments: segments_reason(segments, globs, allowed_prefixes, cwd, root))
 
 
