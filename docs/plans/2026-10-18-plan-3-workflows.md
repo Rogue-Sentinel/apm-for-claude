@@ -821,3 +821,12 @@ Join only when an odd number of backslashes, or of backticks, comes before the n
 `python -m scripts.apm_cli <state subcommand>` was allowed for workers: also match a module word whose last
 dotted part is `apm_cli`. The older hole the re-review noted, a command substitution after a read-only prefix
 (`cat $(...)`), was already open on `main`; it is filed as a follow-up issue, not fixed here.*
+
+*Decision after the residual-round re-review (2026-10-18). The user: "why is the agent finding more things every
+time ... fix it." Cause: each fix tried to predict how a shell joins lines, and each new rule opened a new edge; each
+fresh adversarial re-review then found the next one. Ruling: (1) the continuation logic checks **both readings**,
+the segments split exactly as `main` splits them and the joined reading, and denies if either is denied, so it can
+never be weaker than `main` (pinned by a test that compares the two readings). The parity rule stays only to build
+the joined reading. (2) The quoted module gap: `mask_data` treats `-m`/`-am` as a message only for `git`, so
+`python -m 'apm_cli' note 1` is seen. (3) Stopping rule for this PR: after this round, only a regression against
+`main` or a broken fix blocks the merge. Any other new finding goes into one follow-up issue.*
