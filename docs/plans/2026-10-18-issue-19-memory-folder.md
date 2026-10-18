@@ -409,3 +409,9 @@ are reviewed per task; they are not protected paths.)
 | 4 | self | the gate | consistent |
 
 Rubric check: Task 1 commits red tests on purpose. Tasks 1–3 are safety-critical: each gets its own review.
+
+## Deferred findings
+- Task 1 review (S5) and found elsewhere: ADR 0006 Consequences note that a case-variant path on macOS is denied (false positive only), and that if `~/.claude` is itself a git repository the project's protected globs apply under it (false positives only).
+- Task 1 review (S4): a symlink or junction inside the memory folder pointing out of it is a known limit (realpath denies it under an is_under rule; a pin needs Developer Mode on Windows).
+
+*Ruling after the Task 1 review: S1 (a Write to the `memory` path itself, with no file name, stays denied: the rule allows paths strictly under the folder) and S2 (a worker NotebookEdit under the folder stays denied) become pins that Task 2 adds before its code; S3 (Task 3 pins each remedy text in full, not by substring) is added to Task 3. Each constrains what the next task builds, at the cost of a few test lines.*
