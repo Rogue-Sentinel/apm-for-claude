@@ -301,7 +301,7 @@
       "decisions": [],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/19"
@@ -1073,6 +1073,11 @@
       "at": "2026-10-18T23:02:46.903503+00:00",
       "event": "task 14/3 pending",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:02:49.152474+00:00",
+      "event": "issue 19 status planning",
+      "issue": 19
     }
   ]
 }
