@@ -105,6 +105,14 @@
           "id": "7",
           "status": "pending",
           "title": "Merge gate"
+        },
+        {
+          "attempts": 1,
+          "id": "review",
+          "model": "opus",
+          "status": "running",
+          "title": "Final whole-branch review",
+          "worker": "reviewer"
         }
       ],
       "title": "metrics reports 0 wide classes for C++ (and every brace language): only Python classes are counted",
@@ -295,6 +303,11 @@
     {
       "at": "2026-10-18T19:44:54.110006+00:00",
       "event": "task 9/6 done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:45:14.170075+00:00",
+      "event": "task 9/review running",
       "issue": 9
     }
   ]
