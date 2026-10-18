@@ -258,3 +258,19 @@ reviewed per task; they are not protected paths.)
 - **Issue #13 touches the same reasoning and stays out.** A worker's `cat .apm/profile.json 2>/dev/null` is denied
   before and after this plan; no test here pins it either way, so #13's plan can turn it into an allow without editing
   a test of this one. Build #14 first: both change the same lines of `guard_commands.py`.
+
+## Approval (2026-10-18)
+
+*Approved by the user in chat: "do both 14 and 19", in answer to "Approve #14 now, or plan #19 first?" The plan is built as written: the unquoted-redirect rule in a new `guard_redirects` module, no ADR, #13 after this.*
+
+## Pre-flight scan
+
+| Tasks | Shared file or interface | Producer vs consumer | Found |
+|---|---|---|---|
+| 1 ↔ 2 | `tests/test_guard_glued_redirects.py` | Task 1 creates it; Task 2 turns its FAIL-now cases green without editing it | agrees |
+| 1 ↔ 2 | the verdicts | Task 1 asserts `deny`/`none` through `decide`; Task 2 changes only `protected_reason`, which `decide` reaches for both sessions (workers through `_apm_write`) | agrees |
+| 2 | `space_redirects` | produced in `guard_redirects.py`, consumed only by `guard_commands.protected_reason`; the unit tests pin exact outputs | consistent |
+| 1 | self | FAIL-now and pin cases are listed separately; the parity test pairs glued and spaced forms | consistent |
+| 3 | self | the gate | consistent |
+
+Rubric check: Task 1 commits red tests on purpose (the plan says so). Tasks 1 and 2 are safety-critical: each gets its own review.
