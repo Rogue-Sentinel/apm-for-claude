@@ -16,7 +16,13 @@ denial is written from what the code prints, because running them here would hav
 
 ## 1. Install and set up
 
-**What you say:** type the two install lines, then `/apm:setup`. These are the only commands you type.
+**What you say:** type the two install lines, then `/apm:setup`. These are the only commands you type, plus one more if you installed APM from a local
+folder before.
+
+If you installed APM from a local folder before, remove that marketplace first. Uninstalling the plugin
+leaves it behind, and because it has the same name, adding the new one fails with only "Failed to add
+marketplace." Type `/plugin marketplace remove rogue-sentinel` in Claude Code, or
+`claude plugin marketplace remove rogue-sentinel` in a terminal. A first install skips this step.
 
 ```
 /plugin marketplace add Rogue-Sentinel/apm-for-claude
@@ -407,6 +413,10 @@ explains each key. Every key shown exists. Leave out anything you do not need.
 If the profile has a mistake, the manager says which key and why. It does not guess.
 
 ## 10. Troubleshooting
+
+**Adding the marketplace fails with only "Failed to add marketplace."** The likely cause is an old
+local-folder marketplace with the same name, left behind when you uninstalled the plugin. Remove it with
+`/plugin marketplace remove rogue-sentinel`, then add the marketplace again.
 
 **There is no `gh`, or it is not signed in.** The workflow still runs. `github file` and `github close` exit
 with code 2 and print what failed, then how to do it by hand:
