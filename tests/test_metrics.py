@@ -28,8 +28,7 @@ def test_measure_text_dispatches_by_language_family() -> None:
 
     assert (py.language, [f.name for f in py.functions]) == ("Python", ["f"])
     assert (js.language, [f.name for f in js.functions]) == ("JavaScript", ["g"])
-    assert (sh.language, sh.lines, sh.functions_measured) == ("Shell", 1, False)
-    assert sh.note
+    assert (sh.language, sh.lines, sh.functions_measured, sh.note) == ("Shell", 1, False, "")
 
 
 def test_measure_text_ignores_unknown_extensions() -> None:
@@ -164,6 +163,44 @@ def test_unmeasured_lists_files_with_a_note_largest_first() -> None:
     assert [f.path for f in Report((ok, bad, worse)).unmeasured()] == ["c.py", "b.js"]
 
 
+def test_plain_files_are_kept_apart_from_real_failures() -> None:
+    shell = FileMetric("run.sh", "Shell", 40)
+    broken = FileMetric("b.js", "JavaScript", 50, note="unbalanced braces")
+    ok = _file("a.py")
+
+    report = Report((ok, shell, broken))
+
+    assert [f.path for f in report.unmeasured()] == ["b.js"]
+    assert [f.path for f in report.plain()] == ["run.sh"]
+
+
+def test_plain_is_decided_by_the_language_table_not_the_note() -> None:
+    odd_note = FileMetric("run.sh", "Shell", 40, note="syntax error: looks like a failure")
+    quiet_failure = FileMetric("c.py", "Python", 9)
+
+    report = Report((odd_note, quiet_failure))
+
+    assert [f.path for f in report.plain()] == ["run.sh"]
+    assert [f.path for f in report.unmeasured()] == ["c.py"]
+
+
+def test_plain_lists_are_sorted_largest_first() -> None:
+    files = (FileMetric("a.sh", "Shell", 5), FileMetric("b.sql", "SQL", 90))
+
+    assert [f.path for f in Report(files).plain()] == ["b.sql", "a.sh"]
+
+
+def test_render_text_shows_plain_files_in_their_own_section() -> None:
+    files = (FileMetric("run.sh", "Shell", 40), FileMetric("b.js", "JavaScript", 10, note="unbalanced braces"))
+
+    text = render_text(Report(files), Limits())
+
+    assert "Files whose functions could not be measured: 1" in text
+    assert "  b.js -- unbalanced braces" in text
+    assert "Files measured for size only (no function scanner for the language): 1" in text
+    assert "  run.sh -- 40 lines" in text
+
+
 def test_render_text_summarizes_counts_and_items() -> None:
     files = (
         _file("a.py", (FunctionMetric("f", 3, 20), FunctionMetric("g", 30, 4)), lines=250,
@@ -191,6 +228,7 @@ def test_render_text_for_a_clean_report_lists_nothing_under_the_counts() -> None
         "Files over 200 lines of logic: 0 of 1",
         "Review flags -- classes with 7+ public methods: 0",
         "Files whose functions could not be measured: 0",
+        "Files measured for size only (no function scanner for the language): 0",
     ]
 
 

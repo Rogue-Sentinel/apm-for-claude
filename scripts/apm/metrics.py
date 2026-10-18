@@ -4,7 +4,7 @@ from __future__ import annotations
 import posixpath
 import subprocess
 from collections.abc import Sequence
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from apm.guard_paths import matches_any
@@ -13,8 +13,6 @@ from apm.metrics_lang import language_for, measure_plain
 from apm.metrics_model import ClassMetric, FileMetric, FunctionMetric
 from apm.metrics_python import measure_python
 from apm.standard_config import Limits, MetricsConfig
-
-PLAIN_NOTE = "functions are not measured for this language"
 
 
 def measure_text(path: str, text: str) -> FileMetric | None:
@@ -26,7 +24,7 @@ def measure_text(path: str, text: str) -> FileMetric | None:
         return measure_python(path, text)
     if language.family == "brace":
         return measure_braces(path, text, language)
-    return replace(measure_plain(path, text, language), note=PLAIN_NOTE)
+    return measure_plain(path, text, language)
 
 
 def tracked_files(root: Path) -> list[str]:
@@ -40,13 +38,21 @@ def tracked_files(root: Path) -> list[str]:
 
 
 def select_files(paths: Sequence[str], config: MetricsConfig) -> list[str]:
-    """The paths in a known language that the config includes and does not exclude."""
+    """The paths in a known language that the config includes and does not exclude.
+
+    Globs match case-insensitively, because they reuse the guard's glob compiler.
+    """
     return [
         path for path in paths
         if language_for(path) is not None
         and (not config.include or matches_any(config.include, path))
         and not matches_any(config.exclude, path)
     ]
+
+
+def _is_plain(metric: FileMetric) -> bool:
+    language = language_for(metric.path)
+    return language is not None and language.family == "plain"
 
 
 @dataclass(frozen=True)
@@ -65,7 +71,13 @@ class Report:
         return sorted(found, key=lambda item: -item[1].public_methods)
 
     def unmeasured(self) -> list[FileMetric]:
-        return sorted((f for f in self.files if not f.functions_measured), key=lambda f: -f.lines)
+        """Files that should have had their functions measured and did not."""
+        failed = (f for f in self.files if not f.functions_measured and not _is_plain(f))
+        return sorted(failed, key=lambda f: -f.lines)
+
+    def plain(self) -> list[FileMetric]:
+        """Files in a language with no function scanner: measured for size only."""
+        return sorted((f for f in self.files if _is_plain(f)), key=lambda f: -f.lines)
 
 
 def _under(name: str, prefixes: Sequence[str]) -> bool:
@@ -117,14 +129,20 @@ def _class_section(report: Report, limits: Limits) -> list[str]:
 def _unmeasured_section(report: Report) -> list[str]:
     bad = report.unmeasured()
     return _section(f"Files whose functions could not be measured: {len(bad)}",
-                    [f"{f.path} -- {f.note or PLAIN_NOTE}" for f in bad])
+                    [f"{f.path} -- {f.note}" for f in bad])
+
+
+def _plain_section(report: Report) -> list[str]:
+    plain = report.plain()
+    return _section(f"Files measured for size only (no function scanner for the language): {len(plain)}",
+                    [f"{f.path} -- {f.lines} lines" for f in plain])
 
 
 def render_text(report: Report, limits: Limits) -> str:
     """Counts of what is over the limits, each item on a line, then the review flags."""
     sections = (
         _function_section(report, limits), _file_section(report, limits),
-        _class_section(report, limits), _unmeasured_section(report),
+        _class_section(report, limits), _unmeasured_section(report), _plain_section(report),
     )
     return "\n".join(line for section in sections for line in section)
 
