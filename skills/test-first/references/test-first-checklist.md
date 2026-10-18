@@ -25,7 +25,7 @@ Use this before writing any production code.
 
 ## After the test passes
 - [ ] You wrote the least code that passes.
-- [ ] The whole suite still passes, run with the project's own test command.
+- [ ] The tests covering the change still pass, run with the project's own test command: your test and the tests for every file you changed. The whole suite runs once, through `<CLI> gate`, right before the pull request.
 - [ ] The output is clean: no new errors or warnings.
 - [ ] The code is ready to refactor, if it needs it.
 

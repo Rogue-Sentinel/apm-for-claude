@@ -109,7 +109,7 @@ def test_builders_work_only_in_their_worktree(name):
 
 CLI_SUBCOMMANDS = (
     "brief", "setup", "issue", "task", "allow", "approve", "question", "resolve",
-    "metrics", "debt", "coverage",
+    "metrics", "debt", "coverage", "audit", "init", "github", "gate", "review", "note",
 )
 
 
@@ -135,8 +135,8 @@ def test_manager_never_shows_a_bare_apm_command():
 
 WORKERS_WITH_CLI = ("auditor", "implementer", "debugger", "reviewer")
 WORKER_CLI_RULE = (
-    "You may run only `<CLI> metrics`, `<CLI> debt check` and `<CLI> coverage`, and only with the "
-    "exact CLI command line the manager gives in your brief."
+    "You may run only `<CLI> metrics`, `<CLI> debt check`, `<CLI> coverage` and `<CLI> audit`, and "
+    "only with the exact CLI command line the manager gives in your brief."
 )
 
 
@@ -195,7 +195,8 @@ _SKILL_REF = re.compile(r"apm:([a-z][a-z0-9-]*)")
 EXPECTED_SKILLS = {
     "manager": (
         "design-first", "writing-plans", "executing-plans", "parallel-dispatch", "worktrees",
-        "finishing-a-branch", "code-review", "session-diagnosis",
+        "finishing-a-branch", "code-review", "session-diagnosis", "initializing",
+        "running-an-issue", "merge-gate",
     ),
     "implementer": (
         "test-first", "clean-code", "refactoring", "solid", "object-design", "clean-architecture",
@@ -255,12 +256,13 @@ def test_manager_puts_the_cli_line_in_every_brief():
     assert "Include the exact CLI command line in every brief" in dispatch
 
 
-def test_manager_follows_the_process_skills_until_the_workflows_ship():
+def test_manager_points_at_the_workflows_instead_of_waiting_for_them():
     _, body = parse(AGENTS / "manager.md")
-    role = _section(body, "## Your role")
-    assert "They are not yours to run yet" not in body
-    assert "`apm:design-first`" in role and "`apm:finishing-a-branch`" in role
-    assert "Do not invent an init or a merge-gate command" in role
+    assert "later framework version" not in body
+    assert "Do not invent an init or a merge-gate command" not in body
+    workflows = _section(body, "## The workflows")
+    for skill in ("initializing", "running-an-issue", "merge-gate"):
+        assert f"`apm:{skill}`" in workflows, skill
 
 
 def test_reviewer_uses_the_debt_check_as_evidence():
