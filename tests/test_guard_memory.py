@@ -77,7 +77,15 @@ def test_a_worktree_session_writes_the_main_checkouts_memory_folder(
     assert _run(repo / ".claude" / "worktrees" / "w1", str(target), env) == "none"
 
 
-@pytest.mark.parametrize("environ", [{}, {"CLAUDE_CONFIG_DIR": ""}, {"CLAUDE_CONFIG_DIR": "cfg"}],
+def test_a_worktree_session_may_not_write_its_own_slug_memory_folder(
+    repo: Path, cfg: Path, env: dict[str, str]
+) -> None:
+    run_git(repo, "worktree", "add", ".claude/worktrees/w1", "-b", "w1")
+    own_slug = cfg / "projects" / (_slug(repo) + "--claude-worktrees-w1") / "memory" / "MEMORY.md"
+    assert _run(repo / ".claude" / "worktrees" / "w1", str(own_slug), env) == "deny"
+
+
+@pytest.mark.parametrize("environ", [{},{"CLAUDE_CONFIG_DIR": ""}, {"CLAUDE_CONFIG_DIR": "cfg"}],
                          ids=["unset", "empty", "relative"])
 def test_without_an_absolute_config_dir_the_folder_under_home_is_used(
     repo: Path, tmp_path: Path, environ: dict[str, str]
