@@ -625,3 +625,40 @@ wrong: those three records are written a little late.*
 *Ruling before Task 1 (pacing): the user's build instructions and Global Constraints set lean pacing for this
 build, so `apm:executing-plans`' per-task review applies only to Task 2 (safety-critical). Workers run the
 targeted tests; the manager verifies each task with the same tests plus `test_own_limits` and `debt check`.*
+
+## Added during the build
+
+*Added 2026-10-18 at the user's request, mid-build: user documentation. Built after Task 12 and before Task 13,
+so it describes the finished commands; Task 13's PR includes it.*
+
+### Task 14: A README and a short tutorial
+
+**Files:**
+- Create: `README.md`, `docs/tutorial.md`, `tests/test_docs.py`
+
+**Interfaces:**
+- Consumes: the subcommands from `build_parser()` (Tasks 5 to 9), the three workflow skills (Task 10), the lean
+  pacing defaults (Task 11), and the profile keys `standard` (Plan 2) and `workflow` (Task 1).
+- Produces:
+  - `README.md` (short): what APM is in two or three sentences (the manager is your one point of contact;
+    workers build in worktrees; safety hooks; the debt ratchet); requirements (Claude Code, Python 3.12+, git,
+    and `gh` optionally); install from the `rogue-sentinel` marketplace; `apm setup`; a five-line quick start;
+    and links to the tutorial, the spec and `docs/coverage.md`.
+  - `docs/tutorial.md`: a walkthrough on a small example project, each step showing **what you say** to the
+    manager, **what it does** (the commands it runs, shortened real output), and **what you decide**. The
+    sections are `## 1. Install and set up`, `## 2. Initialize a project` (the audit report, the coverage
+    table, in-flight decisions, approval), `## 3. Ask for a feature` (the filed issue, the plan summary, your
+    one approval, the one-line progress updates, the gate, the PR), `## 4. Report a bug`,
+    `## 5. When a worker finds a bug`, `## 6. Ask where things stand` (`brief`), `## 7. When the guard says
+    no` (a denial, your approval in chat, the 10-minute `approve`), `## 8. Debt`, `## 9. Settings you can
+    change` (a commented `profile.json` example covering `workflow`, `standard` and `models`), and
+    `## 10. Troubleshooting` (no `gh`, a failed gate, a stale review).
+  - `tests/test_docs.py`: every `apm <word>` and `<CLI> <word>` in both files names a real subcommand; every
+    relative link resolves; no British spelling from Plan 2's list; the tutorial has the ten headings above.
+
+- [ ] **Step 1: Write** `tests/test_docs.py`. **Step 2: Run** `python -m pytest tests/test_docs.py -q`. Expected: FAIL (no files).
+- [ ] **Step 3: Write** both documents in plain language, with examples taken from real command output on this branch.
+- [ ] **Step 4: Run** the test. Expected: PASS.
+- [ ] **Step 5: Commit** `"Add a README and a short tutorial"`.
+
+*Structural acceptance criterion added: `README.md` and `docs/tutorial.md` exist and pass `tests/test_docs.py`.*
