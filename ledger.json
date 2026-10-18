@@ -53,10 +53,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "2",
-          "status": "pending",
-          "title": "Report classes as not measured"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Report classes as not measured",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -212,6 +214,11 @@
     {
       "at": "2026-10-18T19:19:04.344627+00:00",
       "event": "task 9/1 done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:19:06.844195+00:00",
+      "event": "task 9/2 running",
       "issue": 9
     }
   ]
