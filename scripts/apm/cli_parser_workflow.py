@@ -35,7 +35,15 @@ def _github(sub) -> None:
     close.add_argument("--pr", required=True, metavar="URL")
 
 
+def _audit(sub) -> None:
+    parser = sub.add_parser("audit", help="look at an existing repository: mode, in-flight work, debt issues (read-only)")
+    parser.add_argument("--base", metavar="REF", help="compare against REF (default: origin/main, main, origin/master, master)")
+    parser.add_argument("--json", action="store_true", help="print the audit as JSON")
+    parser.add_argument("--coverage", metavar="PATH", help="a capability inventory to show in the report")
+
+
 def add_workflow_parsers(sub) -> None:
     _note(sub)
     _review(sub)
     _github(sub)
+    _audit(sub)
