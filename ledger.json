@@ -228,9 +228,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 1 review (opus): 0 must-fix, 2 suggestions + 1 found-elsewhere deferred.",
           "id": "1r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 1 review",
           "worker": "reviewer"
         }
@@ -1090,6 +1091,11 @@
     {
       "at": "2026-10-18T23:05:40.162005+00:00",
       "event": "task 14/1r running",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:10:48.503204+00:00",
+      "event": "task 14/1r done",
       "issue": 14
     }
   ]
