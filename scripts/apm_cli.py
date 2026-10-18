@@ -23,14 +23,27 @@ def _repo() -> Project:
     return project
 
 
-def _project(command: str) -> Project:
+def _project(needs_state: bool) -> Project:
     project = find_project(Path.cwd())
     if project is None or not project.is_initialized:
         raise UsageError("not an initialized APM project (no .apm/profile.json)")
     load_profile(project.profile_path)
-    if command != "brief" and not (project.state_dir / ".git").exists():
+    if needs_state and not (project.state_dir / ".git").exists():
         raise UsageError(f"state is not set up at {project.state_dir}; {SETUP_HINT}")
     return project
+
+
+# What each subcommand needs before it runs: none (anywhere), repo (a git repository), profile (an
+# initialized project), or state (an initialized project with its state branch). The default is state.
+REQUIREMENTS = {"setup": "repo", "brief": "profile"}
+
+
+def project_for(requirement: str) -> Project | None:
+    if requirement == "none":
+        return find_project(Path.cwd())
+    if requirement == "repo":
+        return _repo()
+    return _project(needs_state=requirement == "state")
 
 
 def _run(argv: list[str] | None) -> int:
@@ -38,7 +51,7 @@ def _run(argv: list[str] | None) -> int:
     handler = HANDLERS.get(args.subcommand)
     if handler is None:
         raise UsageError(f"'{args.subcommand}' is not available yet")
-    project = _repo() if args.subcommand == "setup" else _project(args.subcommand)
+    project = project_for(REQUIREMENTS.get(args.subcommand, "state"))
     return handler(project, args) or 0
 
 
