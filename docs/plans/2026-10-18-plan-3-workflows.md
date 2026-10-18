@@ -183,6 +183,24 @@ test_cli_audit.py, test_init_apply.py, test_cli_init.py, test_gate*.py, test_cli
 - [ ] **Step 4: Run** all guard tests: `python -m pytest tests/test_guard*.py tests/test_debt_guards.py -q`. Expected: PASS (Plan 1 and 2 guard tests unchanged).
 - [ ] **Step 5: Commit** `"Keep workers from changing state or writing to GitHub"`.
 
+*Rulings after the Task 2 review (three must-fix findings, each reproduced by the manager): (M1) the `gh`
+classification becomes an **allowlist of read verbs per group** for workers: any other verb, any unknown group,
+and any built-in or user alias is denied; `api` keeps its GET-only rules. This replaces the denylist of write
+verbs, whose own comment said "a verb missing here is a hole" (`gh issue new`, `gh pr new`, `gh ext`, `gh cs`
+were holes). (M2) tokens split on shell punctuation as well as whitespace (`$(gh issue create)`,
+`gh pr ready>/dev/null`). (M3) every `gh` occurrence in a segment is checked (`exec -a gh gh issue create`).
+Folded into the same fix round because they are cheap and safety-relevant: `debt` is denied to workers unless
+followed by `check`; a worker's text search for `gh ...` strings is denied on purpose, pinned by a test, and the
+reason names the Grep tool; `test_the_new_subcommands_are_cli_calls` asserts through `is_cli_call`; the known
+limits (`$GH`, `eval`, a PowerShell backtick escape, `curl`, `git push`, a script the worker writes then runs) are
+written in `guard_github.py`'s docstring. Cost if wrong: some rare `gh` reads are denied to workers, who report to
+the manager instead.*
+
+*Ruling (a bug the worker found, related to this task): the pre-existing `_APM_MUTATION` pattern misses wrapped
+calls (`env apm note 1`, `sudo apm ...`, `xargs apm ...`, `$(apm review 1)`, `(apm github close 3)`), so a worker
+could change APM state through a wrapper. It is fixed on this branch in the same fix round, as its own commit,
+with regression tests seen failing first. Cost if wrong: one more commit in the re-review.*
+
 ### Task 3: Metrics follow-ups: plain files, a git ref, and files in two layers
 
 **Files:**
@@ -687,3 +705,14 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
   `standard_config`; the brief did not ask for it. `lane_for([])` returns `None`. The final review decides.
 - Task 5: `set_parent` rejects self and unknown parents, not longer cycles (a under b under a). The final review decides.
 - Task 5: `_mutate` moved to `cli_workflow.mutate` (refactor commit 84fdbd5) to avoid a circular import.
+- Task 2 review S4: test-first cannot be confirmed per assertion from history (one commit); the worker's
+  mutation check partly covers it.
+- Task 2 review S5: `test_every_subcommand_is_classified` reads argparse internals; a public
+  `subcommand_names()` would be sturdier.
+- Task 2 review (found elsewhere): the worker path check reads a grep pattern holding `.*\` as the protected path
+  `.*/` (a false positive in Plan 1 code).
+- Task 3: `ref_files` runs `git ls-tree` without `-z`, so a git-quoted file name may be mangled; a gitlink whose
+  `git show` fails is skipped silently. Existing test `test_report_json_carries_every_number` gained
+  `"plain": False` on purpose.
+- Task 6: `apm github close` prints a by-hand hint when `gh issue close` fails (not in the brief);
+  `--parent` is checked before `gh` is called.
