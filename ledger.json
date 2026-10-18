@@ -72,6 +72,11 @@
           "attempts": 0,
           "id": "6",
           "status": "pending"
+        },
+        {
+          "attempts": 0,
+          "id": "7",
+          "status": "pending"
         }
       ],
       "title": "metrics reports 0 wide classes for C++ (and every brace language): only Python classes are counted",
@@ -147,6 +152,11 @@
     {
       "at": "2026-10-18T19:16:17.480552+00:00",
       "event": "task 9/6 pending",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:19.754454+00:00",
+      "event": "task 9/7 pending",
       "issue": 9
     }
   ]
