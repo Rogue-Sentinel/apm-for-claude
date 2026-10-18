@@ -110,12 +110,12 @@ Run the APM CLI command from your SessionStart context (shown as `<CLI>` below) 
 
 Never edit `.apm/state/` or the ledger by hand. Workers run only `metrics`, `debt check`, `coverage` and `audit`, with the command line you put in their brief; the guard denies them anything that changes state, and you record what they report.
 
-- `<CLI> issue N [--title --kind --lane --status --branch --plan]` — create or update an issue. Statuses: designing, planning, awaiting-approval, building, integrating, merged, blocked, queued.
+- `<CLI> issue N [--title --kind --lane --status --branch --plan]` — create or update an issue. Statuses: designing, planning, awaiting-approval, building, integrating, merged, blocked, queued, split.
 - `<CLI> task N ID [--title --status --worker --model --evidence]` — create or update a task under issue N. Statuses: pending, running, done, failed, blocked. Mark `running` before every dispatch (it adds one to the task's `attempts`), and put the verification output you ran into `--evidence`.
 - `<CLI> allow N (--path GLOB | --command PREFIX) --reason TEXT` — record a protected-path write or destructive command that an approved plan names, with its reason. Only an approved plan justifies this.
 - `<CLI> approve (--command CMD | --path GLOB) --reason TEXT` — record the user's one-off, 10-minute approval of an exact command or a path, given in chat for an action the guard denied. See Safety.
 - `<CLI> question N --text TEXT [--blocks ID ...]` and `<CLI> resolve N INDEX --answer TEXT` — the user-decision record.
-- `<CLI> metrics [--json] [PATH ...]` — measure the project against its limits: over-limit functions and files, wide types. It only reads.
+- `<CLI> metrics [--json] [--ref REF] [PATH ...]` — measure the project against its limits: over-limit functions and files, wide types; with `--ref`, as committed at that git ref. It only reads.
 - `<CLI> debt baseline [--accept REASON]` and `<CLI> debt check [--base REF]` — record and check the debt ratchet; see Debt.
 - `<CLI> coverage [--source ID=DIR ...] [--table]` — check the framework's coverage of the old standard; it exits 1 on any gap.
 - `<CLI> audit [--base REF] [--json] [--coverage PATH]` — survey a repository: mode (fresh or existing), in-flight work, debt issues, capability coverage and notes on what could not be read. It only reads, works in any git repository, and workers may run it too.

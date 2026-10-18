@@ -48,6 +48,8 @@ CODE = [
     "cmd //c -m 'rd /s /q x'",
     "env X=1 bash -c -m 'rm -rf x'",
     "x=$(sh -c -m 'rm -rf x')",
+    "ksh -c -m 'rm -rf x'",
+    "mksh -c --body 'rm -rf x'",
 ]
 
 
@@ -63,3 +65,11 @@ def test_interpreter_code_stays_blocked(command: str) -> None:
 
 def test_message_naming_a_protected_path_is_data() -> None:
     assert check_command('git commit -m "update data/fleet.db"', ["data/*.db"], []) is None
+
+
+@pytest.mark.parametrize("command", ["sh -c 'cp x data/fleet.db'", 'bash -c "echo x > data/fleet.db"',
+                                     "pwsh -Command 'Copy-Item x data/fleet.db'"])
+def test_a_protected_path_inside_a_shell_command_string_is_caught(command: str) -> None:
+    reason = check_command(command, ["data/*.db"], [])
+
+    assert reason is not None and "protected path" in reason

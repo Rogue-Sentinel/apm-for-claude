@@ -43,6 +43,14 @@ def test_ref_files_lists_the_files_committed_at_the_ref(git_repo: Path) -> None:
     assert ref_files(git_repo, "HEAD") == ["a.py"]
 
 
+def test_a_non_ascii_file_name_is_measured_at_the_ref(git_repo: Path) -> None:
+    _commit(git_repo, "café.py", _func(20))
+
+    report = measure_at_ref(git_repo, "HEAD", MetricsConfig())
+
+    assert [f.path for f in report.files] == ["café.py"]
+
+
 def test_unknown_ref_raises(git_repo: Path) -> None:
     with pytest.raises(RefError, match="unknown ref: nope"):
         measure_at_ref(git_repo, "nope", MetricsConfig())

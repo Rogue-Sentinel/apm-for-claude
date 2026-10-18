@@ -202,6 +202,18 @@ def test_plan_file_missing_fails_criterion_4(repo: Path) -> None:
     assert "docs/nope.md" in next(c.detail for c in result.checks if c.name == "plan")
 
 
+@pytest.mark.parametrize("text", ["# Plan\n\n## Tasks\n- do it\n", "## Structural acceptance criteria\n\nNone yet.\n"])
+def test_a_plan_without_criteria_fails_criterion_4(repo: Path, text: str) -> None:
+    (repo / "docs" / "plan.md").write_text(text, encoding="utf-8")
+    _commit(repo, "plan loses its criteria")
+
+    result = run_gate(repo, reviewed(repo))
+
+    assert failed(result) == {4: ["plan"]}
+    detail = next(c.detail for c in result.checks if c.name == "plan")
+    assert detail == "no `## Structural acceptance criteria` section in docs/plan.md"
+
+
 def test_no_test_command_is_gate_error(repo: Path) -> None:
     workflow = Workflow(commands=Commands(build="BUILD"))
 

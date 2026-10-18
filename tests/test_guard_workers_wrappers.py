@@ -63,7 +63,39 @@ UNLISTED_RUNNERS = [
     "apm.cmd note 1",
     "Apm.Bat review 1",
     "/usr/local/bin/apm debt baseline",
+    "python -m apm_cli note 1",
+    "cd scripts && python -m apm_cli note 1",
 ]
+# Brace expansion builds the words at run time: `{gh,} issue create` runs `gh issue create`.
+BRACE_EXPANSIONS = [
+    ("{gh,issue,create}", "GitHub"),
+    ("{gh,} issue create", "GitHub"),
+    ("gh {issue,} create", "GitHub"),
+    ("apm {note,} 1", "APM state"),
+    ("apm no{t,}e 1", "APM state"),
+    ("{apm,note,1}", "APM state"),
+    ("a{p,}m note 1", "APM state"),
+]
+
+
+@pytest.mark.parametrize(("command", "reason"), BRACE_EXPANSIONS)
+def test_worker_cannot_hide_a_write_in_a_brace_expansion(git_repo: Path, command: str, reason: str) -> None:
+    decision = _worker(git_repo, command)
+
+    assert decision.kind == "deny" and reason in decision.reason
+
+
+@pytest.mark.parametrize("command", ["apm " + "{,a}" * 20 + "no{t,}e 1", "echo " + "{a,b,c}" * 12])
+def test_worker_cannot_run_a_brace_expansion_too_large_to_read(git_repo: Path, command: str) -> None:
+    decision = _worker(git_repo, command)
+
+    assert decision.kind == "deny" and "brace expansion" in decision.reason
+
+
+@pytest.mark.parametrize("command", ["gh issue list --json number,title", "gh pr view 3 --json title,body",
+                                     "apm metrics scripts/{a,b}.py", "cp notes{,.bak}"])
+def test_worker_may_still_read_with_commas_and_braces(git_repo: Path, command: str) -> None:
+    assert _worker(git_repo, command).kind == "none"
 # An expansion that is empty at run time sits between `apm` and its subcommand: the shell still runs `apm note 1`.
 EMPTY_EXPANSIONS = [
     "apm $EMPTY note 1",

@@ -10,7 +10,7 @@ from typing import Any
 
 from apm.cli_debt import check_result
 from apm.cli_errors import DebtError
-from apm.gate_plan import promised_paths, structural_criteria
+from apm.gate_plan import HEADING, promised_paths, structural_criteria
 from apm.layer_map import layer_overlaps
 from apm.metrics import tracked_files
 from apm.setup import TMP_IGNORE
@@ -120,6 +120,8 @@ def _plan_check(root: Path, plan: str, review: dict[str, Any] | None) -> Check:
     if not (root / plan).is_file():
         return Check(4, "plan", False, f"plan file not found: {plan}")
     criteria = structural_criteria((root / plan).read_text(encoding="utf-8"))
+    if not criteria:
+        return Check(4, "plan", False, f"no `{HEADING}` section in {plan}")
     missing = [path for path in promised_paths(criteria) if not (root / path).exists()]
     notes = [f"{len(criteria)} criteria"] + ([f"missing: {', '.join(missing)}"] if missing else [])
     notes += [] if (review or {}).get("criteria_met") else ["criteria not recorded as met"]

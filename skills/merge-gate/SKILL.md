@@ -63,7 +63,8 @@ the baseline, and the baseline itself was not loosened.
 
 - A failed debt check is a stop (`apm:refactoring`). Extract; do not raise a limit.
 - `--accept` on a baseline is used only after the user approves that specific worsening in chat.
-- If debt was paid down, tighten the baseline with `<CLI> debt baseline` as a tracked commit.
+- If debt was paid down, tighten the baseline with `<CLI> debt baseline` as a tracked commit, and
+  commit it before the final review is recorded: a commit after the review makes criterion 3 stale.
 
 ## Criterion 3: the final review is clean
 

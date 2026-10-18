@@ -89,6 +89,27 @@ def test_finish_branch_merged_into_base_passes(git_repo: Path, plugin: Path) -> 
     assert refusals(git_repo, plugin) == []
 
 
+def test_refuses_finish_first_when_origin_is_ahead_of_the_merged_local_copy(git_repo: Path, plugin: Path) -> None:
+    commit_branch(git_repo, "feat")
+    run_git(git_repo, "merge", "feat")
+    commit_branch(git_repo, "later")
+    run_git(git_repo, "update-ref", "refs/remotes/origin/feat", "later")
+    stage(git_repo, [item("branch:feat", "branch", "feat")], {"branch:feat": "finish"})
+
+    found = refusals(git_repo, plugin)
+
+    assert found == ["finish first: branch:feat is not merged into main yet"]
+
+
+def test_finish_first_passes_when_the_only_copy_is_a_merged_origin_branch(git_repo: Path, plugin: Path) -> None:
+    commit_branch(git_repo, "feat")
+    run_git(git_repo, "merge", "feat")
+    run_git(git_repo, "update-ref", "refs/remotes/origin/gone", "feat")
+    stage(git_repo, [item("branch:gone", "branch", "gone")], {"branch:gone": "finish"})
+
+    assert refusals(git_repo, plugin) == []
+
+
 def test_fresh_needs_no_coverage(git_repo: Path, plugin: Path) -> None:
     stage(git_repo, mode="fresh")
 
