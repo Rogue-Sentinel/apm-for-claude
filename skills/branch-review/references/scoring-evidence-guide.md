@@ -7,6 +7,9 @@ to gather for each dimension and how to present it. The concrete patterns for ea
 
 ## How to gather evidence
 
+- **`<base>` is the branch the work was cut from**, the one you were given, falling back to the
+  project's main branch only when none was given. Every command here, and `apm debt check --base`,
+  uses the same ref.
 - **Measure on both sides.** Every count is taken for the old code (the base) and the new code (the
   branch). `git grep` reads a commit directly, so the base needs no checkout:
 
@@ -20,10 +23,11 @@ to gather for each dimension and how to present it. The concrete patterns for ea
   Sum the per-file counts for a total, and keep the per-file lines: the largest ones are the
   evidence worth quoting.
 - **Sizes come from the tool.** `apm metrics` (and `apm metrics --json`) lists every function and
-  file over the profile's limits and every wide type. For the old side, read the baseline recorded on
+  file over the profile's limits and every wide class. For the old side, read the baseline recorded on
   the base (`git show <base>:.apm/debt.json`) or run `apm metrics` in a separate checkout of the base.
-- **The ratchet is evidence too.** `apm debt check --base <base>` prints each regression, or says
-  there is no baseline. Quote what it printed.
+- **The ratchet is evidence too.** `apm debt check --base <base>` prints each regression (including
+  a baseline loosened against `<base>` with no new acceptance), or says there is no baseline. Quote
+  what it printed.
 - **Patterns are evidence, not verdicts.** A count says how often something occurs; read a sample of
   the matches to confirm what they are before scoring on them. A pattern that also matches comments
   or strings gets its count checked by hand.
@@ -100,8 +104,9 @@ modules are over the 200-line file limit."
 - Unknown commands, routes and messages: handled, or silently ignored.
 - With a user interface: screens loaded on demand (lazy loading, dynamic loading, code splitting),
   nested layouts sharing a frame, not-found and error routes, breadcrumbs, prefetching.
-- Without a user interface, the navigation half is N/A with that reason, and the entry points alone
-  are scored.
+- The dimension is never wholly N/A. Without a user interface the navigation half is "N/A (no user
+  interface)" and the entry points are still scored, alone. With one, each half gets a band and the
+  score is the lower of the two.
 
 ### Evidence format
 "Entry points and routing: 8/10. Every screen is loaded on demand, nested layouts under
@@ -119,7 +124,7 @@ handlers still validate their input themselves."
 - Literal style values (colors, sizes, spacing) written inline where things are drawn.
 - Style modules, stylesheets or a theme, and how many there are.
 - Design tokens, and whether the code uses them consistently or mixes them with literals.
-- UI-only: without a user interface, N/A with that reason.
+- UI-scoped: without a user interface, "N/A (no user interface)".
 
 ### Commands
 ```
@@ -139,7 +144,9 @@ color constants module is used inconsistently."
 - Test files against source modules.
 - Test cases, and disabled or skipped tests.
 - Integration and end-to-end tests, against unit tests and shallow tests that only run or render.
-- Accessibility assertions, where there is a user interface.
+- Tests for each part of a screen and accessibility assertions (where there is a user interface).
+  Without a user interface they do not apply, and the top band rests on integration and
+  end-to-end tests alone.
 - Whether tests arrived with the behavior: `git log --stat <base>..HEAD` shows whether each
   behavior commit carries its test.
 
@@ -196,7 +203,7 @@ caching and cancellation, no retry configuration, no optimistic updates."
   containers.
 - Status conveyed by color alone, with no text or shape alternative.
 - Keyboard navigation and visible focus, and tests of them.
-- UI-only: without a user interface, N/A with that reason.
+- UI-scoped: without a user interface, "N/A (no user interface)".
 
 ### Commands
 ```
@@ -218,7 +225,8 @@ use color only, with no text alternative; no keyboard navigation tests."
 - Copy-pasted units of the user interface or of logic.
 - Duplicated helper functions.
 - Shared patterns not extracted into a reusable unit, or one-off copies written although a shared
-  unit exists.
+  unit exists. The shared units are shared components or shared modules: a project with no user
+  interface reaches the top band through shared modules alone.
 
 ### Commands
 ```

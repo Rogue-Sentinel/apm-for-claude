@@ -32,25 +32,28 @@ Use `git diff`, `git grep`, file listings and file reads. Never guess a number; 
 measure something, say so in the evidence instead of estimating it.
 
 1. **Identify the branch and its base.** Use the branch you were given, otherwise the current
-   branch. The base is the project's main branch (`main` or `master`, unless the project says
-   otherwise).
+   branch. The base is the branch the work was cut from, which is the one you were given as the
+   base. Only when none was given do you fall back to the project's main branch (`main` or
+   `master`, unless the project says otherwise). Every command below uses that same `<base>`,
+   `apm debt check --base <base>` included.
 2. **Read the change.**
    - `git diff <base>...HEAD --stat` lists every changed file.
    - `git diff <base>...HEAD` shows the changes themselves.
    - Then read the changed files whole, not only their hunks: a diff without the context around it
      misleads.
 3. **Measure the sizes.** `apm metrics` lists every function and file over the profile's limits
-   (`standard.limits`: by default 15 lines of logic per function, 200 per file, and a flag at 7 or
-   more public methods), each as `path:line name -- N lines`. `apm metrics --json` gives every
-   number. Run it on the branch for the new side. For the old side, use the baseline recorded on
+   (`standard.limits`: by default 15 lines of logic per function, 200 per file, and a wide-class
+   flag at 7 or more public methods), each as `path:line name -- N lines`. `apm metrics --json`
+   gives every number. Run it on the branch for the new side. For the old side, use the baseline recorded on
    the base (`git show <base>:.apm/debt.json`), or `apm metrics` run in a separate checkout of the
    base. A worker asks the manager for that checkout; a review never creates or removes worktrees.
    Flag every changed file over the file limit.
 4. **Run the ratchet.** `apm debt check --base <base>` compares the current numbers with the
    recorded baseline. Exit 0 means no debt grew. Exit 1 means something got worse, and it prints
-   each regression (a total that rose, an over-limit item that grew, a new over-limit item, a
-   checker's number that rose, a loosened limit). Exit 2 means there is no baseline, which is
-   itself a finding. Workers may run `apm metrics` and `apm debt check`, because both only read.
+   each regression: a total that rose, an over-limit item that grew, a new over-limit item, a
+   checker's number that rose, a loosened limit, or a baseline loosened against `<base>` with no
+   new acceptance recorded. Exit 2 means there is no baseline, which is itself a finding. Workers
+   may run `apm metrics` and `apm debt check`, because both only read.
    **Only the manager runs `apm debt baseline`**, and a review never does: a review reports the
    numbers and changes none of them.
 5. **Count the patterns for each dimension**, on both sides. `git grep -c -E '<pattern>' <base> --
@@ -59,9 +62,16 @@ measure something, say so in the evidence instead of estimating it.
    language are in [references/evidence-by-language.md](references/evidence-by-language.md), and a
    project adds its own under `standard.review_patterns` in its profile. Report the count of every
    project pattern under the dimension it names.
-6. **Decide whether the project has a user interface.** Read what the profile and the project's own
-   documents say about it, and confirm it in the code. Without a user interface, the UI-only parts
-   of the scorecard are scored N/A with that reason.
+6. **Decide whether the project has a user interface.** The profile's `standard.ui` holds the
+   answer: `true`, `false`, or absent.
+   - **`true` or `false` decides.** If the code contradicts it (a profile that says `false` over
+     code that draws screens, or `true` over a library with nothing to show), score by the profile
+     and report the contradiction as a profile finding for the manager.
+   - **Absent:** decide from the code, and put the evidence in the N/A reason: "N/A (no user
+     interface: no drawing, window or markup code under `src/`)".
+
+   Without a user interface, the UI-scoped parts of the scorecard are scored N/A with that reason
+   (see [The scorecard](#the-scorecard)).
 7. **Look for a previous review** (see [Previous reviews](#previous-reviews)).
 
 How to gather and present the evidence for each dimension, with an example of each, is in
@@ -69,15 +79,24 @@ How to gather and present the evidence for each dimension, with an example of ea
 
 ## The scorecard
 
-Rate each dimension from 1 to 10 for the old code and the new. A score that falls between two bands
-says which parts of each band the code meets. Two kinds of score are N/A rather than a number:
+Rate each dimension from 1 to 10 for the old code and the new.
+
+**Placing a score within a band.** First find the band whose whole description the code meets; the
+band above it is the one it does not yet meet. Then place the score within the band by how much of
+the next band's description is already true: none of it is the bottom of the band (1, 4 or 7),
+some of it the middle (2 or 5), most of it the top (3, 6 or 8). For 9-10, 9 meets the band and 10
+meets it with nothing left to name in "what still needs work". The evidence says which items of the
+next band are met and which are not, so a reader can check the placement.
+
+Two kinds of score are N/A rather than a number:
 
 - **Greenfield.** If the old code does not exist, the old column is N/A and only the new code is
   rated.
 - **No user interface.** Styling and presentation, accessibility, and the user-navigation half of
-  entry points and routing apply only to code that has a user interface. Without one they are N/A,
-  with the reason written in the cell: "N/A (no user interface)". An N/A dimension leaves the
-  overall score; it does not count as a zero or as a ten.
+  entry points and routing are UI-scoped: they apply only to code that has a user interface.
+  Without one, the first two are N/A with the reason written in the cell, "N/A (no user
+  interface)", and entry points and routing is scored on its entry points alone. An N/A dimension
+  leaves the overall score; it does not count as a zero or as a ten.
 
 The weight of each dimension is in [Weighting the overall score](#weighting-the-overall-score).
 
@@ -138,8 +157,10 @@ the entry points or the presentation layer instead of in tested logic.
 How control enters the program and reaches the code that handles it. Every program has entry
 points: its main function, command-line subcommands, request handlers, message or event handlers,
 callbacks from a host. A program with a user interface also has navigation: the screens or pages,
-and how the user moves between them. The navigation half is UI-only: without a user interface it is
-N/A with that reason, and the score rests on the entry points alone.
+and how the user moves between them. **This dimension is never wholly N/A.** Only its navigation
+half is UI-scoped: without a user interface that half is "N/A (no user interface)",
+the entry points are still scored, and the score rests on them alone. With a user interface,
+each half gets a band, and the dimension's score is the lower of the two.
 
 Look for: one dispatch place, or dispatch scattered through the code; entry points that only
 forward, or that make decisions themselves; unknown commands, routes or messages handled; for
@@ -155,8 +176,8 @@ not-found and error routes, breadcrumbs.
 
 ### Styling and presentation
 
-How the look of a user interface is defined. UI-only: without a user interface this dimension is N/A
-with that reason.
+How the look of a user interface is defined. UI-scoped: without a user interface this dimension is
+"N/A (no user interface)".
 
 Look for: literal style values (colors, sizes, spacing) written inline where things are drawn,
 against styles kept in one named place (stylesheets, style modules, a theme); a design token
@@ -185,7 +206,10 @@ cover.
 | 1-3 | No tests |
 | 4-6 | Shallow smoke tests only |
 | 7-8 | Behavior tests, good coverage, some integration tests |
-| 9-10 | Integration and end-to-end tests, tests for each part of a screen, accessibility tests |
+| 9-10 | Integration and end-to-end tests; tests for each part of a screen and accessibility tests (where there is a user interface) |
+
+Without a user interface, the screen and accessibility parts of the 9-10 band do not apply, so a
+command-line tool or a library reaches 9-10 on integration and end-to-end tests alone.
 
 ### Error handling
 
@@ -225,7 +249,8 @@ optimistic updates.
 ### Accessibility
 
 Whether everyone can use the user interface: with a keyboard alone, with a screen reader, and
-without relying on color. UI-only: without a user interface this dimension is N/A with that reason.
+without relying on color. UI-scoped: without a user interface this dimension is
+"N/A (no user interface)".
 
 Look for: accessible names and roles on controls; semantic structure (landmarks, headings, lists)
 rather than generic containers; status shown by color alone with no text or shape alternative;
@@ -252,8 +277,8 @@ written.
 |-------|--------------------|
 | 1-3 | Extensive copy-paste |
 | 4-6 | Some shared utilities |
-| 7-8 | Centralized constants, shared components |
-| 9-10 | DRY: shared reusable units (hooks, helpers) and a component library |
+| 7-8 | Centralized constants, shared components or shared modules |
+| 9-10 | DRY: shared reusable units (hooks, helpers) and a component library, or a library of shared modules where there is no user interface |
 
 ### Developer experience and maintainability
 
@@ -292,8 +317,10 @@ line says why.
 Look for `BRANCH_REVIEW.md` at the repository root or in the `.claude/` directory. If one exists,
 the scorecard gains a **Previous New** column holding that review's new-code score for each
 dimension, so the report shows the branch's progression, and the bottom line names all three
-scores (see [Report](#report)). When the report is kept for the next review, it is saved as
-`BRANCH_REVIEW.md` at the repository root.
+scores (see [Report](#report)).
+
+A reviewer returns the report and writes no file. The manager decides whether to keep it for the
+next review; when it is kept, it is committed as `BRANCH_REVIEW.md` at the repository root.
 
 A previous review may use the older dimension names. Read them as these:
 
@@ -318,7 +345,7 @@ changed and where.
 ## [Old approach] vs [New approach]: review
 
 ### Measurements
-- apm metrics: functions over the limit N -> M, files over the limit N -> M, wide types N -> M
+- apm metrics: functions over the limit N -> M, files over the limit N -> M, wide classes N -> M
 - apm debt check --base <base>: exit 0 / 1 (each regression) / 2 (no baseline)
 
 ### Scorecard
@@ -397,7 +424,13 @@ branch the bottom line reads "The old code was N/A (greenfield). The new code is
 - **Counting by eye** what `apm metrics` measures.
 - **Running `apm debt baseline` during a review.** A review reports the numbers; only the manager
   records a baseline.
-- **Scoring a UI-only dimension for code with no user interface**, or marking a dimension N/A that
-  does apply, or leaving out the reason.
+- **Scoring a UI-scoped dimension for code with no user interface**, or marking a dimension N/A that
+  does apply, or leaving out the reason. Entry points and routing is never wholly N/A.
+- **Overriding the profile's `standard.ui`** because the code seems to disagree. Score by the
+  profile and report the contradiction.
+- **Comparing with `main`** when the work was cut from another branch. The base is the branch you
+  were given, and `apm debt check --base` gets the same ref.
+- **Committing `BRANCH_REVIEW.md` yourself.** Return the report; the manager decides whether it is
+  kept.
 - **Using one language's patterns on another.** Take the patterns for the project's languages from
   the evidence reference, plus the project's own.

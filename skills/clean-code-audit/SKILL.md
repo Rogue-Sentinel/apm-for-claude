@@ -38,8 +38,12 @@ no baseline and edits no profile.
 3. **Find what the project already has**: its test suites and how they run, its linter and
    formatter, its continuous integration, and any checker of its own that measures sizes or rules
    (a script that counts long functions, say). A checker found here is used in Measure.
-4. **Note whether the project has a user interface.** A later branch review scores the UI-only
-   dimensions N/A without one.
+4. **Decide whether the project has a user interface**, and record the answer as the proposed
+   value of the profile's `standard.ui` (`true` or `false`), with the evidence: the drawing,
+   window or markup code found, or its absence. A branch review reads that key to decide whether
+   the UI-scoped dimensions are N/A. If the profile already sets `standard.ui` and the code
+   contradicts it, report the contradiction as a profile finding; the audit never edits the
+   profile.
 
 ## Measure
 
@@ -49,14 +53,15 @@ Numbers come from tools, never from reading and estimating.
   the profile's limits, `standard.limits`: by default **15 lines of logic per function** (`function`),
   **200 per file** (`file`), and a review flag at **7 or more public methods** (`public_methods`). It
   lists each over-limit function and file as `path:line name -- N lines`, largest first, the wide
-  types, and any file it could not measure, with the reason. It works in any git repository, so it
+  classes, and any file it could not measure, with the reason. It works in any git repository, so it
   runs before the project is initialized, with the defaults.
 - **The profile's checkers.** A project with its own checker declares it under
   `standard.debt_sources`, and its numbers join the ratchet. Run each declared checker, and any
   checker found during the scan, and record its numbers. A checker found but not yet declared is
   reported as a candidate for `standard.debt_sources`.
 - **`apm debt check`**, when the project already has a baseline, reports whether any debt has grown
-  since it was recorded. Exit 2 means there is no baseline yet, which is expected at init. The audit
+  since it was recorded (exit 1, which also covers a baseline loosened against the base ref with no
+  new acceptance recorded). Exit 2 means there is no baseline yet, which is expected at init. The audit
   never runs `apm debt baseline`: only the manager records a baseline, after the user has seen the
   numbers.
 - **Counts for each category**, taken with `git grep -c -E`, using the patterns per language in
@@ -85,7 +90,7 @@ The rules are in `apm:refactoring`; the limits are in `apm:clean-code`.
   logic) is a candidate for extract method. Take the list from `apm metrics`, largest first; never
   judge length by eye.
 - Every file over the file limit (default 200 lines of logic) is a candidate for splitting, and every
-  type with 7 or more public methods needs a stated reason.
+  wide class (7 or more public methods) needs a stated reason.
 - Flag poorly named variables, functions and types (`apm:clean-code`, meaningful names).
 - Detect complex conditionals (nested if and else chains, switch statements with shared logic, the
   same branching on a type in several places) that polymorphism would replace.
@@ -108,7 +113,7 @@ The rules are in `apm:object-design`.
 - Data types with no behavior (anemic domain models), whose rules live in the code that uses them.
 - Exposed internal state: public fields, and getter and setter pairs that guard no invariant.
 - Deep inheritance hierarchies that composition would serve better.
-- Types with 7 or more public methods and no stated reason.
+- Wide classes (7 or more public methods) with no stated reason.
 
 ### Functional core
 
@@ -152,9 +157,10 @@ Produce the report in this shape:
 ### Measurements
 - Limits: function F, file L, public methods P (from the profile, or the defaults)
 - apm metrics: N functions over the limit (largest: path:line name -- N lines),
-  N files over the limit, N wide types, N files unmeasured
+  N files over the limit, N wide classes, N files unmeasured
 - Project checkers: name -> numbers (declared, or a candidate for standard.debt_sources)
 - apm debt check: exit 0 / 1 (each regression) / 2 (no baseline yet)
+- Proposed standard.ui: true / false (the evidence), or the contradiction with the profile's value
 
 ### Findings by Category
 
