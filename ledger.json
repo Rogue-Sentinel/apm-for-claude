@@ -62,10 +62,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "3",
-          "status": "pending",
-          "title": "Count C++ public methods"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Count C++ public methods",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -225,6 +227,11 @@
     {
       "at": "2026-10-18T19:21:32.294122+00:00",
       "event": "task 9/2 done",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:21:34.844443+00:00",
+      "event": "task 9/3 running",
       "issue": 9
     }
   ]
