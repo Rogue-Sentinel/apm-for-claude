@@ -43,6 +43,8 @@ def project_for(requirement: str) -> Project | None:
         return find_project(Path.cwd())
     if requirement == "repo":
         return _repo()
+    if requirement not in ("profile", "state"):
+        raise ValueError(f"unknown requirement {requirement!r}")
     return _project(needs_state=requirement == "state")
 
 

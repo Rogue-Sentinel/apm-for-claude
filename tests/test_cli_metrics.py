@@ -154,3 +154,14 @@ def test_a_none_requirement_runs_anywhere(tmp_path: Path, monkeypatch) -> None:
 
 def test_the_requirement_table_keeps_plan_one_behavior() -> None:
     assert apm_cli.REQUIREMENTS == {"setup": "repo", "metrics": "repo", "brief": "profile"}
+
+
+def test_cli_metrics_path_that_does_not_exist_is_an_error(project: Path, capsys) -> None:
+    assert apm_cli.main(["metrics", "nope.py"]) == 2
+
+    assert "nope.py does not exist" in capsys.readouterr().err
+
+
+def test_an_unknown_requirement_is_a_programming_error() -> None:
+    with pytest.raises(ValueError, match="requirement"):
+        apm_cli.project_for("everything")

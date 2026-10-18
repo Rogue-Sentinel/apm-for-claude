@@ -24,6 +24,8 @@ def _relative(project: Project, argument: str) -> str:
     target = Path.cwd() / argument
     if not is_under(target, project.worktree_root):
         raise UsageError(f"{argument} is outside the repository")
+    if not target.exists():
+        raise UsageError(f"{argument} does not exist")
     return Path(os.path.relpath(os.path.realpath(target), project.worktree_root)).as_posix()
 
 
