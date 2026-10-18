@@ -68,10 +68,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Step 4: 143 passed; tests/test_cli_metrics_classes.py 1 passed ([database.hpp]) 3 failed (the .h cases, as planned) \u2014 in the worktree and on the branch after merge; metrics 0/69 fn, 0/5 files over; braces/heads files unchanged; debt check nothing worse. Ruling: see the plan, Task 3 amendment.",
+          "evidence": "Fix round (debugger, opus): access label read after un-terminated Qt macros; RED 2 failed (NavBridge 0 vs 7, macros-before-private 2 vs 0), GREEN 159 passed in the worktree and on the branch after merge 4c4e1b2; XP12 parity rerun by the manager 30/30 identical; debt check nothing worse. Ruling: see the plan, Task 6 amendment.",
           "id": "3",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Count C++ public methods",
           "worker": "debugger"
         },
@@ -285,6 +285,11 @@
     {
       "at": "2026-10-18T19:38:02.970859+00:00",
       "event": "task 9/3 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:44:28.878999+00:00",
+      "event": "task 9/3 done",
       "issue": 9
     }
   ]
