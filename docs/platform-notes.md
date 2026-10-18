@@ -63,3 +63,32 @@ live check above will confirm.
   hooks fire in desktop Code-tab sessions, whether a hook `ask` still prompts under auto
   mode, the `cwd` a worktree-isolated subagent's hook event carries, and `python` on the
   hook's PATH.
+
+## Plan 3 live checks (2026-10-18)
+
+Run by the manager from the feature branch's own CLI (`python scripts/apm_cli.py ...`), before the 0.3.0
+release.
+
+| # | Check | Result | Evidence |
+|---|---|---|---|
+| a1 | `apm audit` on this repo | PASS, two listing flaws (fixed) | Mode existing, measured at `origin/main`: long functions 1, long files 1, wide classes 0, excess function lines 4, excess file lines 43, unmeasured 0. No debt issues, no coverage inventory yet, no notes. |
+| a2 | `apm audit --json` on VirtualAirline (read-only) | PASS | Mode existing, base `origin/main`. 72 in-flight items (12 worktrees, 22 plans, 21 specs, 17 open issues). Debt issues #53 to #66 and #85. Totals: long functions 389, long files 71, wide classes 0, excess function lines 4,464, excess file lines 7,758, unmeasured files 2. |
+| b | Guard through the hook entry script | PASS | `scripts/hook_pretooluse.py` was fed synthetic PreToolUse events. A worker event (it carries `agent_id`) was denied for `gh issue create`, a multi-line `gh api ... -X POST`, `{gh,issue,create}`, and both a CLI state write and `python -m apm_cli note`. It was allowed (no decision) for `gh pr view`, `pytest`, and a read-only CLI call. A main-session `gh issue list` was allowed. |
+| c | Tracking issue with `apm github file` | PASS | Filed Rogue-Sentinel/apm-for-claude#4. `apm github close` is pending: it runs after the user merges the PR. |
+
+- **Audit listing flaws.** Both were seen on this repo's audit and fixed in the final wave. APM's own
+  `apm/state` branch and worktree were listed as in-flight work, and so was the main checkout's worktree on
+  the base branch. VirtualAirline had no branches in flight: checked by hand, all 59 local and 50 origin
+  branches have 0 commits beyond `origin/main`.
+- **Why the guard check was not a reinstall.** Reinstalling the plugin would have swapped the guard under
+  workers that were running at the time. Feeding the branch's real hook entry script synthetic events
+  exercises the same code path (the same `decide` call, the same worker-versus-main split) without that
+  risk.
+- **Worktrees are cut from `main`.** In this build, the `isolation: "worktree"` dispatch cut worker
+  worktrees from the tip of `main`, not from the session's branch. It also auto-deleted a worktree that a
+  worker left unchanged, and a worker resumed after that was moved into the manager's checkout. The skills
+  now tell a worker to check its base first and fast-forward onto the feature branch with `--ff-only`.
+- **Two checks still pending.** Whether `${CLAUDE_PLUGIN_ROOT}` expands inside a plugin command's text
+  (`/apm:setup`) is unverified. The fallback is the plugin cache path. Both are to be checked live after the
+  merge. The exact install line, `/plugin marketplace add Rogue-Sentinel/apm-for-claude`, is also still to
+  be checked live.
