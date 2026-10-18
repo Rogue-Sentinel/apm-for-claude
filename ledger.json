@@ -77,10 +77,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Review returned: 2 must-fix, 5 deferred; spec compliant; quality good.",
+          "evidence": "Scoped re-review: both must-fix addressed, 0 open, ready for Task 2.",
           "id": "1r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 1 review",
           "worker": "reviewer"
         }
@@ -580,6 +580,11 @@
     {
       "at": "2026-10-18T20:37:58.400926+00:00",
       "event": "task 11/1r running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:38:55.348910+00:00",
+      "event": "task 11/1r done",
       "issue": 11
     }
   ]
