@@ -7,9 +7,20 @@ import sys
 from pathlib import Path
 
 import pytest
+from test_guard_workers_wrappers import (
+    BRACE_EXPANSIONS,
+    EMPTY_EXPANSIONS,
+    SHELL_STRINGS,
+    TEXT_MENTIONS,
+    UNLISTED_RUNNERS,
+    WRAPPED_MUTATIONS,
+    WRAPPED_READS,
+)
 
 from apm.guard import Decision, decide
-from apm.guard_commands import check_command
+from apm.guard_commands import all_read_only, check_command, segments_reason, split_segments
+from apm.guard_data import mask_data
+from apm.guard_workers import worker_segments_violation
 from apm.paths import Project
 from apm.profile import Profile
 
@@ -142,3 +153,39 @@ def test_a_continued_delete_is_not_covered_by_the_allowed_prefix_of_the_line_bef
     reason = check_command(CONTINUED_DELETE, [], ["npm test"])
 
     assert reason is not None and "destructive" in reason
+
+
+# Never weaker than `main`: whatever the split reading alone denies, the full check denies.
+CORPUS = [
+    *(command for command, _ in WORKER_SPLITS), *DESTRUCTIVE_SPLITS, SUBSTITUTION_ACROSS_LINES,
+    HARMLESS_CONTINUATION, *ESCAPED_NEWLINE_WRITES, ESCAPED_NEWLINE_DELETE, ESCAPED_NEWLINE_STATE_WRITE,
+    ODD_RUN_CONTINUATION, *MAIN_UNJOINED, *WORKER_UNJOINED, CONTINUED_DELETE, *WRAPPED_MUTATIONS,
+    *UNLISTED_RUNNERS, *(command for command, _ in BRACE_EXPANSIONS), *EMPTY_EXPANSIONS, *TEXT_MENTIONS,
+    *(command for command, _ in SHELL_STRINGS), *WRAPPED_READS,
+]
+GLOBS, PREFIXES = ("data/*.db", ".apm/**"), ("npm test", "echo", "ls")
+
+
+def _split_reading(command: str) -> list[str]:
+    return split_segments(mask_data(command), join=False)
+
+
+@pytest.mark.parametrize("command", CORPUS)
+def test_the_main_session_check_is_never_weaker_than_the_split_reading(command: str) -> None:
+    split_denies = segments_reason(_split_reading(command), GLOBS, PREFIXES) is not None
+
+    assert not split_denies or check_command(command, GLOBS, PREFIXES) is not None
+
+
+@pytest.mark.parametrize("command", CORPUS)
+def test_the_state_directory_check_is_never_weaker_than_the_split_reading(command: str) -> None:
+    split_reads_only = all(all_read_only(segment) for segment in split_segments(command, join=False))
+
+    assert split_reads_only or not all_read_only(command)
+
+
+@pytest.mark.parametrize("command", CORPUS)
+def test_the_worker_check_is_never_weaker_than_the_split_reading(git_repo: Path, command: str) -> None:
+    split_denies = worker_segments_violation(_split_reading(command), git_repo, git_repo) is not None
+
+    assert not split_denies or _worker(git_repo, command).kind == "deny"
