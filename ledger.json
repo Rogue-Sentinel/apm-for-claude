@@ -95,8 +95,9 @@
         },
         {
           "attempts": 0,
+          "evidence": "Parity on XP12 origin/main 17dddbc (exported to scratch, nothing run in the XP12 repo): 22 of 30 match path, line and count exactly; 8 Qt classes in src/companion_qt are found with 0 public methods (e.g. nav_bridge.h:23 NavBridge, checker 7). Cause: un-terminated Qt macros (Q_OBJECT, QML_ELEMENT, Q_PROPERTY(...)) and the signals: label. Back to Task 3 code via the debugger.",
           "id": "6",
-          "status": "pending",
+          "status": "failed",
           "title": "XP12 parity check (manual)"
         },
         {
@@ -275,6 +276,11 @@
       "at": "2026-10-18T19:36:23.388413+00:00",
       "event": "concern 11 More evidence for #11 during issue 9 Task 5: the Bash guard blocked a worker's Python edit script because its text contained the words 'apm debt baseline' (data, not a command).",
       "issue": 11
+    },
+    {
+      "at": "2026-10-18T19:38:00.525733+00:00",
+      "event": "task 9/6 failed",
+      "issue": 9
     }
   ]
 }
