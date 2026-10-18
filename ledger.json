@@ -34,7 +34,7 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-11-guard-approve.md",
       "questions": [],
-      "status": "awaiting-approval",
+      "status": "building",
       "tasks": [],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/11"
@@ -426,6 +426,11 @@
     {
       "at": "2026-10-18T20:25:39.225104+00:00",
       "event": "decision 11 User approved the plan: narrow backslash rule, Bash-only approvals, the cat-heredoc rule, ADR 0002 read as 'never allow a command that does what the guard must stop', recorded in ADR 0005.",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:25:41.714397+00:00",
+      "event": "issue 11 status building",
       "issue": 11
     }
   ]
