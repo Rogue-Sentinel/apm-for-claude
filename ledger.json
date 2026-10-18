@@ -47,9 +47,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Targeted 6-file run: only Task 4's heredoc hook test fails, in the worktree and on the branch after merge; per-task review clean; metrics 0/4 fn, 0/1 files over; debt check nothing worse.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Backslash rule",
           "worker": "implementer"
         },
@@ -656,6 +657,11 @@
     {
       "at": "2026-10-18T20:48:03.466912+00:00",
       "event": "task 11/2r done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:48:05.844597+00:00",
+      "event": "task 11/2 done",
       "issue": 11
     }
   ]
