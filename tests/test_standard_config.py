@@ -182,3 +182,39 @@ def test_a_layer_may_not_be_named_with_a_reserved_name() -> None:
     layer = {"name": "outside", "paths": ["a/**"], "may_import": []}
     with pytest.raises(ProfileError, match="layers"):
         load_standard(_profile({"layers": [layer]}))
+
+
+def test_duplicate_debt_source_names_rejected() -> None:
+    with pytest.raises(ProfileError, match="debt_sources.*lint"):
+        load_standard(_profile({"debt_sources": [_source(), _source(command="make other")]}))
+
+
+def test_debt_source_needs_at_least_one_number() -> None:
+    for numbers in ({}, None):
+        changes = {"numbers": numbers} if numbers is not None else {}
+        source = {k: v for k, v in _source(**changes).items() if numbers is not None or k != "numbers"}
+        with pytest.raises(ProfileError, match="debt_sources"):
+            load_standard(_profile({"debt_sources": [source]}))
+
+
+@pytest.mark.parametrize("standard, where", [
+    ({"limit": {}}, "standard"),
+    ({"metrics": {"includes": []}}, "metrics"),
+    ({"debt_sources": [{**_source(), "regex": "x"}]}, "debt_sources"),
+    ({"layers": [{"name": "a", "paths": [], "may_import": [], "color": "red"}]}, "layers"),
+])
+def test_unknown_keys_are_rejected(standard: dict, where: str) -> None:
+    with pytest.raises(ProfileError, match=f"{where}.*unknown"):
+        load_standard(_profile(standard))
+
+
+@pytest.mark.parametrize("standard", [
+    {"metrics": {"include": [""]}},
+    {"metrics": {"exclude": ["a/**", ""]}},
+    {"metrics": {"extra_exclude": [""]}},
+    {"layers": [{"name": "a", "paths": [""], "may_import": []}]},
+    {"review_patterns": {"naming": [""]}},
+])
+def test_empty_strings_rejected_in_globs_and_patterns(standard: dict) -> None:
+    with pytest.raises(ProfileError):
+        load_standard(_profile(standard))

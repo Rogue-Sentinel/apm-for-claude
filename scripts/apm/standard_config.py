@@ -13,10 +13,15 @@ from typing import Any
 
 from apm.profile import Profile, ProfileError
 
+# Globs are compiled by the guard's glob compiler, so a match ignores case.
 DEFAULT_EXCLUDES: tuple[str, ...] = (
     "**/node_modules/**", "**/vendor/**", "**/third_party/**", "**/dist/**", "**/build/**",
     "**/*.min.js", "**/*.generated.*", ".apm/**",
 )
+STANDARD_KEYS = ("limits", "metrics", "debt_sources", "adr_dir", "review_patterns", "ui", "layers")
+METRICS_KEYS = ("include", "exclude", "extra_exclude", "builtin")
+SOURCE_KEYS = ("name", "command", "numbers")
+LAYER_KEYS = ("name", "paths", "may_import")
 # In `may_import`, "outside" means libraries beyond the standard library and "*" means every layer.
 RESERVED_LAYERS: tuple[str, ...] = ("outside", "*")
 
@@ -56,8 +61,7 @@ class Standard:
 def load_standard(profile: Profile | None) -> Standard:
     """Read `profile.extra["standard"]`; raise ProfileError for any part that is malformed."""
     raw = profile.extra.get("standard", {}) if profile else {}
-    if not isinstance(raw, dict):
-        raise ProfileError("standard must be an object")
+    _known(_object(raw, "standard"), STANDARD_KEYS, "standard")
     return Standard(
         limits=_limits(raw.get("limits", {})),
         metrics=_metrics(raw.get("metrics", {})),
@@ -67,6 +71,12 @@ def load_standard(profile: Profile | None) -> Standard:
         ui=_ui(raw.get("ui")),
         layers=_layers(raw.get("layers", [])),
     )
+
+
+def _known(given: dict[str, Any], allowed: tuple[str, ...], label: str) -> None:
+    unknown = sorted(set(given) - set(allowed))
+    if unknown:
+        raise ProfileError(f"{label} has unknown keys: {', '.join(unknown)}")
 
 
 def _object(value: object, label: str) -> dict[str, Any]:
@@ -82,8 +92,8 @@ def _text(value: object, label: str) -> str:
 
 
 def _strings(value: object, label: str) -> tuple[str, ...]:
-    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-        raise ProfileError(f"{label} must be a list of strings")
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        raise ProfileError(f"{label} must be a list of non-empty strings")
     return tuple(value)
 
 
@@ -95,14 +105,13 @@ def _positive(value: object, label: str) -> int:
 
 def _limits(raw: object) -> Limits:
     given = _object(raw, "limits")
-    unknown = sorted(set(given) - set(Limits.__dataclass_fields__))
-    if unknown:
-        raise ProfileError(f"limits has unknown keys: {', '.join(unknown)}")
+    _known(given, tuple(Limits.__dataclass_fields__), "limits")
     return Limits(**{name: _positive(value, f"limits.{name}") for name, value in given.items()})
 
 
 def _metrics(raw: object) -> MetricsConfig:
     given = _object(raw, "metrics")
+    _known(given, METRICS_KEYS, "metrics")
     builtin = given.get("builtin", True)
     if not isinstance(builtin, bool):
         raise ProfileError("metrics.builtin must be true or false")
@@ -115,15 +124,24 @@ def _metrics(raw: object) -> MetricsConfig:
 def _sources(raw: object) -> tuple[DebtSource, ...]:
     if not isinstance(raw, list):
         raise ProfileError("debt_sources must be a list")
-    return tuple(_source(item, f"debt_sources[{index}]") for index, item in enumerate(raw))
+    sources = tuple(_source(item, f"debt_sources[{index}]") for index, item in enumerate(raw))
+    names = [source.name for source in sources]
+    for name in sorted({n for n in names if names.count(n) > 1}):
+        raise ProfileError(f"debt_sources: duplicate name {name}")
+    return sources
 
 
 def _source(raw: object, label: str) -> DebtSource:
     given = _object(raw, label)
-    name = _text(given.get("name"), f"{label}.name")
-    command = _text(given.get("command"), f"{label}.command")
-    numbers = _object(given.get("numbers", {}), f"{label}.numbers")
-    return DebtSource(name, command, {metric: _one_group(rx, f"{label} number {metric}") for metric, rx in numbers.items()})
+    _known(given, SOURCE_KEYS, label)
+    numbers = _object(given.get("numbers"), f"{label}.numbers")
+    if not numbers:
+        raise ProfileError(f"{label}.numbers needs at least one entry")
+    return DebtSource(
+        _text(given.get("name"), f"{label}.name"),
+        _text(given.get("command"), f"{label}.command"),
+        {metric: _one_group(rx, f"{label} number {metric}") for metric, rx in numbers.items()},
+    )
 
 
 def _one_group(pattern: object, label: str) -> str:
@@ -169,6 +187,7 @@ def _layers(raw: object) -> tuple[Mapping[str, Any], ...]:
 
 def _layer(raw: object, label: str) -> dict[str, Any]:
     given = _object(raw, label)
+    _known(given, LAYER_KEYS, label)
     return {
         "name": _text(given.get("name"), f"{label}.name"),
         "paths": list(_strings(given.get("paths"), f"{label}.paths")),
