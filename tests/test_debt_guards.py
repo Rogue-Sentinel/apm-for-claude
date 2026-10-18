@@ -1,4 +1,8 @@
-from apm.debt import compare
+from datetime import datetime, timedelta, timezone
+
+import pytest
+
+from apm.debt import accept, compare
 from apm.standard_config import Limits
 from debt_helpers import file_metric as fm, snap
 
@@ -81,3 +85,24 @@ def test_pure_file_move_is_not_a_regression() -> None:
 
     assert not result.worse
     assert result.moves == ("moved: old/big.py → new/big.py (300 lines)",)
+
+
+def test_accept_strips_the_reason_and_ignores_a_blank_one() -> None:
+    now = datetime(2026, 10, 17, tzinfo=timezone.utc)
+    previous = {"accepted": [{"reason": "first", "at": "t"}]}
+
+    kept = accept(snap(fm("a.py")), previous, "  split later \n", now)["accepted"]
+    blank = accept(snap(fm("a.py")), previous, "  \t\n", now)["accepted"]
+
+    assert [entry["reason"] for entry in kept] == ["first", "split later"]
+    assert blank == previous["accepted"]
+
+
+def test_accept_requires_an_aware_time_and_records_utc() -> None:
+    with pytest.raises(ValueError):
+        accept(snap(fm("a.py")), None, "why", datetime(2026, 10, 17))
+
+    plus_two = datetime(2026, 10, 17, 14, 0, tzinfo=timezone(timedelta(hours=2)))
+    entry = accept(snap(fm("a.py")), None, "why", plus_two)["accepted"][0]
+
+    assert entry["at"] == "2026-10-17T12:00:00+00:00"

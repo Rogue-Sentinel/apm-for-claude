@@ -2,6 +2,10 @@
 
 Snapshots are plain dicts so the baseline file stays diff-friendly. Only items over a limit are
 listed, which is why a function that shrinks under the limit simply leaves the snapshot.
+
+Known limit: a cross-file "move" is matched by bare name and a number no larger, so it can hide an
+unlisted same-named function elsewhere that grew past the limit in the same change. The snapshot
+lists only items that are already over the limit, so that function had no number to compare against.
 """
 from __future__ import annotations
 
@@ -108,8 +112,14 @@ def compare(base: dict, current: dict) -> Comparison:
 
 
 def accept(new: dict, previous: dict | None, reason: str, now: datetime) -> dict:
-    """`new` with the accepted history carried forward, plus this acceptance when a reason is given."""
+    """`new` with the accepted history carried forward, plus this acceptance when a reason is given.
+
+    The reason is stripped, and a blank one counts as none. `now` must be timezone-aware; it is
+    recorded in UTC.
+    """
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("accept needs a timezone-aware datetime")
     history = list((previous or {}).get("accepted", []))
-    if reason:
-        history.append({"reason": reason, "at": now.astimezone(timezone.utc).isoformat()})
+    if reason.strip():
+        history.append({"reason": reason.strip(), "at": now.astimezone(timezone.utc).isoformat()})
     return {**new, "accepted": history}
