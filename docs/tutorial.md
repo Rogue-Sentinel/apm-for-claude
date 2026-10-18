@@ -8,7 +8,8 @@ This walks through APM on a small example project, a notes app. Each step has th
 
 You never type the commands yourself. They are shown so you know what is happening and can check the work.
 In this tutorial `<CLI>` stands for the command line the manager runs. Everything you type is a plain
-request in the chat, plus the two install lines and `/apm:setup` in section 1.
+request in the chat, plus the two install lines and `/apm:setup` in section 1 (and one remove line if you
+installed APM from a local folder before).
 
 A note on the examples. The output of `audit`, `metrics`, `coverage` and `brief` was captured from the real
 commands and then shortened. The output of `github file`, `github close`, `init`, `gate` and the guard's
@@ -16,8 +17,8 @@ denial is written from what the code prints, because running them here would hav
 
 ## 1. Install and set up
 
-**What you say:** type the two install lines, then `/apm:setup`. These are the only commands you type, plus one more if you installed APM from a local
-folder before.
+**What you say:** type the two install lines, then `/apm:setup`. These are the only commands you type,
+plus one more if you installed APM from a local folder before.
 
 If you installed APM from a local folder before, remove that marketplace first. Uninstalling the plugin
 leaves it behind, and because it has the same name, adding the new one fails with only "Failed to add
@@ -416,7 +417,8 @@ If the profile has a mistake, the manager says which key and why. It does not gu
 
 **Adding the marketplace fails with only "Failed to add marketplace."** The likely cause is an old
 local-folder marketplace with the same name, left behind when you uninstalled the plugin. Remove it with
-`/plugin marketplace remove rogue-sentinel`, then add the marketplace again.
+`/plugin marketplace remove rogue-sentinel` in Claude Code, or
+`claude plugin marketplace remove rogue-sentinel` in a terminal, then add the marketplace again.
 
 **There is no `gh`, or it is not signed in.** The workflow still runs. `github file` and `github close` exit
 with code 2 and print what failed, then how to do it by hand:
