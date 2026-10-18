@@ -7,8 +7,9 @@ plain lines.
 - **The manager is your one point of contact.** Workers never talk to you. Every question and every
   report comes through the manager.
 - **Workers build in their own git worktrees.** A worker that goes wrong damages only its own copy.
-- **Safety hooks guard every tool call.** Protected paths, destructive commands and `gh` writes are
-  denied to workers, and to the manager unless you approve in chat.
+- **Safety hooks guard every tool call.** Workers are denied protected paths, destructive commands and
+  `gh` writes. The manager files and closes issues freely, but needs your approval in chat for a
+  protected path or a destructive command.
 - **A debt ratchet keeps the code from getting worse.** Function, file and class sizes are measured
   against limits, and no number may rise without your say-so.
 
@@ -17,7 +18,8 @@ You speak twice per piece of work: the request, and the approval of the plan. Th
 ## Requirements
 
 - Claude Code (the desktop app or the CLI).
-- Python 3.12 or newer. The plugin's scripts use only the standard library.
+- Python 3.12 or newer, installed on your machine. The plugin's scripts use only the standard library, and
+  you do not run them yourself. Claude and the manager do.
 - git.
 - `gh`, the GitHub CLI, signed in. This is optional. Without it, APM still works and tells you what to do
   by hand where it would have used GitHub.
@@ -31,20 +33,21 @@ The plugin lives in the `rogue-sentinel` marketplace. In Claude Code:
 /plugin install apm@rogue-sentinel
 ```
 
-Then set up each project you want it in. From the project's folder, run `apm setup`. The name `apm`
-can belong to another tool on your PATH, so the safe form is the full path to the plugin's script:
+Then set up each project you want it in. Open Claude Code in the project and type this in the chat:
 
 ```
-python "<plugin folder>/scripts/apm_cli.py" setup
+/apm:setup
 ```
 
-The plugin folder is under `~/.claude/plugins/cache/rogue-sentinel/apm/<version>/`. Setup makes the
-manager the project's main agent, writes a starting profile in `.apm/profile.json`, and adds the state
-folders to `.gitignore`. It is safe to run twice.
+Claude runs the setup for you. It makes the manager the project's main agent, writes a starting profile
+in `.apm/profile.json`, and adds the state folders to `.gitignore`. It is safe to run twice. When it is
+done, open a new Claude Code session in the project. That new session is the manager.
+
+You never type a command-line command. The manager runs them for you.
 
 ## Quick start
 
-1. Open Claude Code in the project. You are now talking to the manager.
+1. Type `/apm:setup`, then open a new Claude Code session in the project. You are now talking to the manager.
 2. Say: "Set this project up." The manager audits it and shows you a report to approve.
 3. Say what you want: "Add a dark-mode toggle to the settings page."
 4. Read the plan summary and answer yes, or say what to change. That is your one approval.

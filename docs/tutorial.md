@@ -7,9 +7,8 @@ This walks through APM on a small example project, a notes app. Each step has th
 - **What you decide**, which is often nothing.
 
 You never type the commands yourself. They are shown so you know what is happening and can check the work.
-In this tutorial `<CLI>` stands for the full command line the manager gets in its session context. It looks
-like `python "<plugin folder>/scripts/apm_cli.py"`, and the manager never uses a bare `apm`, because
-another tool on your machine may own that name.
+In this tutorial `<CLI>` stands for the command line the manager runs. Everything you type is a plain
+request in the chat, plus the two install lines and `/apm:setup` in section 1.
 
 A note on the examples. The output of `audit`, `metrics`, `coverage` and `brief` was captured from the real
 commands and then shortened. The output of `github file`, `github close`, `init`, `gate` and the guard's
@@ -17,22 +16,21 @@ denial is written from what the code prints, because running them here would hav
 
 ## 1. Install and set up
 
-**What you say:** nothing yet. This part is yours.
-
-**What you do:**
+**What you say:** type the two install lines, then `/apm:setup`. These are the only commands you type.
 
 ```
 /plugin marketplace add Rogue-Sentinel/apm-for-claude
 /plugin install apm@rogue-sentinel
 ```
 
-Then, in the project's folder, run the setup command once:
+Then open Claude Code in your project and type this in the chat:
 
 ```
-python "<plugin folder>/scripts/apm_cli.py" setup
+/apm:setup
 ```
 
-**What it does:** setup prints the files it wrote, and nothing for files that were already right.
+**What it does:** Claude runs the setup for you. Setup prints the files it wrote, and nothing for files that
+were already right.
 
 ```
 .claude/settings.json
@@ -43,7 +41,8 @@ python "<plugin folder>/scripts/apm_cli.py" setup
 It makes `apm:manager` the project's main agent, caps the workers at three at a time, writes a starting
 profile and keeps the state folders out of git. Run it twice and the second run prints nothing.
 
-**What you decide:** nothing. Open Claude Code in the project. The first thing the manager reads is the
+**What you decide:** nothing. Claude ends by asking you to open a new Claude Code session in the project.
+That session is the manager. The first thing the manager reads is the
 briefing, and it says `No work recorded yet.`
 
 ## 2. Initialize a project
@@ -52,6 +51,8 @@ briefing, and it says `No work recorded yet.`
 
 **What it does:** the manager loads the `apm:initializing` skill and looks before it touches anything. The
 first command only reads:
+
+**The manager runs:**
 
 ```
 <CLI> audit
@@ -102,6 +103,8 @@ parts you act on:
 **What you decide:** the in-flight items, and then approval of the whole report. The manager does not ask
 while the coverage table has a gap. When you say yes, it runs the one command that applies the audit:
 
+**The manager runs:**
+
 ```
 <CLI> init --issue 1
 ```
@@ -126,6 +129,8 @@ for the scaffold.
 **What you say:** "Add a dark-mode toggle to the settings page."
 
 **What it does:** the manager loads `apm:running-an-issue`. First it files an issue, so the work has a number:
+
+**The manager runs:**
 
 ```
 <CLI> github file --title "Add a dark-mode toggle to settings" --body-file .apm/tmp/issue-12.md --kind feature
@@ -168,6 +173,8 @@ if the profile says `"review": "per-task"`, or if it touches a path listed under
 When every task is done, a reviewer reads the whole branch once. The manager records the result and runs
 the merge gate with the `apm:merge-gate` skill:
 
+**The manager runs:**
+
 ```
 <CLI> review 12 --open 0 --criteria-met --evidence "Reviewed the whole branch; no findings."
 <CLI> gate 12
@@ -191,6 +198,8 @@ gate again.
 
 Then the manager opens the pull request, merges it the way you chose and closes the loop:
 
+**The manager runs:**
+
 ```
 <CLI> github close 12 --pr https://github.com/you/notes/pull/13
 ```
@@ -205,6 +214,8 @@ say "go ahead" for any of it.
 **What it does:** the same path as a feature, with one difference. A bug is planned with the reproduction
 first. The failing test that shows the empty file is Task 1, and the manager finds the cause with the
 `apm:systematic-debugging` skill before it plans the fix. It files the issue with `--kind bug`:
+
+**The manager runs:**
 
 ```
 <CLI> github file --title "Export downloads an empty file" --body-file .apm/tmp/issue-14.md --kind bug
@@ -241,6 +252,8 @@ are the manager's cue to stop and ask you.
 
 **What it does:** the manager answers from the project record, never from memory, using `brief`:
 
+**The manager runs:**
+
 ```
 <CLI> brief
 ```
@@ -266,7 +279,8 @@ task that was running.
 
 Safety hooks check every command and every file write. Workers are denied destructive commands (`rm -rf`,
 `git reset --hard`, force-push and the like), writes to protected paths, any `gh` call that writes to GitHub
-and any command that changes the project record. The manager is held to the same rules.
+and any command that changes the project record. The manager is held to the same rules for protected paths and destructive commands, and may file and
+close issues freely.
 
 A denial reads like this:
 
@@ -282,6 +296,8 @@ for a file write), then retry.
 
 If you say "yes", it records a one-off approval and retries once:
 
+**The manager runs:**
+
 ```
 <CLI> approve --command 'rm -rf build' --reason "Clear stale build output; the user approved in chat."
 ```
@@ -295,7 +311,9 @@ names the action, the manager needs no extra approval, because the approved plan
 Debt means code over the size limits: functions over 15 lines of logic, files over 200, classes with seven
 or more public methods. The rule is a ratchet: **no number may get worse.**
 
-You can measure any time:
+Ask "how big is the debt?" at any time, and the manager measures:
+
+**The manager runs:**
 
 ```
 <CLI> metrics
