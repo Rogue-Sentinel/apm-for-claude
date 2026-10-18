@@ -146,6 +146,25 @@ def test_the_xp12_map_screen_header_has_eight_public_methods() -> None:
     assert _classes(MAP_SCREEN) == [("MapScreen", 2, 8), ("MapScreen::Canvas", 14, 0)]
 
 
+QT_MACROS = 'Q_OBJECT\nQML_ELEMENT\nQML_UNCREATABLE("x")\nQ_PROPERTY(QString s READ s NOTIFY changed)\n'
+NAV_BRIDGE = ("class NavBridge : public QObject {\n" + QT_MACROS + "public:\n"
+              "explicit NavBridge(Prefs& prefs, QObject* parent = nullptr);\n"
+              + "".join(f"Q_INVOKABLE void open{n}(int index);\n" for n in "ABCDE")
+              + "[[nodiscard]] Screen current() const noexcept { return nav_.current(); }\n"
+              "signals:\nvoid changed();\nprivate:\n[[nodiscard]] QString s() const { return s_; }\n"
+              "void show();\nQString s_;\n};\n")
+
+
+def test_an_access_label_after_qt_macros_with_no_semicolon_is_read() -> None:
+    assert _classes(NAV_BRIDGE) == [("NavBridge", 1, 7)]
+
+
+def test_methods_after_qt_macros_and_a_private_label_are_not_counted() -> None:
+    text = "struct S {\n" + QT_MACROS + "private:\nvoid a();\nvoid b() { }\n};\n"
+
+    assert _classes(text) == [("S", 1, 0)]
+
+
 def test_a_cpp_file_with_unbalanced_braces_reports_no_classes() -> None:
     metric = measure_text("a.hpp", "class A {\npublic:\nvoid a();\n")
 
