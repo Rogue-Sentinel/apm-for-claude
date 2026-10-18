@@ -16,6 +16,7 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
 from __future__ import annotations
 
 import os
+import re
 import string
 from dataclasses import dataclass
 from typing import Literal
@@ -62,9 +63,11 @@ def _plain(
 
 
 PYTHON = Language("Python", "python", ("#",), (), ('"""', "'''", '"', "'"))
+C = _brace("C", preprocessor=True)
+CPP = _brace("C++", preprocessor=True)
 _LANGUAGE_EXTENSIONS: tuple[tuple[Language, str], ...] = (
-    (_brace("C", preprocessor=True), "c h"),
-    (_brace("C++", preprocessor=True), "cc cpp cxx hpp hh"),
+    (C, "c h"),
+    (CPP, "cc cpp cxx hpp hh"),
     (_brace("C#", _TEXT_BLOCK_QUOTES, preprocessor=True, raw=_RAW_BLOCK), "cs"),
     (_brace("Objective-C", preprocessor=True), "m"),
     (_brace("Java", _TEXT_BLOCK_QUOTES), "java"),
@@ -93,6 +96,24 @@ _BY_EXTENSION = {
 
 def language_for(path: str) -> Language | None:
     return _BY_EXTENSION.get(os.path.splitext(path)[1].lower())
+
+
+_CPP_MARKER = re.compile(
+    r"^[ \t]*template\s*<"
+    r"|\bnamespace(?:\s+[\w:]+)?\s*\{"
+    r"|\busing\s+namespace\b"
+    r"|\bclass\s+\w+[^;{(=]*\{"
+    r"|^[ \t]*(?:public|protected|private)[ \t]*:[ \t]*$",
+    re.MULTILINE,
+)
+
+
+def language_of(path: str, text: str) -> Language | None:
+    """The language of a file; a `.h` header whose code holds a C++-only construct is C++."""
+    language = language_for(path)
+    if language is C and path.lower().endswith(".h") and _CPP_MARKER.search(strip_code(text, C)):
+        return CPP
+    return language
 
 
 def is_logic_line(line: str) -> bool:
