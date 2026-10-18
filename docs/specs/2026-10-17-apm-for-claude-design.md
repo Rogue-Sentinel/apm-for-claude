@@ -308,6 +308,9 @@ Several layers, because no single rule is enough:
    is flagged and reverted in review.
 5. **Workers build in isolated worktrees**, so a misbehaving worker damages only its own copy.
 
+*The guard defends against a cooperative worker's mistakes, not an adversary's evasions; see
+[ADR 0002](../adr/0002-guard-threat-model.md).*
+
 ## 10. Prior art
 - **APM:** borrow the roles, the shared-file memory, and planning before implementation. Drop the
   user-as-relay, the handoff prompts and the multi-assistant CLI.

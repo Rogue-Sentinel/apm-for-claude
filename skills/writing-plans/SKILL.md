@@ -269,6 +269,13 @@ it to the task that owns the code, and name that task in the line: "Tests are in
 5." An empty section means you checked and found none, not that you skipped the check. The reviewer
 is pointed at this list and checks each line deliberately.
 
+When a line covers a safety check (a guard, a hook, an allowlist), it states the threat model the
+check defends against and lists the realistic shapes to test: the commands a cooperative worker would
+plausibly type by mistake or by misreading its brief. It never asks for "any way past" the check: an
+unbounded search against a check that cannot be complete never ends, and each patch risks denying
+routine work. Inputs built to evade the check are known limits, not review targets (ADR 0002,
+`docs/adr/0002-guard-threat-model.md`).
+
 ## Self-review
 
 After writing the whole plan, look at the design with fresh eyes and check the plan against it.

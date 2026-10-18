@@ -110,6 +110,14 @@ prompt:
   - A migration strategy if a stored format changed? Backward compatibility considered?
     Documentation complete? No obvious bugs?
 
+  A guard, a hook or another safety check (ADR 0002, docs/adr/0002-guard-threat-model.md):
+  - The check defends against a cooperative worker's mistakes, not an adversary. Each finding
+    about it names a plausible way a cooperative worker, or the manager, would produce that
+    command while following its brief. A finding that cannot is a known limit: a suggestion,
+    never must fix. Do not search for "any way past" the check.
+  - A change that loosens a verdict that was denied before is always must fix.
+  - A routine command the check wrongly denies is a defect too.
+
   ## Calibration
 
   Grade every finding honestly: must fix only when it blocks the next task or a merge, and say
