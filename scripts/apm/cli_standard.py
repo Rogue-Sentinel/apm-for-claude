@@ -11,7 +11,9 @@ from apm.cli_debt import run_debt
 from apm.cli_errors import UsageError
 from apm.coverage import INVENTORY_PATH, PLUGIN_ROOT, find_gaps, load_inventory, render_table, scan_source
 from apm.guard_paths import is_under
-from apm.metrics import measure_tree, render_text, report_json
+from apm.layer_map import layer_overlaps
+from apm.metrics import Report, measure_tree, render_text, report_json
+from apm.metrics_ref import RefError, measure_at_ref
 from apm.paths import Project
 from apm.profile import load_profile
 from apm.standard_config import Standard, load_standard
@@ -31,14 +33,30 @@ def _relative(project: Project, argument: str) -> str:
     return Path(os.path.relpath(os.path.realpath(target), project.worktree_root)).as_posix()
 
 
+def _measure(project: Project, standard: Standard, args: argparse.Namespace) -> Report:
+    paths = [_relative(project, argument) for argument in args.paths]
+    if not args.ref:
+        return measure_tree(project.worktree_root, standard.metrics, paths)
+    try:
+        return measure_at_ref(project.worktree_root, args.ref, standard.metrics, paths)
+    except RefError as error:
+        raise UsageError(str(error)) from error
+
+
+def _overlap_lines(overlaps: list[tuple[str, str, str]]) -> str:
+    rows = [f"  {path}: {first}, {second}" for path, first, second in overlaps]
+    return "\n".join([f"files in two layers: {len(overlaps)}", *rows])
+
+
 def metrics(project: Project, args: argparse.Namespace) -> int:
     standard = _standard(project)
-    paths = [_relative(project, argument) for argument in args.paths]
-    report = measure_tree(project.worktree_root, standard.metrics, paths)
-    if args.json:
-        print(json.dumps(report_json(report, standard.limits), indent=2))
-    else:
-        print(render_text(report, standard.limits))
+    report = _measure(project, standard, args)
+    overlaps = layer_overlaps([f.path for f in report.files], standard.layers)
+    data = report_json(report, standard.limits)
+    if standard.layers:
+        data["layer_overlaps"] = [list(overlap) for overlap in overlaps]
+    text = render_text(report, standard.limits) + (f"\n{_overlap_lines(overlaps)}" if standard.layers else "")
+    print(json.dumps(data, indent=2) if args.json else text)
     return 0
 
 

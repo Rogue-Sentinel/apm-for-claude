@@ -6,6 +6,7 @@ import pytest
 import apm_cli
 from apm.paths import find_project
 from apm.state_store import init_state
+from conftest import run_git
 
 
 def _big_function(lines: int = 20) -> str:
@@ -168,3 +169,45 @@ def test_cli_metrics_path_that_does_not_exist_is_an_error(project: Path, capsys)
 def test_an_unknown_requirement_is_a_programming_error() -> None:
     with pytest.raises(ValueError, match="requirement"):
         apm_cli.project_for("everything")
+
+
+@pytest.fixture
+def layered(project: Path) -> Path:
+    source = project / "src" / "core" / "io"
+    source.mkdir(parents=True)
+    (source / "x.py").write_text(_big_function(20), encoding="utf-8")
+    run_git(project, "add", ".")
+    run_git(project, "commit", "-m", "files")
+    (source / "x.py").write_text(_big_function(2), encoding="utf-8")
+    layers = [{"name": "domain", "paths": ["src/core/**"], "may_import": []},
+              {"name": "adapters", "paths": ["src/**/io/**"], "may_import": ["domain"]}]
+    _initialize(project, {"layers": layers})
+    return project
+
+
+def test_cli_metrics_ref_measures_the_committed_file(layered: Path, capsys) -> None:
+    assert apm_cli.main(["metrics", "--ref", "HEAD", "src"]) == 0
+
+    assert "big -- 20 lines" in capsys.readouterr().out
+
+
+def test_cli_metrics_overlaps_in_text_and_json(layered: Path, capsys) -> None:
+    assert apm_cli.main(["metrics", "--ref", "HEAD", "src"]) == 0
+    text = capsys.readouterr().out
+    assert apm_cli.main(["metrics", "--json", "--ref", "HEAD", "src"]) == 0
+    data = json.loads(capsys.readouterr().out)
+
+    assert "files in two layers:" in text and "src/core/io/x.py: domain, adapters" in text
+    assert data["layer_overlaps"] == [["src/core/io/x.py", "domain", "adapters"]]
+
+
+def test_cli_metrics_without_layers_has_no_overlap_section(project: Path, capsys) -> None:
+    assert apm_cli.main(["metrics"]) == 0
+
+    assert "two layers" not in capsys.readouterr().out
+
+
+def test_cli_metrics_unknown_ref_exits_two(project: Path, capsys) -> None:
+    assert apm_cli.main(["metrics", "--ref", "nope"]) == 2
+
+    assert "unknown ref: nope" in capsys.readouterr().err
