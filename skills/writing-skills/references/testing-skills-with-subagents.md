@@ -36,7 +36,8 @@ task (`running` before it, `done` or `failed` with the evidence after it).
 - **A run that plays a worker role** is dispatched as that role (an implementer scenario to
   `apm:implementer`, a review scenario to `apm:reviewer`) with `isolation: "worktree"`, so even a
   run that misbehaves touches only its own copy, and its brief says it takes no real action: it
-  chooses an option and explains why, and changes nothing.
+  chooses an option and explains why, and changes nothing. Where the setup text below says "choose
+  and act", acting means making the choice in the answer, never carrying it out.
 - **A skill only the manager uses** (design, planning, dispatch, diagnosis) is tested by dispatching
   `general-purpose` with the manager's prompt as its context, since the manager is the main session
   and cannot be dispatched as itself.

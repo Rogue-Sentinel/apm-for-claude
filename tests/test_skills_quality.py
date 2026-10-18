@@ -248,3 +248,17 @@ def test_redaction_catches_uuids():
 def test_credits_trace_the_best_practices_to_anthropic():
     credits = (SKILLS_DIR / "CREDITS.md").read_text(encoding="utf-8")
     assert "Anthropic's skill-authoring documentation" in credits
+
+
+def test_every_diagnosis_opens_its_issue_before_the_first_dispatch():
+    text = section(_body("session-diagnosis"), "## When this applies")
+    assert "before the first dispatch" in text and "`<CLI> issue N" in text
+    for worker in ("analyst", "scrubber", "pressure run"):
+        assert worker in text, worker
+    assert "When the user asks for the diagnosis to be filed" not in text
+
+
+def test_a_pressure_run_acts_only_by_choosing_in_its_answer():
+    text = section(_reference("writing-skills", "testing-skills-with-subagents.md"),
+                   "## Who runs the tests")
+    assert "making the choice in the answer" in text

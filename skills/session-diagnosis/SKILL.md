@@ -22,11 +22,12 @@ that the wrong instruction gets fixed and the failure does not repeat.
 and routes the fixes. Analysts are read-only workers that report to the manager only. The session
 can be the current one or a past one, named by its id or its path.
 
-**Record it like any work.** When the user asks for the diagnosis to be filed as an issue, the
-manager files it and records every analyst and pressure-run dispatch under that issue number, as for
-any task: `<CLI> task N ID --status running --worker auditor --model <model>` before the dispatch,
-and `done` or `failed` with the evidence after it. `<CLI>` is the framework's command line, as the
-manager's prompt defines it.
+**Record it like any work.** Every diagnosis opens its own issue before the first dispatch
+(`<CLI> issue N --title TEXT --status building`), and every analyst, scrubber and pressure run is
+recorded under that issue number like any task: `<CLI> task N ID --status running --worker auditor
+--model <model>` before the dispatch, and `done` or `failed` with the evidence after it.
+`<CLI>` is the framework's command line, as the manager's prompt defines it. Only filing an issue on
+the framework's own repository waits for the user to ask, or to approve its text.
 
 ## The core rule
 
@@ -50,7 +51,7 @@ statement that names:
 - the observable they care about: wall-clock time, tokens, repeated actions, or one specific action.
 
 "It took too long" is a complaint, not a problem statement. Note whether the user wants an issue
-filed, or a shareable bundle, as the outcome.
+filed on the framework's repository, or a shareable bundle, as the outcome.
 
 - **Nothing in the steps below starts until the user has answered.** If they are away, write the
   questions in chat and wait. A statement you reconstructed for them is not their answer.
