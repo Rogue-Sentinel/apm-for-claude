@@ -63,3 +63,34 @@ def test_a_backtick_substitution_across_lines_never_makes_its_contents_exempt() 
 
 def test_a_continued_line_of_a_harmless_command_is_still_allowed() -> None:
     assert check_command("ls -la " + BACKSLASH_NEWLINE + "build", [], []) is None
+
+
+# An even run of escapes before a newline is literal: the newline ends the command, and the next line is its own.
+ESCAPED_BACKSLASH_NEWLINE = chr(92) * 2 + chr(10)
+ESCAPED_BACKTICK_NEWLINE = "``" + chr(10)
+
+
+@pytest.mark.parametrize("command", [
+    "cat x " + ESCAPED_BACKSLASH_NEWLINE + "cp y data/fleet.db",
+    "cat x " + ESCAPED_BACKTICK_NEWLINE + "Copy-Item y data/fleet.db",
+])
+def test_a_protected_write_after_an_escaped_newline_is_denied(command: str) -> None:
+    assert check_command(command, ("data/*.db",), ()) is not None
+
+
+def test_a_destructive_command_after_an_escaped_newline_is_not_covered_by_an_allowed_prefix() -> None:
+    command = "npm test " + ESCAPED_BACKSLASH_NEWLINE + "rm -rf build"
+
+    reason = check_command(command, [], ["npm test"])
+
+    assert reason is not None and "destructive" in reason
+
+
+def test_a_worker_state_write_after_an_escaped_newline_is_denied(git_repo: Path) -> None:
+    decision = _worker(git_repo, "cat x " + ESCAPED_BACKSLASH_NEWLINE + "cp y .apm/state/ledger.json")
+
+    assert decision.kind == "deny" and ".apm/" in decision.reason
+
+
+def test_an_odd_run_of_backslashes_still_continues_a_harmless_command() -> None:
+    assert check_command("ls -la " + chr(92) * 3 + chr(10) + "build", [], []) is None

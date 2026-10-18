@@ -39,6 +39,12 @@ def _program(word: str) -> str:
     return re.sub(r"\.(?:exe|cmd|bat)$", "", word.rsplit("/", 1)[-1].lower())
 
 
+def _is_apm(word: str) -> bool:
+    """True for the apm program, or a dotted module ending in `apm_cli` (`python -m scripts.apm_cli`)."""
+    program = _program(word)
+    return program in _APM_PROGRAMS or program.rsplit(".", 1)[-1] == "apm_cli"
+
+
 def _changes_state(after: list[str]) -> bool:
     """True when any word after the program is a state subcommand, or `debt` not followed by `check`."""
     followers = [*after[1:], ""]
@@ -47,7 +53,7 @@ def _changes_state(after: list[str]) -> bool:
 
 
 def _runs_apm_state_change(words: list[str]) -> bool:
-    return any(_program(word) in _APM_PROGRAMS and _changes_state(words[index + 1:])
+    return any(_is_apm(word) and _changes_state(words[index + 1:])
                for index, word in enumerate(words))
 
 
