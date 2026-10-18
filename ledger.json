@@ -208,9 +208,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Red on purpose: 46 FAIL-now cases all 'none'=='deny', 40 pins pass, in the worktree and on the branch after merge; per-task review clean; metrics 0/7 fn, 0/1 files over; debt check nothing worse.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Failing tests and pins",
           "worker": "implementer"
         },
@@ -1096,6 +1097,11 @@
     {
       "at": "2026-10-18T23:10:48.503204+00:00",
       "event": "task 14/1r done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:10:51.044139+00:00",
+      "event": "task 14/1 done",
       "issue": 14
     }
   ]
