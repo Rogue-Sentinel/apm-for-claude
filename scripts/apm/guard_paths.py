@@ -45,6 +45,13 @@ def is_under(path: Path | str, root: Path | str) -> bool:
     return _real(path) == base or _real(path).startswith(base.rstrip(os.sep) + os.sep)
 
 
+def memory_folder(main_root: Path, config_dir: Path) -> Path:
+    """Where Claude Code keeps the memory of the project at `main_root`: its path with every
+    character outside [A-Za-z0-9] turned into `-`, under the config dir's `projects` folder."""
+    slug = re.sub(r"[^A-Za-z0-9]", "-", str(main_root))
+    return config_dir / "projects" / slug / "memory"
+
+
 def _in_scope(target: Path, project: Project, temp_roots: Sequence[Path]) -> bool:
     roots = [project.main_root, project.worktree_root, *temp_roots]
     return any(is_under(target, root) for root in roots)

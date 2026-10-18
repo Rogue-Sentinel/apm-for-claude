@@ -85,7 +85,7 @@ def test_a_worktree_session_may_not_write_its_own_slug_memory_folder(
     assert _run(repo / ".claude" / "worktrees" / "w1", str(own_slug), env) == "deny"
 
 
-@pytest.mark.parametrize("environ", [{},{"CLAUDE_CONFIG_DIR": ""}, {"CLAUDE_CONFIG_DIR": "cfg"}],
+@pytest.mark.parametrize("environ", [{}, {"CLAUDE_CONFIG_DIR": ""}, {"CLAUDE_CONFIG_DIR": "cfg"}],
                          ids=["unset", "empty", "relative"])
 def test_without_an_absolute_config_dir_the_folder_under_home_is_used(
     repo: Path, tmp_path: Path, environ: dict[str, str]
@@ -145,3 +145,16 @@ def test_in_project_protections_are_unchanged(
 ) -> None:
     _init(git_repo, protected_paths=["data/*.db"])
     assert _run(git_repo, str(git_repo / relative), env) == verdict
+
+
+def test_the_memory_folder_path_itself_stays_denied(
+    repo: Path, cfg: Path, env: dict[str, str]
+) -> None:
+    assert _run(repo, str(_memory(cfg, repo)), env, "Write") == "deny"
+
+
+def test_a_worker_may_not_edit_a_notebook_in_the_memory_folder(
+    repo: Path, cfg: Path, env: dict[str, str]
+) -> None:
+    target = _memory(cfg, repo) / "notes.ipynb"
+    assert _run(repo, str(target), env, "NotebookEdit", agent_id="w1") == "deny"
