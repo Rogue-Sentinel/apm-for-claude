@@ -85,8 +85,15 @@ class Comparison:
         return bool(self.regressions)
 
 
+def _unsupported(base: dict, current: dict) -> tuple[str, ...]:
+    bad = [("baseline", base.get("version")), ("current", current.get("version"))]
+    return tuple(f"{who} version {version} is not supported" for who, version in bad if version != VERSION)
+
+
 def compare(base: dict, current: dict) -> Comparison:
     """Everything in `current` that is worse than `base`, and everything that got better."""
+    if _unsupported(base, current):
+        return Comparison(_unsupported(base, current), ())
     parts = [compare_limits(base, current), compare_totals(base, current),
              compare_unmeasured(base, current), compare_sources(base, current),
              *(compare_items(base, current, kind) for kind in KINDS)]

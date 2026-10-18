@@ -119,7 +119,10 @@ def _numbers(base: Items, current: Items, rose: str, fell: str, prefix: str = ""
 
 
 def compare_limits(base: Mapping, current: Mapping) -> Findings:
-    return _numbers(base.get("limits", {}), current.get("limits", {}), "limit loosened", "limit tightened")
+    old, now = base.get("limits", {}), current.get("limits", {})
+    missing = [f"limit missing: {name}" for name in sorted(old.keys() ^ now.keys())]
+    found = _numbers(old, now, "limit loosened", "limit tightened")
+    return Findings(missing + found.regressions, found.improvements, [])
 
 
 def compare_totals(base: Mapping, current: Mapping) -> Findings:
