@@ -1,0 +1,1942 @@
+{
+ "sources": [
+  {
+   "id": "va-skills",
+   "title": "VirtualAirline skills",
+   "origin": "the 21 vendored skills and their references and examples, in the VirtualAirline project's .claude folder",
+   "scan": [
+    "skills/*/SKILL.md",
+    "skills/*/references/*",
+    "skills/*/examples/*",
+    "skills/*/TESTING.md"
+   ],
+   "not_methodology": [
+    {
+     "path": "skills/xp12-ui/SKILL.md",
+     "reason": "X-Plane 12 interface rules belong to that project, not to the standard"
+    },
+    {
+     "path": "skills/xp12-ui/TESTING.md",
+     "reason": "tests of the X-Plane 12 interface skill"
+    },
+    {
+     "path": "skills/ui-screen-structure/SKILL.md",
+     "reason": "that project's screen layout, not the standard"
+    },
+    {
+     "path": "skills/ui-screen-structure/TESTING.md",
+     "reason": "tests of that project's screen layout skill"
+    }
+   ]
+  },
+  {
+   "id": "va-commands",
+   "title": "VirtualAirline commands",
+   "origin": "the clean-code-audit and branch-review commands, in the VirtualAirline project's .claude folder",
+   "scan": [
+    "commands/*.md"
+   ],
+   "not_methodology": []
+  },
+  {
+   "id": "va-scorecard",
+   "title": "The branch-review scorecard",
+   "origin": "the 11 dimensions of the branch-review command",
+   "scan": [],
+   "not_methodology": []
+  },
+  {
+   "id": "va-audit",
+   "title": "The clean-code audit",
+   "origin": "the audit's assessment steps and report format",
+   "scan": [],
+   "not_methodology": []
+  },
+  {
+   "id": "va-rules",
+   "title": "VirtualAirline working agreement",
+   "origin": "the rules of the VirtualAirline CLAUDE.md that are method, not project",
+   "scan": [],
+   "not_methodology": [
+    {
+     "path": "CLAUDE.md#the-ui-must-look-like-x-plane-12",
+     "reason": "that project's interface rules"
+    },
+    {
+     "path": "CLAUDE.md#conventions",
+     "reason": "that project's language, spelling, storage and threading conventions belong in its own profile and skills"
+    },
+    {
+     "path": "CLAUDE.md#environment-notes",
+     "reason": "that project's environment facts"
+    }
+   ]
+  },
+  {
+   "id": "sp-skills",
+   "title": "Superpowers skills",
+   "origin": "the 15 superpowers skills and their supporting files (version 7.0.0)",
+   "scan": [
+    "skills/**/*"
+   ],
+   "not_methodology": [
+    {
+     "path": "skills/systematic-debugging/test-academic.md",
+     "reason": "Superpowers' own test for its skill, not methodology"
+    },
+    {
+     "path": "skills/systematic-debugging/test-pressure-1.md",
+     "reason": "Superpowers' own test for its skill, not methodology"
+    },
+    {
+     "path": "skills/systematic-debugging/test-pressure-2.md",
+     "reason": "Superpowers' own test for its skill, not methodology"
+    },
+    {
+     "path": "skills/systematic-debugging/test-pressure-3.md",
+     "reason": "Superpowers' own test for its skill, not methodology"
+    },
+    {
+     "path": "skills/using-superpowers/references/antigravity-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    },
+    {
+     "path": "skills/using-superpowers/references/claude-code-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    },
+    {
+     "path": "skills/using-superpowers/references/codex-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    },
+    {
+     "path": "skills/using-superpowers/references/gemini-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    },
+    {
+     "path": "skills/using-superpowers/references/hermes-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    },
+    {
+     "path": "skills/using-superpowers/references/muse-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    },
+    {
+     "path": "skills/using-superpowers/references/pi-tools.md",
+     "reason": "Superpowers' tool-name map for another coding assistant; this framework runs in Claude Code only"
+    }
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "va-skill/solid-single-responsibility",
+   "source": "va-skills",
+   "what": "Skill: solid-single-responsibility",
+   "source_path": "skills/solid-single-responsibility/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/SKILL.md",
+     "anchor": "## Single responsibility"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-single-responsibility/srp-indicators",
+   "source": "va-skills",
+   "what": "solid-single-responsibility: references/srp-indicators.md",
+   "source_path": "skills/solid-single-responsibility/references/srp-indicators.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/references/srp-indicators.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-open-closed",
+   "source": "va-skills",
+   "what": "Skill: solid-open-closed",
+   "source_path": "skills/solid-open-closed/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/SKILL.md",
+     "anchor": "## Open-closed"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-open-closed/ocp-strategies",
+   "source": "va-skills",
+   "what": "solid-open-closed: references/ocp-strategies.md",
+   "source_path": "skills/solid-open-closed/references/ocp-strategies.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/references/ocp-strategies.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-liskov-substitution",
+   "source": "va-skills",
+   "what": "Skill: solid-liskov-substitution",
+   "source_path": "skills/solid-liskov-substitution/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/SKILL.md",
+     "anchor": "## Liskov substitution"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-liskov-substitution/lsp-violations",
+   "source": "va-skills",
+   "what": "solid-liskov-substitution: examples/lsp-violations.md",
+   "source_path": "skills/solid-liskov-substitution/examples/lsp-violations.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/references/lsp-violations.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-interface-segregation",
+   "source": "va-skills",
+   "what": "Skill: solid-interface-segregation",
+   "source_path": "skills/solid-interface-segregation/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/SKILL.md",
+     "anchor": "## Interface segregation"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-interface-segregation/isp-patterns",
+   "source": "va-skills",
+   "what": "solid-interface-segregation: references/isp-patterns.md",
+   "source_path": "skills/solid-interface-segregation/references/isp-patterns.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/references/isp-patterns.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-dependency-inversion",
+   "source": "va-skills",
+   "what": "Skill: solid-dependency-inversion",
+   "source_path": "skills/solid-dependency-inversion/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/SKILL.md",
+     "anchor": "## Dependency inversion"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/solid-dependency-inversion/dip-patterns",
+   "source": "va-skills",
+   "what": "solid-dependency-inversion: references/dip-patterns.md",
+   "source_path": "skills/solid-dependency-inversion/references/dip-patterns.md",
+   "covered_by": [
+    {
+     "file": "skills/solid/references/dip-patterns.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/hexagonal-ports-adapters",
+   "source": "va-skills",
+   "what": "Skill: hexagonal-ports-adapters",
+   "source_path": "skills/hexagonal-ports-adapters/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-architecture/SKILL.md",
+     "anchor": "## Ports and adapters"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/hexagonal-ports-adapters/port-adapter-anatomy",
+   "source": "va-skills",
+   "what": "hexagonal-ports-adapters: references/port-adapter-anatomy.md",
+   "source_path": "skills/hexagonal-ports-adapters/references/port-adapter-anatomy.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-architecture/references/port-adapter-anatomy.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/hexagonal-domain-isolation",
+   "source": "va-skills",
+   "what": "Skill: hexagonal-domain-isolation",
+   "source_path": "skills/hexagonal-domain-isolation/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-architecture/SKILL.md",
+     "anchor": "## Domain isolation"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/hexagonal-domain-isolation/acl-patterns",
+   "source": "va-skills",
+   "what": "hexagonal-domain-isolation: references/acl-patterns.md",
+   "source_path": "skills/hexagonal-domain-isolation/references/acl-patterns.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-architecture/references/anti-corruption-layer.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/oop-encapsulation",
+   "source": "va-skills",
+   "what": "Skill: oop-encapsulation",
+   "source_path": "skills/oop-encapsulation/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/object-design/SKILL.md",
+     "anchor": "## Encapsulation"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/oop-encapsulation/encapsulation-checklist",
+   "source": "va-skills",
+   "what": "oop-encapsulation: references/encapsulation-checklist.md",
+   "source_path": "skills/oop-encapsulation/references/encapsulation-checklist.md",
+   "covered_by": [
+    {
+     "file": "skills/object-design/references/encapsulation-checklist.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/oop-composition-over-inheritance",
+   "source": "va-skills",
+   "what": "Skill: oop-composition-over-inheritance",
+   "source_path": "skills/oop-composition-over-inheritance/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/object-design/SKILL.md",
+     "anchor": "## Composition over inheritance"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/oop-composition-over-inheritance/composition-patterns",
+   "source": "va-skills",
+   "what": "oop-composition-over-inheritance: examples/composition-patterns.md",
+   "source_path": "skills/oop-composition-over-inheritance/examples/composition-patterns.md",
+   "covered_by": [
+    {
+     "file": "skills/object-design/references/composition-patterns.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/fp-pure-functions",
+   "source": "va-skills",
+   "what": "Skill: fp-pure-functions",
+   "source_path": "skills/fp-pure-functions/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/SKILL.md",
+     "anchor": "## Pure functions"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/fp-pure-functions/purity-rules",
+   "source": "va-skills",
+   "what": "fp-pure-functions: references/purity-rules.md",
+   "source_path": "skills/fp-pure-functions/references/purity-rules.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/references/purity-rules.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/fp-higher-order-functions",
+   "source": "va-skills",
+   "what": "Skill: fp-higher-order-functions",
+   "source_path": "skills/fp-higher-order-functions/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/SKILL.md",
+     "anchor": "## Higher-order functions"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/fp-higher-order-functions/hof-patterns",
+   "source": "va-skills",
+   "what": "fp-higher-order-functions: examples/hof-patterns.md",
+   "source_path": "skills/fp-higher-order-functions/examples/hof-patterns.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/references/hof-patterns.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/fp-error-handling",
+   "source": "va-skills",
+   "what": "Skill: fp-error-handling",
+   "source_path": "skills/fp-error-handling/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/SKILL.md",
+     "anchor": "## Absence and failure are values"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/fp-error-handling/either-result-option",
+   "source": "va-skills",
+   "what": "fp-error-handling: references/either-result-option.md",
+   "source_path": "skills/fp-error-handling/references/either-result-option.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/references/result-and-option.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/refactor-extract-method",
+   "source": "va-skills",
+   "what": "Skill: refactor-extract-method",
+   "source_path": "skills/refactor-extract-method/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/SKILL.md",
+     "anchor": "## Extract method"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/refactor-extract-method/extraction-heuristics",
+   "source": "va-skills",
+   "what": "refactor-extract-method: references/extraction-heuristics.md",
+   "source_path": "skills/refactor-extract-method/references/extraction-heuristics.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/references/extraction-heuristics.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/refactor-rename",
+   "source": "va-skills",
+   "what": "Skill: refactor-rename",
+   "source_path": "skills/refactor-rename/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/SKILL.md",
+     "anchor": "## Rename"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/refactor-rename/naming-conventions",
+   "source": "va-skills",
+   "what": "refactor-rename: references/naming-conventions.md",
+   "source_path": "skills/refactor-rename/references/naming-conventions.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code/references/naming-conventions.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/refactor-replace-conditional-with-polymorphism",
+   "source": "va-skills",
+   "what": "Skill: refactor-replace-conditional-with-polymorphism",
+   "source_path": "skills/refactor-replace-conditional-with-polymorphism/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/SKILL.md",
+     "anchor": "## Replace conditional with polymorphism"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/refactor-replace-conditional-with-polymorphism/polymorphism-before-after",
+   "source": "va-skills",
+   "what": "refactor-replace-conditional-with-polymorphism: examples/polymorphism-before-after.md",
+   "source_path": "skills/refactor-replace-conditional-with-polymorphism/examples/polymorphism-before-after.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/references/polymorphism-before-after.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/tdd-test-first",
+   "source": "va-skills",
+   "what": "Skill: tdd-test-first",
+   "source_path": "skills/tdd-test-first/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## Test first"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/tdd-test-first/test-first-checklist",
+   "source": "va-skills",
+   "what": "tdd-test-first: references/test-first-checklist.md",
+   "source_path": "skills/tdd-test-first/references/test-first-checklist.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/references/test-first-checklist.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/tdd-red-green-refactor",
+   "source": "va-skills",
+   "what": "Skill: tdd-red-green-refactor",
+   "source_path": "skills/tdd-red-green-refactor/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## Red, green, refactor"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/tdd-red-green-refactor/cycle-steps",
+   "source": "va-skills",
+   "what": "tdd-red-green-refactor: references/cycle-steps.md",
+   "source_path": "skills/tdd-red-green-refactor/references/cycle-steps.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/references/cycle-steps.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/tdd-arrange-act-assert",
+   "source": "va-skills",
+   "what": "Skill: tdd-arrange-act-assert",
+   "source_path": "skills/tdd-arrange-act-assert/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## Arrange, act, assert"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/tdd-arrange-act-assert/aaa-patterns",
+   "source": "va-skills",
+   "what": "tdd-arrange-act-assert: examples/aaa-patterns.md",
+   "source_path": "skills/tdd-arrange-act-assert/examples/aaa-patterns.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/references/aaa-patterns.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/clean-code-boy-scout-rule",
+   "source": "va-skills",
+   "what": "Skill: clean-code-boy-scout-rule",
+   "source_path": "skills/clean-code-boy-scout-rule/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code/SKILL.md",
+     "anchor": "## The boy scout rule"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/clean-code-boy-scout-rule/improvement-checklist",
+   "source": "va-skills",
+   "what": "clean-code-boy-scout-rule: references/improvement-checklist.md",
+   "source_path": "skills/clean-code-boy-scout-rule/references/improvement-checklist.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code/references/improvement-checklist.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/clean-code-detect-smells",
+   "source": "va-skills",
+   "what": "Skill: clean-code-detect-smells",
+   "source_path": "skills/clean-code-detect-smells/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/code-smells/SKILL.md",
+     "anchor": "## Finding smells"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/clean-code-detect-smells/smell-catalog",
+   "source": "va-skills",
+   "what": "clean-code-detect-smells: references/smell-catalog.md",
+   "source_path": "skills/clean-code-detect-smells/references/smell-catalog.md",
+   "covered_by": [
+    {
+     "file": "skills/code-smells/references/smell-catalog.md"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/branch-review",
+   "source": "va-skills",
+   "what": "Skill: branch-review",
+   "source_path": "skills/branch-review/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "## The scorecard"
+    }
+   ]
+  },
+  {
+   "id": "va-skill/branch-review/scoring-evidence-guide",
+   "source": "va-skills",
+   "what": "branch-review: references/scoring-evidence-guide.md",
+   "source_path": "skills/branch-review/references/scoring-evidence-guide.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/references/scoring-evidence-guide.md"
+    }
+   ]
+  },
+  {
+   "id": "va-command/clean-code-audit",
+   "source": "va-commands",
+   "what": "Command: clean-code-audit",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "# Clean code audit"
+    }
+   ]
+  },
+  {
+   "id": "va-command/branch-review",
+   "source": "va-commands",
+   "what": "Command: branch-review",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "# Branch review"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/type-and-contract-safety",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Type and contract safety",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Type and contract safety"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/state-management",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: State management",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### State management"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/module-architecture",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Module architecture",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Module architecture"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/entry-points-and-routing",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Entry points and routing",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Entry points and routing"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/styling-and-presentation",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Styling and presentation",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Styling and presentation"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/testing",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Testing",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Testing"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/error-handling",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Error handling",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Error handling"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/external-integration",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: External integration",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### External integration"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/accessibility",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Accessibility",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Accessibility"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/code-duplication",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Code duplication",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Code duplication"
+    }
+   ]
+  },
+  {
+   "id": "va-scorecard/developer-experience",
+   "source": "va-scorecard",
+   "what": "Scorecard dimension: Developer experience and maintainability",
+   "source_path": "commands/branch-review.md",
+   "covered_by": [
+    {
+     "file": "skills/branch-review/SKILL.md",
+     "anchor": "### Developer experience and maintainability"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/scan",
+   "source": "va-audit",
+   "what": "Audit Step 1: scan the codebase",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "## Scan"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/tdd",
+   "source": "va-audit",
+   "what": "Audit Step 2: test-driven development assessment",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### Test-first"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/refactoring",
+   "source": "va-audit",
+   "what": "Audit Step 3: refactoring opportunities",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### Refactoring"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/solid",
+   "source": "va-audit",
+   "what": "Audit Step 4: SOLID compliance",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### SOLID"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/oop",
+   "source": "va-audit",
+   "what": "Audit Step 5: object-oriented review",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### Object design"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/functional",
+   "source": "va-audit",
+   "what": "Audit Step 6: functional programming opportunities",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### Functional core"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/architecture",
+   "source": "va-audit",
+   "what": "Audit Step 7: architecture assessment",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### Architecture"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/hygiene",
+   "source": "va-audit",
+   "what": "Audit Step 8: code hygiene",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "### Hygiene"
+    }
+   ]
+  },
+  {
+   "id": "va-audit/report-format",
+   "source": "va-audit",
+   "what": "Audit The report format: summary, findings by category with scores, top five actions",
+   "source_path": "commands/clean-code-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code-audit/SKILL.md",
+     "anchor": "## Report format"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/function-limit",
+   "source": "va-rules",
+   "what": "Limit: 15 lines of logic per function",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code/SKILL.md",
+     "anchor": "## The limits"
+    },
+    {
+     "file": "scripts/apm/standard_config.py",
+     "anchor": "class Limits"
+    },
+    {
+     "file": "tests/test_own_limits.py"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/file-limit",
+   "source": "va-rules",
+   "what": "Limit: 200 lines of logic per file",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code/SKILL.md",
+     "anchor": "## The limits"
+    },
+    {
+     "file": "scripts/apm/standard_config.py",
+     "anchor": "class Limits"
+    },
+    {
+     "file": "tests/test_own_limits.py"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/public-method-reason",
+   "source": "va-rules",
+   "what": "Seven or more public methods need a stated reason",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/object-design/SKILL.md",
+     "anchor": "## Seven or more public methods"
+    },
+    {
+     "file": "skills/clean-code/SKILL.md",
+     "anchor": "## The limits"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/mandatory-tdd",
+   "source": "va-rules",
+   "what": "Test-driven development is mandatory",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## Test first"
+    },
+    {
+     "file": "agents/implementer.md",
+     "anchor": "## Rules"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/no-skipped-tests",
+   "source": "va-rules",
+   "what": "No test may skip",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## No test skips"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/no-waiting-tests",
+   "source": "va-rules",
+   "what": "No test, and no test run, waits for a person",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## No test waits on a person"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/regression-test-before-fix",
+   "source": "va-rules",
+   "what": "A regression test comes before every bug fix",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## A bug fix starts with a failing test"
+    },
+    {
+     "file": "skills/systematic-debugging/SKILL.md",
+     "anchor": "## Reproduce it as a failing test"
+    },
+    {
+     "file": "agents/debugger.md",
+     "anchor": "## Rules"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/never-weaken-a-test",
+   "source": "va-rules",
+   "what": "Never delete, skip or weaken a test to get green",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## Never weaken a test"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/extract-before-you-add",
+   "source": "va-rules",
+   "what": "Extract before you add",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/SKILL.md",
+     "anchor": "## Extract before you add"
+    },
+    {
+     "file": "skills/writing-plans/SKILL.md",
+     "anchor": "## Extract before you add"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/refactor-and-behavior-apart",
+   "source": "va-rules",
+   "what": "Refactor and behavior never share a commit",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/SKILL.md",
+     "anchor": "## Refactor and behavior never share a commit"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/structural-constraints-are-acceptance-criteria",
+   "source": "va-rules",
+   "what": "A plan's structural constraints are acceptance criteria",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-plans/SKILL.md",
+     "anchor": "## Structural acceptance criteria"
+    },
+    {
+     "file": "skills/finishing-a-branch/SKILL.md",
+     "anchor": "## Verify everything"
+    },
+    {
+     "file": "agents/reviewer.md",
+     "anchor": "## Rules"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/logic-does-not-move-sideways",
+   "source": "va-rules",
+   "what": "Logic does not move sideways",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/refactoring/SKILL.md",
+     "anchor": "## Logic does not move sideways"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/adrs",
+   "source": "va-rules",
+   "what": "Decisions are recorded as ADRs",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/adr/SKILL.md",
+     "anchor": "## The core rule"
+    },
+    {
+     "file": "skills/adr/SKILL.md",
+     "anchor": "## When a decision needs an ADR"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/honest-reporting",
+   "source": "va-rules",
+   "what": "Report results honestly",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/verification/SKILL.md",
+     "anchor": "## Honest reporting"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/debt-never-grows",
+   "source": "va-rules",
+   "what": "Debt may shrink but never grow",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-code/SKILL.md",
+     "anchor": "## Debt never grows"
+    },
+    {
+     "file": "skills/finishing-a-branch/SKILL.md",
+     "anchor": "## The debt check"
+    },
+    {
+     "file": "scripts/apm/debt.py"
+    },
+    {
+     "file": "tests/test_debt.py"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/skills-are-invoked",
+   "source": "va-rules",
+   "what": "Skills are invoked, not remembered",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "agents/manager.md",
+     "anchor": "## Skills"
+    },
+    {
+     "file": "agents/implementer.md",
+     "anchor": "## Skills"
+    },
+    {
+     "file": "skills/clean-code/SKILL.md",
+     "anchor": "## Which skill, when"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/architecture-rule",
+   "source": "va-rules",
+   "what": "Frameworks and input/output stay at the edges so the core is tested without them",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/clean-architecture/SKILL.md",
+     "anchor": "## Testing at the edges"
+    },
+    {
+     "file": "skills/clean-architecture/SKILL.md",
+     "anchor": "## The dependency rule"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/merge-main-first",
+   "source": "va-rules",
+   "what": "Merge main into the branch before the pull request",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/finishing-a-branch/SKILL.md",
+     "anchor": "## Merge main in first"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/one-branch-per-lane",
+   "source": "va-rules",
+   "what": "One branch open per lane at a time",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/finishing-a-branch/SKILL.md",
+     "anchor": "## Merge main in first"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/merge-style",
+   "source": "va-rules",
+   "what": "Merge in the project's declared style",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/finishing-a-branch/SKILL.md",
+     "anchor": "## The project's merge style"
+    }
+   ]
+  },
+  {
+   "id": "va-rule/absence-and-clock-idioms",
+   "source": "va-rules",
+   "what": "Absence is a typed value; the clock is a parameter",
+   "source_path": "CLAUDE.md",
+   "covered_by": [
+    {
+     "file": "skills/functional-core/SKILL.md",
+     "anchor": "## Absence and failure are values"
+    },
+    {
+     "file": "skills/functional-core/SKILL.md",
+     "anchor": "## Time and randomness are parameters"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming",
+   "source": "sp-skills",
+   "what": "Skill: brainstorming",
+   "source_path": "skills/brainstorming/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Nothing is built before an approved design"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers",
+   "source": "sp-skills",
+   "what": "Skill: diagnosing-superpowers",
+   "source_path": "skills/diagnosing-superpowers/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/SKILL.md",
+     "anchor": "## The core rule"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/dispatching-parallel-agents",
+   "source": "sp-skills",
+   "what": "Skill: dispatching-parallel-agents",
+   "source_path": "skills/dispatching-parallel-agents/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/parallel-dispatch/SKILL.md",
+     "anchor": "## When work can run in parallel"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/executing-plans",
+   "source": "sp-skills",
+   "what": "Skill: executing-plans",
+   "source_path": "skills/executing-plans/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## One task at a time"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/finishing-a-development-branch",
+   "source": "sp-skills",
+   "what": "Skill: finishing-a-development-branch",
+   "source_path": "skills/finishing-a-development-branch/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/finishing-a-branch/SKILL.md",
+     "anchor": "## The core rule"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/receiving-code-review",
+   "source": "sp-skills",
+   "what": "Skill: receiving-code-review",
+   "source_path": "skills/receiving-code-review/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/code-review/SKILL.md",
+     "anchor": "## Receiving a review"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/requesting-code-review",
+   "source": "sp-skills",
+   "what": "Skill: requesting-code-review",
+   "source_path": "skills/requesting-code-review/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/code-review/SKILL.md",
+     "anchor": "## Requesting a review"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development",
+   "source": "sp-skills",
+   "what": "Skill: subagent-driven-development",
+   "source_path": "skills/subagent-driven-development/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## Review after every task"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging",
+   "source": "sp-skills",
+   "what": "Skill: systematic-debugging",
+   "source_path": "skills/systematic-debugging/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/systematic-debugging/SKILL.md",
+     "anchor": "## Root cause first"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/test-driven-development",
+   "source": "sp-skills",
+   "what": "Skill: test-driven-development",
+   "source_path": "skills/test-driven-development/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/SKILL.md",
+     "anchor": "## Test first"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/using-git-worktrees",
+   "source": "sp-skills",
+   "what": "Skill: using-git-worktrees",
+   "source_path": "skills/using-git-worktrees/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/worktrees/SKILL.md",
+     "anchor": "## The core rule"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/using-superpowers",
+   "source": "sp-skills",
+   "what": "Skill: using-superpowers",
+   "source_path": "skills/using-superpowers/SKILL.md",
+   "covered_by": [
+    {
+     "file": "agents/manager.md",
+     "anchor": "## Skills"
+    },
+    {
+     "file": "agents/implementer.md",
+     "anchor": "## Skills"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/verification-before-completion",
+   "source": "sp-skills",
+   "what": "Skill: verification-before-completion",
+   "source_path": "skills/verification-before-completion/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/verification/SKILL.md",
+     "anchor": "## Evidence before claims"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-plans",
+   "source": "sp-skills",
+   "what": "Skill: writing-plans",
+   "source_path": "skills/writing-plans/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-plans/SKILL.md",
+     "anchor": "## The core rule"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills",
+   "source": "sp-skills",
+   "what": "Skill: writing-skills",
+   "source_path": "skills/writing-skills/SKILL.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/SKILL.md",
+     "anchor": "## A skill is tested like code"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/builder-check-prompt",
+   "source": "sp-skills",
+   "what": "brainstorming: builder-check-prompt.md",
+   "source_path": "skills/brainstorming/builder-check-prompt.md",
+   "covered_by": [
+    {
+     "file": "skills/design-first/references/builder-check-brief.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/visual-companion",
+   "source": "sp-skills",
+   "what": "brainstorming: visual-companion.md",
+   "source_path": "skills/brainstorming/visual-companion.md",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Showing, not telling"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/scripts/frame-template",
+   "source": "sp-skills",
+   "what": "brainstorming: scripts/frame-template.html",
+   "source_path": "skills/brainstorming/scripts/frame-template.html",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Showing, not telling"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/scripts/helper",
+   "source": "sp-skills",
+   "what": "brainstorming: scripts/helper.js",
+   "source_path": "skills/brainstorming/scripts/helper.js",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Showing, not telling"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/scripts/server",
+   "source": "sp-skills",
+   "what": "brainstorming: scripts/server.cjs",
+   "source_path": "skills/brainstorming/scripts/server.cjs",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Showing, not telling"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/scripts/start-server",
+   "source": "sp-skills",
+   "what": "brainstorming: scripts/start-server.sh",
+   "source_path": "skills/brainstorming/scripts/start-server.sh",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Showing, not telling"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/brainstorming/scripts/stop-server",
+   "source": "sp-skills",
+   "what": "brainstorming: scripts/stop-server.sh",
+   "source_path": "skills/brainstorming/scripts/stop-server.sh",
+   "covered_by": [
+    {
+     "file": "skills/design-first/SKILL.md",
+     "anchor": "## Showing, not telling"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/analyst-common",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/analyst-common.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/analyst-common.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## The common brief"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/cost-and-time",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/cost-and-time.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/cost-and-time.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Cost and time"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/plan-adherence",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/plan-adherence.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/plan-adherence.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Plan adherence"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/quality-evidence",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/quality-evidence.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/quality-evidence.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Quality evidence"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/repeated-work",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/repeated-work.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/repeated-work.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Repeated work"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/request-conflicts",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/request-conflicts.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/request-conflicts.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Request conflicts"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/scrub-audit",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/scrub-audit.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/scrub-audit.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/export-and-redaction.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/scrub",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/scrub.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/scrub.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/export-and-redaction.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/similar-session",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/similar-session.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/similar-session.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## The similar-session matcher"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/skill-timeline",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/skill-timeline.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/skill-timeline.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Skill timeline"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/prompts/stumbles",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: prompts/stumbles.md",
+   "source_path": "skills/diagnosing-superpowers/prompts/stumbles.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/analyst-briefs.md",
+     "anchor": "## Stumbles"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/references/context-safety",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: references/context-safety.md",
+   "source_path": "skills/diagnosing-superpowers/references/context-safety.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/case-and-report.md",
+     "anchor": "## Context-safety rules for every reader of these files"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/references/github-issues",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: references/github-issues.md",
+   "source_path": "skills/diagnosing-superpowers/references/github-issues.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/export-and-redaction.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/references/redaction-policy",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: references/redaction-policy.md",
+   "source_path": "skills/diagnosing-superpowers/references/redaction-policy.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/export-and-redaction.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/references/session-discovery",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: references/session-discovery.md",
+   "source_path": "skills/diagnosing-superpowers/references/session-discovery.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/transcripts.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/templates/bundle-README",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: templates/bundle-README.md",
+   "source_path": "skills/diagnosing-superpowers/templates/bundle-README.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/export-and-redaction.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/templates/case",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: templates/case.md",
+   "source_path": "skills/diagnosing-superpowers/templates/case.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/case-and-report.md",
+     "anchor": "## The case file"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/templates/issue",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: templates/issue.md",
+   "source_path": "skills/diagnosing-superpowers/templates/issue.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/export-and-redaction.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/diagnosing-superpowers/templates/report",
+   "source": "sp-skills",
+   "what": "diagnosing-superpowers: templates/report.md",
+   "source_path": "skills/diagnosing-superpowers/templates/report.md",
+   "covered_by": [
+    {
+     "file": "skills/session-diagnosis/references/case-and-report.md",
+     "anchor": "## The report"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/executing-plans/scripts/task-done",
+   "source": "sp-skills",
+   "what": "executing-plans: scripts/task-done",
+   "source_path": "skills/executing-plans/scripts/task-done",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## Recording each task"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/executing-plans/scripts/task-start",
+   "source": "sp-skills",
+   "what": "executing-plans: scripts/task-start",
+   "source_path": "skills/executing-plans/scripts/task-start",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## Recording each task"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/requesting-code-review/code-reviewer",
+   "source": "sp-skills",
+   "what": "requesting-code-review: code-reviewer.md",
+   "source_path": "skills/requesting-code-review/code-reviewer.md",
+   "covered_by": [
+    {
+     "file": "skills/code-review/references/reviewer-checklist.md"
+    },
+    {
+     "file": "agents/reviewer.md",
+     "anchor": "## Your job"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development/implementer-prompt",
+   "source": "sp-skills",
+   "what": "subagent-driven-development: implementer-prompt.md",
+   "source_path": "skills/subagent-driven-development/implementer-prompt.md",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/references/implementer-brief.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development/re-review-prompt",
+   "source": "sp-skills",
+   "what": "subagent-driven-development: re-review-prompt.md",
+   "source_path": "skills/subagent-driven-development/re-review-prompt.md",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/references/re-review-brief.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development/task-reviewer-prompt",
+   "source": "sp-skills",
+   "what": "subagent-driven-development: task-reviewer-prompt.md",
+   "source_path": "skills/subagent-driven-development/task-reviewer-prompt.md",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/references/reviewer-brief.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development/scripts/review-package",
+   "source": "sp-skills",
+   "what": "subagent-driven-development: scripts/review-package",
+   "source_path": "skills/subagent-driven-development/scripts/review-package",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## Review after every task"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development/scripts/sdd-workspace",
+   "source": "sp-skills",
+   "what": "subagent-driven-development: scripts/sdd-workspace",
+   "source_path": "skills/subagent-driven-development/scripts/sdd-workspace",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## Before the first task"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/subagent-driven-development/scripts/task-brief",
+   "source": "sp-skills",
+   "what": "subagent-driven-development: scripts/task-brief",
+   "source_path": "skills/subagent-driven-development/scripts/task-brief",
+   "covered_by": [
+    {
+     "file": "skills/executing-plans/SKILL.md",
+     "anchor": "## Briefing a worker"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging/condition-based-waiting-example",
+   "source": "sp-skills",
+   "what": "systematic-debugging: condition-based-waiting-example.ts",
+   "source_path": "skills/systematic-debugging/condition-based-waiting-example.ts",
+   "covered_by": [
+    {
+     "file": "skills/systematic-debugging/references/condition-based-waiting.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging/condition-based-waiting",
+   "source": "sp-skills",
+   "what": "systematic-debugging: condition-based-waiting.md",
+   "source_path": "skills/systematic-debugging/condition-based-waiting.md",
+   "covered_by": [
+    {
+     "file": "skills/systematic-debugging/references/condition-based-waiting.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging/defense-in-depth",
+   "source": "sp-skills",
+   "what": "systematic-debugging: defense-in-depth.md",
+   "source_path": "skills/systematic-debugging/defense-in-depth.md",
+   "covered_by": [
+    {
+     "file": "skills/systematic-debugging/references/defense-in-depth.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging/find-polluter",
+   "source": "sp-skills",
+   "what": "systematic-debugging: find-polluter.sh",
+   "source_path": "skills/systematic-debugging/find-polluter.sh",
+   "covered_by": [
+    {
+     "file": "skills/systematic-debugging/references/root-cause-tracing.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging/root-cause-tracing",
+   "source": "sp-skills",
+   "what": "systematic-debugging: root-cause-tracing.md",
+   "source_path": "skills/systematic-debugging/root-cause-tracing.md",
+   "covered_by": [
+    {
+     "file": "skills/systematic-debugging/references/root-cause-tracing.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/systematic-debugging/CREATION-LOG",
+   "source": "sp-skills",
+   "what": "systematic-debugging: CREATION-LOG.md",
+   "source_path": "skills/systematic-debugging/CREATION-LOG.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/testing-skills-with-subagents.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/test-driven-development/writing-good-tests",
+   "source": "sp-skills",
+   "what": "test-driven-development: writing-good-tests.md",
+   "source_path": "skills/test-driven-development/writing-good-tests.md",
+   "covered_by": [
+    {
+     "file": "skills/test-first/references/writing-good-tests.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills/anthropic-best-practices",
+   "source": "sp-skills",
+   "what": "writing-skills: anthropic-best-practices.md",
+   "source_path": "skills/writing-skills/anthropic-best-practices.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/best-practices.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills/examples/CLAUDE_MD_TESTING",
+   "source": "sp-skills",
+   "what": "writing-skills: examples/CLAUDE_MD_TESTING.md",
+   "source_path": "skills/writing-skills/examples/CLAUDE_MD_TESTING.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/testing-skills-with-subagents.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills/graphviz-conventions",
+   "source": "sp-skills",
+   "what": "writing-skills: graphviz-conventions.dot",
+   "source_path": "skills/writing-skills/graphviz-conventions.dot",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/best-practices.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills/persuasion-principles",
+   "source": "sp-skills",
+   "what": "writing-skills: persuasion-principles.md",
+   "source_path": "skills/writing-skills/persuasion-principles.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/best-practices.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills/render-graphs",
+   "source": "sp-skills",
+   "what": "writing-skills: render-graphs.js",
+   "source_path": "skills/writing-skills/render-graphs.js",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/best-practices.md"
+    }
+   ]
+  },
+  {
+   "id": "sp-skill/writing-skills/testing-skills-with-subagents",
+   "source": "sp-skills",
+   "what": "writing-skills: testing-skills-with-subagents.md",
+   "source_path": "skills/writing-skills/testing-skills-with-subagents.md",
+   "covered_by": [
+    {
+     "file": "skills/writing-skills/references/testing-skills-with-subagents.md"
+    }
+   ]
+  }
+ ]
+}

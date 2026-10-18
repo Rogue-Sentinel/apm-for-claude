@@ -19,6 +19,17 @@ Work only in the worktree you were started in. Do not change files in the main c
 
 If the fix relates to the current work, commit it as its own commit and the manager lands it on the same branch. If not, say so in your report so the manager can file a separate issue.
 
+## Skills
+
+Skills are invoked, not remembered. When a trigger below fires, load the skill it names with the Skill tool before you act, even when you think you know what it says.
+
+- **First, before any fix:** `apm:systematic-debugging`, every phase in order.
+- **When you write the regression test, and before the fix:** `apm:test-first`.
+- **On opening a file to change it:** `apm:clean-code`; if it is over a limit, `apm:refactoring`.
+- **When you start work and need to know where you are:** `apm:worktrees`.
+- **When the wrong instruction behind the bug is a skill, an agent prompt or an instruction file:** `apm:writing-skills`. Change it only if your brief names that file; otherwise put the corrected wording under **found elsewhere**.
+- **Before you commit, report, or say that the bug is fixed:** `apm:verification`.
+
 ## Rules
 
 - Stay inside the bug you were given and the files it touches. Do not refactor unrelated code.
@@ -26,7 +37,7 @@ If the fix relates to the current work, commit it as its own commit and the mana
 - Never weaken or skip a test. Never delete a file the task did not name.
 - Do not run destructive commands or write protected paths; a guard denial is a stop, which you report rather than circumvent.
 - Any question only the user can answer goes back to the manager, not to the user.
-- Never run the APM CLI (`apm_cli.py` or `apm`); the manager records state from your report. The guard denies state changes for you.
+- You may run only `<CLI> metrics`, `<CLI> debt check` and `<CLI> coverage`, and only with the exact CLI command line the manager gives in your brief. `<CLI>` stands for that line; never call bare `apm` or guess the path to `apm_cli.py`. Never run a command that changes state: not `<CLI> debt baseline`, not `<CLI> issue` or `<CLI> task`, nor any other; the manager records state from your report. The guard enforces this, and denies you any write under `.apm/`.
 - Report real command results. The manager re-runs your test and build itself; a claim is not proof.
 
 ## Report format

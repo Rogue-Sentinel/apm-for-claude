@@ -51,6 +51,27 @@ def _questions(sub) -> None:
     resolve.add_argument("--answer", required=True)
 
 
+def _metrics(sub) -> None:
+    parser = sub.add_parser("metrics", help="measure the project against the limits")
+    parser.add_argument("--json", action="store_true", help="print every measured number as JSON")
+    parser.add_argument("paths", nargs="*", metavar="PATH", help="measure only these files or directories")
+
+
+def _coverage(sub) -> None:
+    parser = sub.add_parser("coverage", help="check that the standard covers every item of the old one")
+    parser.add_argument("--source", action="append", default=[], metavar="ID=DIR", help="also scan an old source folder")
+    parser.add_argument("--table", action="store_true", help="print the coverage table")
+
+
+def _debt(sub) -> None:
+    parser = sub.add_parser("debt", help="the debt ratchet: record a baseline and check the code against it")
+    actions = parser.add_subparsers(dest="action", required=True)
+    baseline = actions.add_parser("baseline", help="record the current numbers; refuses to loosen without --accept")
+    baseline.add_argument("--accept", metavar="REASON", help="record why a worse number is accepted")
+    check = actions.add_parser("check", help="exit 1 when anything is worse than the baseline")
+    check.add_argument("--base", default="main", metavar="REF", help="the ref whose baseline may not be loosened")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="apm", description="Record and report project state.")
     sub = parser.add_subparsers(dest="subcommand", required=True)
@@ -61,4 +82,7 @@ def build_parser() -> argparse.ArgumentParser:
     _allow(sub)
     _approve(sub)
     _questions(sub)
+    _metrics(sub)
+    _debt(sub)
+    _coverage(sub)
     return parser

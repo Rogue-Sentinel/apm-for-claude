@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any
 
 ALWAYS_PROTECTED: tuple[str, ...] = (".git/**", ".apm/state/**")
+# A worker never writes the profile or the debt baseline, whatever an allowlist says.
+WORKER_PROTECTED: tuple[str, ...] = (".apm/**",)
 DEFAULT_MODELS: dict[str, str] = {
     "auditor": "haiku",
     "planner": "opus",
