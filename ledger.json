@@ -73,6 +73,14 @@
           "id": "6",
           "status": "pending",
           "title": "Merge gate"
+        },
+        {
+          "attempts": 1,
+          "id": "1r",
+          "model": "opus",
+          "status": "running",
+          "title": "Task 1 review",
+          "worker": "reviewer"
         }
       ],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
@@ -535,6 +543,11 @@
     {
       "at": "2026-10-18T20:26:13.216244+00:00",
       "event": "task 11/1 running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:30:34.981765+00:00",
+      "event": "task 11/1r running",
       "issue": 11
     }
   ]
