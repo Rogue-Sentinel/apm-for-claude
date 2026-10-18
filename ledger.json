@@ -45,9 +45,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Red on purpose, as planned: tests/test_cli_metrics_classes.py 4 failed for the defect ([] where a class was expected x2, 'C' != 'C++', text flag ': 0' confirmed by a direct metrics run), tests/test_cli_metrics.py 24 passed, in the worktree and on the branch after merge 764f82f; debt check: nothing worse.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Reproduce the bug as failing tests",
           "worker": "implementer"
         },
@@ -206,6 +207,11 @@
     {
       "at": "2026-10-18T19:16:44.611985+00:00",
       "event": "task 9/1 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:19:04.344627+00:00",
+      "event": "task 9/1 done",
       "issue": 9
     }
   ]
