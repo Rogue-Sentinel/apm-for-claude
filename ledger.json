@@ -38,10 +38,10 @@
       "tasks": [
         {
           "attempts": 2,
-          "evidence": "Task 1 review (opus): 2 must-fix open: (1) ADR 0005 states the approved reading of ADR 0002 rule 2 as the rule itself; (2) no pin for the reverse-order cat heredoc writing a protected file (cat <<'EOF' > docs/x.md; worker cat <<'EOF' > .apm/notes.md). 5 suggestions deferred in the plan.",
+          "evidence": "Red on purpose: 19 FAIL-now tests fail for the defect, 63 pins/existing pass, in the worktree and on the branch after merge; fix round 1 (2 addressed, 0 open; commits 01ee922..75a028b); per-task review + re-review clean; debt check nothing worse.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Failing tests, pins, ADR 0005",
           "worker": "implementer"
         },
@@ -585,6 +585,11 @@
     {
       "at": "2026-10-18T20:38:55.348910+00:00",
       "event": "task 11/1r done",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:38:57.899881+00:00",
+      "event": "task 11/1 done",
       "issue": 11
     }
   ]
