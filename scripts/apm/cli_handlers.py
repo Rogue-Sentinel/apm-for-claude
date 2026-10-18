@@ -10,6 +10,7 @@ from typing import Any
 
 from apm import ledger as lg
 from apm.briefing import render_briefing
+from apm.cli_standard import HANDLERS as STANDARD_HANDLERS
 from apm.paths import Project, to_native_path
 from apm.setup import setup_project
 from apm.state_store import commit_state, load_state
@@ -106,4 +107,5 @@ def setup(project: Project, args: argparse.Namespace) -> None:
 HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
     "brief": brief, "issue": issue, "task": task, "allow": allow, "approve": approve,
     "question": question, "resolve": resolve, "setup": setup,
+    **STANDARD_HANDLERS,
 }
