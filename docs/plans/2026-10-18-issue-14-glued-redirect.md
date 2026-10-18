@@ -286,3 +286,4 @@ EOF"` (allowed) so the glued-head body masking is pinned.
 - Task 2 review (S3): the guard_redirects docstring could also name two fail-closed misreads: a `#` comment and `(( a>b ))` arithmetic are read as redirects.
 - Task 2 review (S4): add unit cases for op-run boundaries: here-string, process substitution, `>&2`.
 - Task 2 review (found elsewhere): `_candidates` splits `HEAD:docs/x.md` only on `/`, so `git show HEAD:docs/x.md` never matches `docs/**` (a read; noted only).
+- *Recorded after the final review (N1): the Task 2 fix round changed the op group to `[&*]?[<>][<>&]*` so PowerShell's `*>` stays whole, and added `tests/test_guard_redirects_streams.py` (25 lines of logic, within the limits) as its regression test. Final review M1 fixed: the glued-head heredoc pin now names `docs/b.md` in its body.*
