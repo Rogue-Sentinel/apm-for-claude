@@ -246,7 +246,10 @@ already holds that lane). Then each goes to the planner with the design document
 time per lane, and each plan comes back to the user for approval before any of it is built.
 
 **The parent issue** holds no tasks of its own. When the design is approved and split, record it as
-`<CLI> issue N --status building`: its sub-issues are being built. It stays open on GitHub, listing
+`<CLI> issue N --status building`: its sub-issues are being built. The parent holds no lane, so
+its sub-issues are never queued behind it; each sub-issue holds its own lane. The parent never
+records allowlist entries: every protected-path write or destructive step belongs to the sub-issue
+whose approved plan names it. It stays open on GitHub, listing
 its sub-issues, until the last one merges; then it is recorded `merged` and closed.
 
 If the design turns out to be one piece, it is one issue. Do not split for the sake of splitting.

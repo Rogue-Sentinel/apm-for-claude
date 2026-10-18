@@ -275,9 +275,10 @@ the rounds follow the manager's one retry rule, the same everywhere in this skil
    fresh worker told: "A prior worker attempted this task N times; you own it now. Read its report
    for what was tried." A loop that survives a fix round usually means the worker cannot see its own
    problem; fresh eyes and more capability, in one move.
-4. **If that round also fails, stop.** Every must-fix finding still open goes to the user (see
-   "When to stop and ask"). A worker that was already on opus has no stronger tier: it stops and
-   asks after its two failures.
+4. **If that round also fails, stop.** At the stop, decide each finding still open: a contestable
+   one gets a recorded ruling (below), and every real must-fix finding goes to the user (see "When
+   to stop and ask"). A worker that was already on opus has no stronger tier: it stops after its two
+   failures.
 
 Count failures from the task's `attempts` in the ledger, never from memory, so the rule survives a
 reset.
@@ -292,11 +293,13 @@ passing before and after. Each round's outcome is the evidence of the record tha
 next `failed`, or the final `done`): `fix round R (X addressed, Y open: <one line each>; commits
 a..b)`. The ledger shows the latest round; the commits in git hold every round's work.
 
-**Before the stop, only a contestable finding may get a ruling.** If the reviewer is wrong, or the
-point is genuinely contestable, record a ruling saying why the code stands (as an amendment in the
-plan file, like every ruling), tell the user, and let the final review see both sides. A real
-finding is never ruled away and never deferred to end a loop: it is fixed, or it goes to the user at
-the stop. Every decision is recorded; a silent discard is forbidden.
+**Rule on contestable findings only at the stop.** While the loop runs, every open finding goes back
+to the worker; ruling on one mid-loop to end the loop is pre-judging under another name. At the stop,
+a finding where the reviewer is wrong, or the point is genuinely contestable, gets a recorded ruling
+saying why the code stands (as an amendment in the plan file, like every ruling); tell the user, and
+let the final review see both sides. A real finding is never ruled away and never deferred: it is
+fixed, or it goes to the user at the stop. Every decision is recorded; a silent discard is
+forbidden.
 
 **The final review.** When every task is done, the whole branch gets one review, on the most capable
 model: a package from the merge base with `main` to HEAD, the plan and design paths, the plan's Review
@@ -374,8 +377,8 @@ Stop, and ask the user, for these and only these:
    gets built, drops or loosens a structural criterion, raises a limit or accepts a worse debt
    number, or needs a design change.
 5. **A task that failed under the retry rule:** two failures on its model, then one more on the
-   next tier (or two failures, for a worker already on opus). Every must-fix finding still open goes
-   to the user with it.
+   next tier (or two failures, for a worker already on opus). Contestable findings get a recorded
+   ruling at the stop; every real must-fix finding still open goes to the user with it.
 6. **A merge-gate criterion that cannot be met.**
 7. **A plan so broken that every path forward is a guess.**
 
@@ -395,7 +398,7 @@ can be dispatched at all, stop and tell the user: the manager does not build the
 | "Close enough on spec compliance." | A spec gap means not done. Fix it, or stop and ask. |
 | "I'll fix it myself; dispatching is overhead." | Your fixes skip review and fill your context. Send it back. |
 | "One more round will converge." | Past the retry rule, rounds do not converge; the failure is structural. Stop and ask. |
-| "This real finding can be deferred so the loop can end." | Only a contestable finding gets a ruling. A real one is fixed, or goes to the user. |
+| "This real finding can be deferred so the loop can end." | Only a contestable finding gets a ruling, and only at the stop. A real one is fixed, or goes to the user. |
 | "The reviewer will just find something new anyway." | A scoped re-review verifies fixes and cannot wander. New findings outside the fix are recorded, not looped. |
 | "This finding is obviously wrong; I'll drop it." | You decide only at the stop, and every decision is recorded. Silent discards are forbidden. |
 | "The fix was small; skip the re-review." | Unreviewed fixes are how regressions land. Every round ends with a re-review. |
