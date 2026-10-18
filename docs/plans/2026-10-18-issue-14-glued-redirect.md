@@ -281,3 +281,8 @@ moved a.md->docs/b.md
 EOF"` (allowed) so the glued-head body masking is pinned.
 - Task 1 review (S2): add operator-run neighbors as smoke pins: `echo x >&2`, `python x.py 1>&2`, a here-string `<<<`, a process substitution `<(...)`.
 - Task 1 review (found elsewhere): `_CAT_HEREDOC` needs a blank between `cat` and `<<`, so `cat<<'EOF'>body.md` bodies are scanned line by line; after Task 2 a glued arrow to a protected path in such a body is denied too (accepted under Risks). Candidate small issue: mask the body when `cat<<'TAG'` has no blank.
+- Task 2 review (S1): a `"$(cat <<EOF ... EOF)"` commit or PR body is left unmasked by design, so its lines are scanned and now glued mentions of protected paths are denied too; the manager writes bodies with the Write tool and passes --body-file or -F. Candidate small issue.
+- Task 2 review (S2): confirms the Task 1 deferred finding: `cat<<EOF>body.md` with a glued arrow to a protected path in the body goes from allowed to denied.
+- Task 2 review (S3): the guard_redirects docstring could also name two fail-closed misreads: a `#` comment and `(( a>b ))` arithmetic are read as redirects.
+- Task 2 review (S4): add unit cases for op-run boundaries: here-string, process substitution, `>&2`.
+- Task 2 review (found elsewhere): `_candidates` splits `HEAD:docs/x.md` only on `/`, so `git show HEAD:docs/x.md` never matches `docs/**` (a read; noted only).
