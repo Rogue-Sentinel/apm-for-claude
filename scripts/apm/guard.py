@@ -21,6 +21,8 @@ _ASK_USER = (
     ". Ask the user in chat; if they approve this exact action, record it with "
     f'{_CLI} approve --command "<the exact full command>" --reason "<why>" '
     "(or --path <glob> for a file write), then retry."
+    " Run the approve call with the Bash tool, on its own, with the command in single quotes "
+    "if it holds a double quote."
 )
 
 
@@ -62,7 +64,7 @@ def _file_violation(
 def _state_dir_write(command: str, cwd: Path, project: Project) -> str | None:
     if not is_under(cwd, project.state_dir) or all_read_only(command):
         return None
-    return f"command runs inside the APM state directory: {command}"
+    return "command runs inside the APM state directory"
 
 
 def _cwd(event: Mapping[str, Any], project: Project, windows: bool) -> Path:
@@ -74,11 +76,12 @@ def _command_violation(
     prefixes: Sequence[str], windows: bool,
 ) -> str | None:
     cwd = _cwd(event, project, windows)
-    return (
+    reason = (
         worker_command_violation(command, event, cwd, project.worktree_root)
         or _state_dir_write(command, cwd, project)
         or check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
     )
+    return f"{reason}: {command.strip()}" if reason else None
 
 
 def _violation(
