@@ -38,9 +38,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Task 1 review (opus): 2 must-fix open: (1) ADR 0005 states the approved reading of ADR 0002 rule 2 as the rule itself; (2) no pin for the reverse-order cat heredoc writing a protected file (cat <<'EOF' > docs/x.md; worker cat <<'EOF' > .apm/notes.md). 5 suggestions deferred in the plan.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "failed",
           "title": "Failing tests, pins, ADR 0005",
           "worker": "implementer"
         },
@@ -548,6 +549,11 @@
     {
       "at": "2026-10-18T20:30:34.981765+00:00",
       "event": "task 11/1r running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:36:22.103293+00:00",
+      "event": "task 11/1 failed",
       "issue": 11
     }
   ]
