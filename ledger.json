@@ -389,7 +389,8 @@
         {
           "attempts": 0,
           "id": "4",
-          "status": "pending"
+          "status": "pending",
+          "title": "Merge gate"
         }
       ],
       "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
@@ -1368,6 +1369,11 @@
     {
       "at": "2026-10-18T23:44:30.684506+00:00",
       "event": "task 19/3 updated",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:44:33.013668+00:00",
+      "event": "task 19/4 updated",
       "issue": 19
     }
   ]
