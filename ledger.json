@@ -256,6 +256,14 @@
           "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix",
+          "model": "haiku",
+          "status": "running",
+          "title": "Final review fix",
+          "worker": "implementer"
         }
       ],
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
@@ -1221,6 +1229,11 @@
     {
       "at": "2026-10-18T23:36:58.465701+00:00",
       "event": "task 14/review failed",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:37:00.853953+00:00",
+      "event": "task 14/fix running",
       "issue": 14
     }
   ]
