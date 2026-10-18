@@ -203,6 +203,18 @@ with regression tests seen failing first. Cost if wrong: one more commit in the 
 
 *Ruling during Task 2 fix round 1: the shared word splitter lives in a new `scripts/apm/guard_words.py` (outside the round's file list), so `guard_github.py` and `guard_workers.py` share it without an import cycle. `grep -r 'gh issue' docs` moved from the allowed reads to the denied text searches, as the S2 ruling requires. Cost if wrong: one small file.*
 
+*Rulings after the Task 2 re-review (M1, M2, M3, S1, S2, S3 and S6 addressed; the wrapper fix fails open):
+(a) the `apm` check is applied as first ruled: an `apm`-program word (bare, by path, `apm.exe`, `.cmd`, `.bat`, or
+`apm_cli.py`) followed by a state-changing subcommand **anywhere in a segment** is denied to workers. There is no
+wrapper list, so `eval`, `iex`, `Invoke-Expression`, `cmd /c call`, `start`, `timeout 30s`, `watch`, `strace`,
+`flock`, `uv run`, `busybox` and `parallel` are all caught. `echo apm note` and `grep apm issue docs` are now
+denied on purpose, the same trade S2 made for `gh`. To offset it, `_state_change` runs on `mask_data(command)`, as
+`_github_write` does, so a literal commit message is not read as a command (an expanding value such as
+`-m "$(apm note 1)"` is still seen). Also: `gh auth status` with `--show-token`/`-t` is denied (it prints the
+token, like the already-denied `gh auth token`), and `gh pr checkout` leaves the read allowlist (it moves a
+worker's worktree off its task branch). Under the retry rule this was the second failure, so fix round 2 goes to a
+fresh worker on opus. Cost if wrong: more false positives for workers, who fail closed and use the Grep tool.*
+
 ### Task 3: Metrics follow-ups: plain files, a git ref, and files in two layers
 
 **Files:**
@@ -732,3 +744,8 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
   `--parent` is checked before `gh` is called.
 - Task 4: test_setup_gitignore_without_trailing_newline now also expects `.apm/tmp/` (on purpose). The guard denied a worker's heredoc whose text held `.apm/tmp` as a write to `.apm/` (a Plan 1 false positive; the worker used the Edit tool).
 - Task 8: the finish-first check passes when either the local branch or `origin/<name>` is merged into the base (`any`), so a merged local branch with `origin/<name>` ahead passes; `apply` takes `run` but does not use it; refusals print to stdout. The final review decides.
+- Task 2 re-review S2: the read allowlist denies a worker's `git commit -m "$(cat <<'EOF' ... EOF)"` whose message
+  mentions a `gh` write, because `mask_data` does not mask a quoted-tag heredoc substitution (Plan 1 code in
+  `guard_data.py`). The final review decides.
+- Task 2 re-review S6: `_RUN_STRING` (`-\w*c`) also matches `grep -c` and `head -c` (false positives that fail
+  closed).
