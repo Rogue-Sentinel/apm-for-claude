@@ -63,8 +63,10 @@ Every plan starts with this header, in this order:
 # <Project> — <Feature> — Implementation Plan
 
 > **For agentic workers:** the manager builds this plan task by task. Each task is built
-> test-first by one implementer, verified by the manager, and reviewed before the next task
-> starts. Steps use checkbox (`- [ ]`) syntax for tracking.
+> test-first by one implementer in its own worktree and verified by the manager with the task's
+> targeted tests. The whole branch is reviewed once at the end, and the full suite runs exactly
+> once, through the merge gate, right before the PR. [Name any task that is safety-critical and
+> also gets its own review.] Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** <one or two sentences: what this builds>
 
@@ -122,8 +124,8 @@ tests/orders/test_pricing.ext
 
 ## Tasks
 
-**Right-size each task.** A task is the smallest unit that carries its own test cycle and is worth a
-fresh reviewer's gate. Fold setup, configuration, scaffolding and documentation into the task whose
+**Right-size each task.** A task is the smallest unit that carries its own test cycle and is worth its
+own verification and record. Fold setup, configuration, scaffolding and documentation into the task whose
 deliverable needs them. Split only where a reviewer could meaningfully reject one task while
 approving its neighbor. Each task ends with an independently testable deliverable.
 
@@ -150,7 +152,8 @@ Each task has this shape:
   - `test_rejects_an_empty_order`: an order with no lines gives the error "order has no lines".
 - [ ] **Step 2: Run** `<the project's test command for that file>`. Expected: FAIL (no such function).
 - [ ] **Step 3: Implement** `price(order) -> Money` in `src/orders/pricing.ext`.
-- [ ] **Step 4: Run** the whole suite. Expected: all PASS.
+- [ ] **Step 4: Run** `<the task's tests and the tests for the files it changed>`. Expected: PASS.
+  (The full suite is not a task step: it runs once, through `<CLI> gate`, right before the PR.)
 - [ ] **Step 5: Commit** `"Price an order from its lines"`.
 ```
 

@@ -114,8 +114,10 @@ the root cause:
 - **One change** at a time.
 - **No "while I'm here" improvements** and no bundled refactoring. Refactoring is a separate commit
   (`apm:refactoring`).
-- **Verify the fix.** The new test passes, no other test broke (run the project's whole suite), and
-  the original symptom is gone. Then prove the test guards the bug: revert the fix, run the test and
+- **Verify the fix.** The new test passes, no covering test broke (run the tests for every file the
+  fix changed; the whole suite runs once, through `<CLI> gate`, right before the PR), and
+  the original symptom is gone. `<CLI>` is the framework's command line, as the manager's prompt
+  defines it. Then prove the test guards the bug: revert the fix, run the test and
   see it **fail**, restore the fix, and see it pass. Claims follow `apm:verification`.
 
 The test-first rules (`apm:test-first`, "A bug fix starts with a failing test") apply in full:
@@ -286,7 +288,7 @@ When you see one: stop, and go back to phase 1.
 
 The debugger returns the framework's structured report to the manager, and nothing else: status
 (done, blocked or needs decision), files changed (the regression test included), commands run with
-their real output (the test failing, then passing, and the suite), concerns, and found elsewhere.
+their real output (the test failing, then passing, and the covering tests), concerns, and found elsewhere.
 Add the root cause stated plainly, the instruction or project knowledge behind it and what you did
 about it, and whether the fix belongs on this branch or in a new issue. You never address the user.
 

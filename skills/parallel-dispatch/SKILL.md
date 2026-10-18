@@ -122,18 +122,21 @@ When the workers return:
 2. **Verify each one yourself, in its own worktree.** A worker's claim is not evidence.
 3. **Check for conflicts.** Did two workers edit the same code after all? If so, the files were not
    disjoint: integrate one, then route the other back with the first one's change in its brief.
-4. **Merge one branch at a time** into the feature branch, and run the full suite after each merge.
-   A green task can still break once combined with another.
+4. **Merge one branch at a time** into the feature branch, and run the targeted tests after each
+   merge: the merged task's own tests and the tests for the files it changed. A green task can still
+   break once combined with another. The full suite waits for `<CLI> gate`.
 5. **Spot-check.** Workers make systematic errors; read a sample of each diff, not just the reports.
-6. **Review and record each task** as `apm:executing-plans` says: one review per task, and one record
-   per task, with the evidence from your own runs.
+6. **Record each task** as `apm:executing-plans` says, with the evidence from your own runs, and post
+   its one-line update. A task gets its own review only in the cases under "When to review" there;
+   otherwise its diff waits for the one whole-branch review.
 
 An example. After a large refactoring, six tests fail across three files: three timing failures in
 the abort tests, two in batch completion (calls never run), one in an approval race (a count of
 zero). The domains are independent: abort logic, batch completion and the approval race share no
 code. Three workers run at once. One replaces arbitrary delays with waiting on events, one fixes an
 event carrying its identifier in the wrong field, one waits for the asynchronous call to finish. The
-fixes touch different files and do not conflict; after each merge the full suite is green.
+fixes touch different files and do not conflict; after each merge the targeted tests are green, and
+the gate runs the full suite once at the end.
 
 ## Common mistakes
 
@@ -141,7 +144,7 @@ fixes touch different files and do not conflict; after each merge the full suite
 - **A fourth worker** "because it's small", or a cap counted per issue instead of across all of them.
 - **Briefs that are too broad**, carry no context, set no constraints, or ask for vague output.
 - **Parallel investigation of related failures**, so three workers fix one root cause three ways.
-- **Merging every branch at once** and running the suite only at the end, so a break cannot be
-  traced to one merge.
+- **Merging every branch at once** and running no tests until the end, so a break cannot be traced
+  to one merge.
 - **Trusting the reports** instead of verifying each worktree and spot-checking the diffs.
 - **Pasting the session's history** into every brief instead of each problem's own context.

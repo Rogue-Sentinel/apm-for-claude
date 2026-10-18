@@ -54,7 +54,10 @@ better interfaces as a side effect.
 3. **Watch it fail, for the right reason**: the behavior is missing, not a typo or a bad import.
    If it fails for another reason, fix the test and run it again.
 4. **Write just enough** production code to pass. Do not anticipate later requirements.
-5. **Run the whole suite.** Green: pick the next behavior. Anything red: fix it before moving on.
+5. **Run the tests covering the change**: the test you wrote and the tests for the files you
+   changed. Green: pick the next behavior. Anything red: fix it before moving on. The whole suite
+   is not part of the cycle: it runs exactly once, through `<CLI> gate`, right before the pull
+   request.
 
 Test-after versus test-first:
 
@@ -82,7 +85,7 @@ produces both correct and clean code.
 RED       write one failing test for the next small behavior
   verify  it fails, and fails for the expected reason       -- wrong failure: back to RED
 GREEN     the simplest code that passes
-  verify  it passes, the whole suite passes, output clean   -- not green: back to GREEN
+  verify  it passes, the covering tests pass, output clean  -- not green: back to GREEN
 REFACTOR  improve the structure with everything green
   verify  still green after every step
 NEXT      the next behavior, back to RED
@@ -105,11 +108,14 @@ NEXT      the next behavior, back to RED
   BAD   retryOperation(operation, options: { maxRetries, backoff: linear | exponential, onRetry })
         -- options no test asked for: you aren't going to need it
   ```
-- **Verify green.** The test passes, every other test still passes, and the output is clean (no new
-  errors or warnings). "Other tests" means **the project's whole suite**, run with the project's own
-  test command, even when your task named one test file: the task bounds what you deliver, not what
-  you verify. A failure, including one you did not cause, goes in your report by name. A red test
-  you saw scroll past and left out falsifies the report. Test failing? Fix the code, not the test.
+- **Verify green.** The test passes, the tests covering the files you changed still pass, and the
+  output is clean (no new errors or warnings). "Covering tests" means the task's own tests **and the
+  tests for every file you changed**, run with the project's own test command, even when your task
+  named one test file: the task bounds what you deliver, not what you verify. The whole suite runs
+  exactly once, through `<CLI> gate`, right before the pull request, and again only if the gate
+  failed and something changed. A failure, including one you did not cause, goes in your report by
+  name. A red test you saw scroll past and left out falsifies the report. Test failing? Fix the
+  code, not the test.
 - **Refactor**, only when green: remove duplication, improve names, extract helpers, simplify
   conditionals. One structural change at a time, tests after each. No new behavior. Refactoring
   commits are separate from behavior commits (`apm:refactoring`).
@@ -197,7 +203,7 @@ RED       test "rejects an empty email":
               expect(result.error).toBe("Email required")
 verify    FAIL: expected "Email required", got nothing
 GREEN     submitForm(data): if data.email is blank: return error "Email required"
-verify    PASS, whole suite green
+verify    PASS, covering tests green
 REFACTOR  extract validation if more fields need it
 ```
 
@@ -343,5 +349,6 @@ Any of these means: delete the code, start over from a test.
 - **Designing the whole architecture before the first test.**
 - **Arranging more than the behavior needs**, or relying on hidden global state with no arrange.
 - **Vague test names** that do not describe the scenario.
-- **Running only your own test file** and calling the suite green.
+- **Running only your own test file** and calling the change verified, when other files' tests cover
+  what you touched.
 - **Getting stuck on what to test next.** Pick the simplest next behavior; when unsure, the happy path.

@@ -60,7 +60,8 @@ commands it ran with their real output, so the manager knows what to re-run and 
 
 | Claim | Requires | Not enough |
 |-------|----------|------------|
-| Tests pass | the project's whole test command, run fresh: zero failures | an earlier run, one test file, "should pass" |
+| The change's tests pass | the targeted tests, run fresh: the task's own tests and the tests for every file it changed, zero failures | an earlier run, only the test you just wrote, "should pass" |
+| The suite passes, the branch is ready for the PR | `<CLI> gate`: the full suite, run once, right before the PR (again only if the gate failed and something changed): zero failures | targeted tests, an earlier run, "should pass" |
 | A checker is clean | the checker's output: zero errors | a partial check, an extrapolation |
 | The build succeeds | the build command: exit status 0 | a clean lint, logs that "look good" |
 | A bug is fixed | the original symptom, re-tested: it passes | the code changed, so it is assumed fixed |
@@ -76,7 +77,8 @@ read-only verbs, `metrics` and `debt check`.
 The key patterns:
 
 ```
-TESTS        run the project's test command; see "34 passed, 0 failed"; then say "all 34 tests pass"
+TESTS        run the targeted tests; see "34 passed, 0 failed"; then say "the 34 targeted tests
+             pass". Say "the suite passes" only after `<CLI> gate` shows it
              never "should pass now" or "looks correct"
 
 REGRESSION   write the test; run it (it passes with the fix); revert the fix; run it (it MUST fail);
@@ -147,13 +149,14 @@ Stop, and run the verification, if you notice any of these:
 
 ## References
 
-- `apm:test-first`: the red-green cycle that a regression check repeats, and the rule that the
-  whole suite is what you verify.
+- `apm:test-first`: the red-green cycle that a regression check repeats, and the rule that the tests
+  covering the files you changed are what you verify while working.
 - `apm:systematic-debugging`: what to do when the evidence says the fix did not work.
 
 ## Common mistakes
 
-- **Running the one test you wrote** and reporting the suite green.
+- **Running the one test you wrote** and reporting the suite green. Targeted tests support a claim
+  about the change; only the gate supports a claim about the suite.
 - **Reading the summary line only**, and missing the error printed above it.
 - **Verifying in the wrong place**: your worktree passes, the merged branch fails.
 - **A regression test never checked against the code without the fix.**

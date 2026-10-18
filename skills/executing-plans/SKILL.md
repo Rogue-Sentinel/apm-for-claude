@@ -6,8 +6,8 @@ description: "Use when the manager is building an approved plan: dispatching a w
 # Executing plans
 
 Build an approved plan task by task: a fresh worker for each task, the manager's own verification
-of what it produced, a review after every task, and a record after every task. The plan already did
-the thinking. Carry it out exactly, prove each task with commands you ran yourself, and leave a
+of what it produced with targeted tests, one whole-branch review at the end, and a record after
+every task. The plan already did the thinking. Carry it out exactly, prove each task with commands you ran yourself, and leave a
 record that survives your own forgetting.
 
 ## When this applies
@@ -20,15 +20,21 @@ approves it under the framework.
 
 ## The core rule
 
-**A fresh worker per task, the manager's own verification, a review after every task, and a record
-after every task.** The manager directs; it does not write production code when a worker can, and
-it never fixes review findings itself, since a fix it makes skips review. A worker's claim is not
-evidence.
+**A fresh worker per task, the manager's own verification, one whole-branch review at the end, and
+a record after every task.** The manager directs; it does not write production code when a worker
+can, and it never fixes review findings itself, since a fix it makes skips review. A worker's claim
+is not evidence.
+
+**Lean pacing is the default.** While working, run the targeted tests: the task's own tests and the
+tests for the files it changed. The full suite runs **exactly once**, through `<CLI> gate`, right
+before the pull request, and again only if the gate failed and something changed. There is **one
+whole-branch review at the end**. A review after a single task happens only in the three cases under
+"When to review". After each task the manager posts one plain line: what finished, what is next,
+and roughly how much time is left.
 
 **Once the plan is approved, run to the merge.** Do not stop between tasks to check in, and do not
 ask "should I continue?": the user approved the plan so they would not have to answer that. Keep
-them informed in short lines (what you are about to do, what a worker reported, what you verified),
-and stop only for the reasons in "When to stop and ask".
+them informed with that one line per task, and stop only for the reasons in "When to stop and ask".
 
 ## Before the first task
 
@@ -86,18 +92,23 @@ The loop, for every task:
 record    <CLI> task N ID --status running --worker implementer --model sonnet
 dispatch  one fresh worker, in its own worktree, with its brief
 report    read it; handle its status
-verify    run the verification yourself, in its worktree; merge; run it again on the branch
-review    a reviewer checks the diff
+verify    run the targeted tests yourself, in its worktree; merge; run them again on the branch
+review    only when a trigger fires (see "When to review"): a reviewer checks the diff
           findings: <CLI> task N ID --status failed --evidence "<the findings>", then a fix round
           (running again), until clean, or stop and ask
 record    <CLI> task N ID --status done --evidence "<the command you ran and its result>"
+update    one plain line: what finished, what is next, rough time left
 next      the next task
+
+after the last task:
+review    one whole-branch review, and its fixes
+gate      <CLI> gate: the full suite, exactly once, right before the pull request
 ```
 
 - **Sequential by default.** Tasks run in parallel only through `apm:parallel-dispatch`: disjoint
   files, never more than the worker cap.
-- **Never start the next task** while the review has open must-fix findings that are neither fixed
-  nor brought to the user.
+- **Never start the next task** while a review that ran has open must-fix findings that are neither
+  fixed nor brought to the user.
 - **Batch small same-shape work.** Several small, independent edits of one kind (the same one-line
   fix across files, a constant changed in several places) go to one worker in one brief listing
   every file and its change, and are reviewed as one diff. Keep one dispatch per task for work that
@@ -173,7 +184,7 @@ changed, commands run with their output, concerns, and found elsewhere.
 - **Done, with concerns:** read the concerns first. About correctness or scope: address them before
   review. Observations ("this file is getting large"): note them and go on to review.
 - **Any blocked report is a failed attempt:** record it `--status failed` with the blocker as
-  evidence, and let the retry rule (under "Review after every task") choose the model for the next
+  evidence, and let the retry rule (under "When to review") choose the model for the next
   try. What changes is the brief:
 - **Blocked by missing context:** provide it and dispatch again.
 - **Blocked because the task needs more reasoning:** the retry rule moves it one tier stronger after
@@ -195,7 +206,8 @@ changed. If a worker said it is stuck, something has to change.
 When a worker reports done, run the verification **yourself**, read the actual output, and only then
 believe it:
 
-1. Run the task's tests and the project's full suite and checkers in the **worker's worktree**.
+1. Run the targeted tests (the task's own tests and the tests for the files it changed) and the
+   project's checkers in the **worker's worktree**. The full suite waits for the gate.
 2. If they pass, merge the worktree's branch into the feature branch (`apm:worktrees`).
 3. Run them again **on the feature branch**: a clean task can still break once merged with the
    others.
@@ -220,11 +232,23 @@ the output matches. **The plan is wrong** (a step contradicts the design, an int
 what an earlier task produced, a command that cannot work): rule on the smallest change that
 satisfies the design, record the ruling, and carry it into later tasks that touch the same interface.
 
-## Review after every task
+## When to review
 
-Every task gets a review, and the review is a gate: never skip it, and never accept a review that
-lacks either verdict. Spec compliance **and** quality are both required. The worker's own
-self-review never replaces it.
+Under lean pacing the whole branch gets **one review at the end** (see "The final review" below),
+and that review is never skipped. A task gets its own review, before the next task starts, in these
+cases and only these:
+
+1. **The user asked for it.**
+2. **The profile says `"review": "per-task"`.**
+3. **The task touches a path in the profile's `workflow.safety_critical`.**
+
+Without one of the three, the task is recorded done on the manager's own verification, and its diff
+is reviewed with the rest of the branch. Review a task on a hunch and you spend the time the user
+chose to save.
+
+When a review does run, it is a gate: never skip it, and never accept a review that lacks either
+verdict. Spec compliance **and** quality are both required. The worker's own self-review never
+replaces it. The retry rule and the fix loop below apply to every review, per-task or final.
 
 Dispatch the reviewer (`apm:reviewer` role) with
 [references/reviewer-brief.md](references/reviewer-brief.md) and four things:
@@ -318,7 +342,8 @@ starts with a test that reproduces the finding and is seen failing; a behavior f
 verified. A structural fix is confirmed by the re-review, and an extraction by the unchanged suite
 passing on both sides. Then one
 scoped re-review of the fix. There is no second wave: residual findings go to the user, because
-criterion 3 of the merge gate is a final review with nothing unresolved. Then finish with
+criterion 3 of the merge gate is a final review with nothing unresolved. Then run `<CLI> gate`, the
+one full-suite run (a second only if the gate failed and something changed), and finish with
 `apm:finishing-a-branch`.
 
 ## Re-review after fixes
@@ -402,7 +427,9 @@ can be dispatched at all, stop and tell the user: the manager does not build the
 | "The reviewer will just find something new anyway." | A scoped re-review verifies fixes and cannot wander. New findings outside the fix are recorded, not looped. |
 | "This finding is obviously wrong; I'll drop it." | You decide only at the stop, and every decision is recorded. Silent discards are forbidden. |
 | "The fix was small; skip the re-review." | Unreviewed fixes are how regressions land. Every round ends with a re-review. |
-| "Reviews slow the loop down." | Without reviews the loop is unverified churn. |
+| "Reviews slow the loop down." | Not skipping the final one is the floor. A per-task review is slower, so it runs only for the three triggers in "When to review". |
+| "I'll run the full suite after every task, to be safe." | The task's tests and the tests for the files it changed are the evidence. The full suite runs once, through `<CLI> gate`. |
+| "This task feels risky; I'll review it on its own." | Risk you can name is a `workflow.safety_critical` path, or the user asked. A feeling goes to the final review. |
 | "Recording is overhead; I'll catch up after a few tasks." | The record is what survives a reset. Record every task as it finishes. |
 | "I remember what Task N says." | You remember a summary. The brief has the exact values. |
 | "The worker said the tests pass." | A claim is not evidence. Run them. |
@@ -431,25 +458,28 @@ Task 1: the save-point store
 [BASE a1b2c3d; <CLI> task 42 1 --status running --worker implementer --model sonnet]
 [dispatch: brief, files owned, report contract]
 worker: done. RED: test_saves_and_loads failed (no such function); GREEN: 6/6 pass.
-[manager: suite in the worktree, 214 pass; merge into the branch; suite again, 214 pass]
-[reviewer: spec compliant; quality approved]
-[<CLI> task 42 1 --status done --evidence "suite 214 passed, on the branch after merge"]
+[manager: targeted tests in the worktree, 6 pass; merge into the branch; targeted tests again, 6 pass]
+[no trigger fires: no review for this task]
+[<CLI> task 42 1 --status done --evidence "tests/test_store.py 6 passed, on the branch after merge"]
+[update: "Task 1 done, Task 2 next, about 20 minutes left"]
 
-Task 2: resuming from a save point
+Task 2: resuming from a save point (touches a workflow.safety_critical path)
 [BASE d4e5f6a; <CLI> task 42 2 --status running ... --evidence "Ruling: see the plan, Task 2
  amendment"; dispatch, carrying the savePoint ruling]
 worker: done. 9/9 pass.
-[manager: suite green in the worktree and on the branch]
+[manager: targeted tests green in the worktree and on the branch]
+[trigger 3 fires: a per-task review]
 [reviewer: spec gap, the "resume within one second" limit is not tested; must-fix: a magic number]
 [<CLI> task 42 2 --status failed --evidence "spec gap: 1s limit untested; must-fix: magic number"]
 [fix round 1: <CLI> task 42 2 --status running (attempts 2); resume the same worker with both]
 worker: limit test added and failing first, then passing; constant extracted; covering tests 11/11.
 [re-review: both addressed, no new breakage]
-[record: fix round 1 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e); done, with the suite output]
+[record: fix round 1 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e); done, with the test output]
 
 [all tasks done: final review on the most capable model, Review Focus verbatim, rulings listed]
 final reviewer: no must-fix findings; one suggestion; nothing declined.
 [suggestion added to the plan's "## Deferred findings", committed]
+[<CLI> gate: the full suite once, 214 pass]
 [<CLI> issue 42 --status integrating; apm:finishing-a-branch]
 
 Report to the user, built from the plan's amendments and deferred findings: what shipped, the pull
