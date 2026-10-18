@@ -20,7 +20,7 @@ DEFAULT_EXCLUDES: tuple[str, ...] = (
 )
 STANDARD_KEYS = ("limits", "metrics", "debt_sources", "adr_dir", "review_patterns", "ui", "layers")
 METRICS_KEYS = ("include", "exclude", "extra_exclude", "builtin")
-SOURCE_KEYS = ("name", "command", "numbers")
+SOURCE_KEYS = ("name", "command", "numbers", "timeout")
 LAYER_KEYS = ("name", "paths", "may_import")
 # In `may_import`, "outside" means libraries beyond the standard library and "*" means every layer.
 RESERVED_LAYERS: tuple[str, ...] = ("outside", "*")
@@ -45,6 +45,7 @@ class DebtSource:
     name: str
     command: str
     numbers: Mapping[str, str]
+    timeout: int = 300
 
 
 @dataclass(frozen=True)
@@ -141,6 +142,7 @@ def _source(raw: object, label: str) -> DebtSource:
         _text(given.get("name"), f"{label}.name"),
         _text(given.get("command"), f"{label}.command"),
         {metric: _one_group(rx, f"{label} number {metric}") for metric, rx in numbers.items()},
+        _positive(given.get("timeout", 300), f"{label}.timeout"),
     )
 
 

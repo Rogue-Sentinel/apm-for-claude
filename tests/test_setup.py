@@ -69,7 +69,7 @@ def test_setup_gitignore_without_trailing_newline(git_repo: Path) -> None:
     (git_repo / ".gitignore").write_text("node_modules", encoding="utf-8", newline="\n")
     setup_project(find_project(git_repo))
     text = (git_repo / ".gitignore").read_text(encoding="utf-8")
-    assert text == "node_modules\n.apm/state/\n"
+    assert text == "node_modules\n.apm/state/\n.apm/tmp/\n"
 
 
 @pytest.mark.parametrize("content", ["{not json", "[1, 2]"])
@@ -169,3 +169,18 @@ def test_setup_mirrors_an_existing_profile_verbatim(git_repo: Path) -> None:
     project = find_project(git_repo)
     setup_project(project)
     assert (project.state_dir / "profile.json").read_text(encoding="utf-8") == text
+
+
+def test_setup_ignores_tmp_once(git_repo: Path) -> None:
+    project = find_project(git_repo)
+    setup_project(project)
+    setup_project(project)
+    lines = (git_repo / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert lines.count(".apm/tmp/") == 1 and lines.count(".apm/state/") == 1
+
+
+def test_setup_adds_the_tmp_ignore_to_a_gitignore_that_only_has_state(git_repo: Path) -> None:
+    (git_repo / ".gitignore").write_text(".apm/state/\n", encoding="utf-8", newline="\n")
+    changed = setup_project(find_project(git_repo))
+    text = (git_repo / ".gitignore").read_text(encoding="utf-8")
+    assert ".gitignore" in changed and text == ".apm/state/\n.apm/tmp/\n"

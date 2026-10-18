@@ -16,6 +16,7 @@ SETTINGS_PATH = ".claude/settings.json"
 PROFILE_PATH = ".apm/profile.json"
 GITIGNORE_PATH = ".gitignore"
 STATE_IGNORE = ".apm/state/"
+TMP_IGNORE = ".apm/tmp/"
 MIRROR_NAME = "profile.json"
 
 
@@ -92,10 +93,11 @@ def _mirror_profile(project: Project) -> None:
 def _setup_gitignore(project: Project) -> bool:
     path = project.worktree_root / GITIGNORE_PATH
     old = _read_text(path) or ""
-    if STATE_IGNORE in old.splitlines():
+    missing = [line for line in (STATE_IGNORE, TMP_IGNORE) if line not in old.splitlines()]
+    if not missing:
         return False
     lead = "" if not old or old.endswith("\n") else "\n"
-    _write_text(path, old + lead + STATE_IGNORE + "\n")
+    _write_text(path, old + lead + "".join(line + "\n" for line in missing))
     return True
 
 
