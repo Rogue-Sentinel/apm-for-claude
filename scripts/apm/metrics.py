@@ -10,7 +10,9 @@ from pathlib import Path
 from apm.guard_paths import matches_any
 from apm.metrics_braces import measure_braces
 from apm.metrics_lang import language_for, measure_plain
-from apm.metrics_model import ClassMetric, FileMetric, FunctionMetric
+from apm.metrics_model import (
+    CLASS_LANGUAGES, CLASSLESS_LANGUAGES, ClassMetric, FileMetric, FunctionMetric, classes_measured,
+)
 from apm.metrics_python import measure_python
 from apm.standard_config import Limits, MetricsConfig
 
@@ -55,6 +57,11 @@ def _is_plain(metric: FileMetric) -> bool:
     return language is not None and language.family == "plain"
 
 
+def _is_brace(metric: FileMetric) -> bool:
+    language = language_for(metric.path)
+    return language is not None and language.family == "brace"
+
+
 @dataclass(frozen=True)
 class Report:
     files: tuple[FileMetric, ...]
@@ -78,6 +85,12 @@ class Report:
     def plain(self) -> list[FileMetric]:
         """Files in a language with no function scanner: measured for size only."""
         return sorted((f for f in self.files if _is_plain(f)), key=lambda f: -f.lines)
+
+    def classes_unscanned(self) -> dict[str, int]:
+        """Brace-language files with no class scanner, counted by language name."""
+        skipped = CLASS_LANGUAGES | CLASSLESS_LANGUAGES
+        names = [f.language for f in self.files if _is_brace(f) and f.language not in skipped]
+        return {name: names.count(name) for name in sorted(set(names))}
 
 
 def under_paths(names: Sequence[str], paths: Sequence[str] | None) -> list[str]:
@@ -126,10 +139,28 @@ def _file_section(report: Report, limits: Limits) -> list[str]:
                     [f"{f.path} -- {f.lines} lines" for f in over])
 
 
+def _class_header(report: Report, limits: Limits) -> str:
+    head = f"Review flags -- classes with {limits.public_methods}+ public methods: "
+    langs = ", ".join(report.classes_unscanned())
+    if not langs:
+        return head + str(len(report.wide_classes(limits)))
+    if not any(classes_measured(f) for f in report.files):
+        return head + f"not measured (no class scanner for {langs})"
+    return head + f"{len(report.wide_classes(limits))} (classes not measured for {langs})"
+
+
 def _class_section(report: Report, limits: Limits) -> list[str]:
     wide = report.wide_classes(limits)
-    return _section(f"Review flags -- classes with {limits.public_methods}+ public methods: {len(wide)}",
+    return _section(_class_header(report, limits),
                     [f"{p}:{c.line} {c.name} -- {c.public_methods} public methods" for p, c in wide])
+
+
+def _class_unscanned_section(report: Report) -> list[str]:
+    unscanned = report.classes_unscanned()
+    if not unscanned:
+        return []
+    title = f"Files whose classes were not measured (no class scanner for the language): {sum(unscanned.values())}"
+    return _section(title, [f"{name}: {count}" for name, count in unscanned.items()])
 
 
 def _unmeasured_section(report: Report) -> list[str]:
@@ -148,7 +179,8 @@ def render_text(report: Report, limits: Limits) -> str:
     """Counts of what is over the limits, each item on a line, then the review flags."""
     sections = (
         _function_section(report, limits), _file_section(report, limits),
-        _class_section(report, limits), _unmeasured_section(report), _plain_section(report),
+        _class_section(report, limits), _class_unscanned_section(report),
+        _unmeasured_section(report), _plain_section(report),
     )
     return "\n".join(line for section in sections for line in section)
 
@@ -157,6 +189,7 @@ def _file_json(metric: FileMetric) -> dict:
     return {
         "path": metric.path, "language": metric.language, "lines": metric.lines,
         "functions_measured": metric.functions_measured, "note": metric.note, "plain": _is_plain(metric),
+        "classes_measured": classes_measured(metric),
         "functions": [asdict(fn) for fn in metric.functions],
         "classes": [asdict(c) for c in metric.classes],
     }
