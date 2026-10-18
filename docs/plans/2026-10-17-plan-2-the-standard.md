@@ -253,6 +253,10 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
   - `@dataclass(frozen=True) class DebtSource: name: str; command: str; numbers: Mapping[str, str]` (metric name to regex with one group)
   - `@dataclass(frozen=True) class Standard: limits: Limits; metrics: MetricsConfig; sources: tuple[DebtSource, ...]; adr_dir: str = "docs/adr/"; review_patterns: Mapping[str, tuple[str, ...]] = {}`
     (`adr_dir` and `review_patterns` are named by the `adr` and `branch-review` skills. *Added after the Task 7 review.*)
+    It also has `ui: bool | None = None`: whether the project has a user interface. `None` means the reviewer
+    decides from the code. `review_patterns` maps a scorecard dimension name to grep patterns. *Added after Task 9.*
+    It also has `layers: tuple[Mapping[str, Any], ...] = ()`, the layer map that the `clean-architecture` skill
+    reads. Each entry is `{"name", "paths": [globs], "may_import": [layer names]}`. The loader checks that shape. *Added after Task 8.*
   - `load_standard(profile: Profile | None) -> Standard`. It reads `profile.extra["standard"]`
     (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`), uses the defaults when there's no profile or no key, and raises
     `ProfileError` for a non-positive limit, a non-string glob, a source without a name or command, or a
