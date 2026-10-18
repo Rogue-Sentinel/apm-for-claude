@@ -241,10 +241,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 2 review (opus): 1 must-fix (PowerShell *> split, * glob-expanded: a false denial when a visible top-level path is protected), 4 suggestions deferred; no verdict loosened (probe).",
+          "evidence": "Scoped re-review: M1 addressed, no regression, 0 open.",
           "id": "2r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 2 review",
           "worker": "reviewer"
         }
@@ -1192,6 +1192,11 @@
     {
       "at": "2026-10-18T23:27:53.752027+00:00",
       "event": "task 14/2r running",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:30:54.033641+00:00",
+      "event": "task 14/2r done",
       "issue": 14
     }
   ]
