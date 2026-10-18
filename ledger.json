@@ -171,6 +171,17 @@
       "title": "The guard misses a redirect written with no space before it (cat>docs/x.md)",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/14"
     },
+    "15": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "The guard's message mask reads an unmatched -m quote inside a heredoc body and hides the code after it",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/15"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -768,6 +779,11 @@
       "at": "2026-10-18T21:04:03.436713+00:00",
       "event": "task 11/review running",
       "issue": 11
+    },
+    {
+      "at": "2026-10-18T21:11:52.410355+00:00",
+      "event": "filed 15 https://github.com/Rogue-Sentinel/apm-for-claude/issues/15",
+      "issue": 15
     }
   ]
 }
