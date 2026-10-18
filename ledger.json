@@ -63,9 +63,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Step 4: 143 passed; tests/test_cli_metrics_classes.py 1 passed ([database.hpp]) 3 failed (the .h cases, as planned) \u2014 in the worktree and on the branch after merge; metrics 0/69 fn, 0/5 files over; braces/heads files unchanged; debt check nothing worse. Ruling: see the plan, Task 3 amendment.",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Count C++ public methods",
           "worker": "implementer"
         },
@@ -232,6 +233,11 @@
     {
       "at": "2026-10-18T19:21:34.844443+00:00",
       "event": "task 9/3 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:26:08.875338+00:00",
+      "event": "task 9/3 done",
       "issue": 9
     }
   ]
