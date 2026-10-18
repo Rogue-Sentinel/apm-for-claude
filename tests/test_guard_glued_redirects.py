@@ -122,6 +122,7 @@ def test_a_redirect_sign_inside_quotes_or_a_message_stays_allowed(git_repo: Path
         "cat > body.md <<'EOF'\na -> b\nsee docs/x.md -> docs/y.md\nx=>y\nEOF",
         "cat <<'EOF'>body.md\na -> b\nEOF",
         "cat >body.md <<'EOF'\na->b\nEOF",
+        "cat <<'EOF'>body.md\nmoved a.md->docs/b.md\nEOF",
     ],
 )
 def test_an_arrow_in_a_markdown_heredoc_body_stays_allowed(git_repo: Path, command: str, extra: dict) -> None:
