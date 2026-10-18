@@ -13,6 +13,8 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
 - a class defined in a macro argument, or whose head is built by a macro, is read by its text;
 - `#ifdef` arms that each open a class or a function leave an extra `{`, and the file is then
   reported as "unbalanced braces" by the function scanner, so no classes are reported either;
+- a C++20 `requires` clause before an inline body (`void b() requires C<T> { } void c();`) merges that
+  method with the next one, so only one of the two is counted;
 - the limits of `metrics_cpp_heads` and of `strip_code` in `metrics_lang` apply first.
 """
 from __future__ import annotations
@@ -22,13 +24,12 @@ from dataclasses import dataclass, replace
 from typing import Literal
 
 from apm.metrics_cpp_heads import (
-    access_label, class_head, is_function_head, is_public_method, scope_kind,
+    BASE_COLON, access_label, class_head, is_function_head, is_public_method, scope_kind,
 )
 from apm.metrics_lang import Language, strip_code
 from apm.metrics_model import ClassMetric, FileMetric
 
 _EVENT = re.compile(r"[{};]|(?<!:):(?!:)")
-_BASE_COLON = re.compile(r"(?<!:):(?!:)")
 
 
 @dataclass
@@ -137,7 +138,7 @@ class _Walker:
 
     def _name_line(self, head: str, name: str, at: int) -> int:
         """The line of the class name in its head, or of the brace when the head does not show it."""
-        base = _BASE_COLON.search(head)
+        base = BASE_COLON.search(head)
         region = head[:base.start()] if base else head
         hits = list(re.finditer(rf"(?<!\w){re.escape(name)}(?!\w)", region))
         end = hits[-1].end() if hits else len(head)

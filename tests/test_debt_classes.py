@@ -69,6 +69,17 @@ def test_a_wide_class_with_no_recorded_language_is_judged_as_measured() -> None:
     assert "new wide class: db.h::Database (7 public methods)" in result.regressions
 
 
+def test_a_class_the_base_already_lists_is_never_newly_measured_whatever_the_language_label() -> None:
+    base = snap(_cpp(("Database", 7)))
+    relabeled = snap(file_metric("db.h", classes=[("Database", 9)], language="Rust"))
+    current = {**relabeled, "class_languages": {"db.h": "Rust"}}
+
+    result = compare(base, current)
+
+    assert "grew: db.h::Database 7 → 9" in result.regressions
+    assert result.newly_measured == ()
+
+
 @pytest.mark.parametrize("field, value", [("class_scanners", "C++"), ("class_languages", {"db.h": 3})])
 def test_a_baseline_with_malformed_class_fields_is_rejected(field: str, value: object) -> None:
     data = {**snap(_cpp()), field: value}

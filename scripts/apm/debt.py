@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from apm.debt_compare import (
     KINDS, Findings, compare_items, compare_limits, compare_sources, compare_scope, compare_totals, compare_unmeasured, merge,
 )
-from apm.debt_classes import project_classes
+from apm.debt_classes import class_path, project_classes
 from apm.metrics import Report
 from apm.metrics_model import CLASS_LANGUAGES
 from apm.standard_config import Limits, MetricsConfig
@@ -79,7 +79,7 @@ def _scope(scope: MetricsConfig | None) -> dict:
 
 def _class_fields(report: Report, classes: Mapping) -> dict:
     """The languages whose classes were scanned, and the language of each file holding a wide class."""
-    paths = {key.split("::", 1)[0] for key in classes}
+    paths = {class_path(key) for key in classes}
     return {"class_scanners": sorted(CLASS_LANGUAGES),
             "class_languages": {f.path: f.language for f in report.files if f.path in paths}}
 

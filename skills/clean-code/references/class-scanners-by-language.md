@@ -6,7 +6,9 @@
 
 - **Python.**
 - **C++.** A `.h` header counts as C++ when its code declares a class, a namespace, a template or an
-  access label. A `.h` header with none of these is read as C, which has no classes to count.
+  access label. A `.h` header with none of these is read as C, which has no classes to count. A C++
+  header with no such marker (for example one holding only a `struct` with methods) is read as C too, and
+  its classes are missed (ADR 0004).
 
 ## Every other language
 
