@@ -57,7 +57,7 @@ _API_VALUED = "HqtpX"
 # The text after it is a zero-width capture, so a second `gh` in the same segment is found too
 # (`exec -a gh gh issue create`).
 _GH = re.compile(
-    r"(?<![\w.-])(?:\S*[/\\])?gh(?:\.exe)?(?=[\s()<>{}`;|&$]|$)(?=(?P<rest>.*))", re.IGNORECASE)
+    r"(?<![\w.-])(?:\S*[/\\])?gh(?:\.exe)?(?=[\s()<>{}`;|&$,]|$)(?=(?P<rest>.*))", re.IGNORECASE)
 _REASON = (
     "workers do not write to GitHub; report to the manager instead "
     "(to search for the text, use the Grep tool: it does not go through the shell)"

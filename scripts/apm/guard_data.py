@@ -18,7 +18,7 @@ _HEREDOC = re.compile(
 # `.exe`, in any case, followed later by an option holding a `c` (`-c`, `-lc`, `-Command`), or `cmd` by `/c`,
 # `/k` or `/r` (`//c` from Git Bash). It is looked for in the whole command, quotes removed, so it fails closed.
 _SHELL_STRING = re.compile(
-    r"(?<![\w.-])(?:\S*[/\\])?(?:(?:bash|sh|zsh|dash|pwsh|powershell)(?:\.exe)?\s(?:.*?\s)?-[\w-]*c"
+    r"(?<![\w.-])(?:\S*[/\\])?(?:(?:bash|sh|zsh|dash|ksh|mksh|pwsh|powershell)(?:\.exe)?\s(?:.*?\s)?-[\w-]*c"
     r"|cmd(?:\.exe)?\s(?:.*?\s)?//?[ckr]\b)",
     re.IGNORECASE | re.DOTALL,
 )

@@ -11,23 +11,24 @@ from .guard_commands import protected_reason, split_segments
 from .guard_data import mask_data
 from .guard_github import gh_write_reason
 from .guard_paths import matches_any
-from .guard_words import shell_words, spellings
+from .guard_words import shell_words, spellings, unreadable_braces
 from .paths import worktree_relative
 from .profile import WORKER_PROTECTED
 
 # A worker never records state; the manager does. A segment changes state when a word naming the apm
-# program (`apm`, by path, `.exe`/`.cmd`/`.bat`, in any case, or `apm_cli.py`) is followed anywhere later
-# in the segment by a state subcommand. There is no list of wrappers to fall behind (`eval`, `timeout 30s`,
-# `uv run`, `parallel` all run it), and an expansion that is empty at run time (`apm $X note 1`) cannot
-# hide the subcommand. `debt` counts unless the word after it starts with `check`, which only reads:
-# `debt baseline` rewrites the ratchet's baseline, and an action added later is denied until classified.
-# The cost is that text naming such a call (`echo apm note`, `grep apm issue docs`) is denied too; a
-# message argument is masked first, so a commit message that only names one is allowed. Known limits:
-# the subcommand built at run time (`apm $CMD 1`), and the program named at run time (`$APM note 1`).
+# program (`apm`, by path, `.exe`/`.cmd`/`.bat`, in any case, `apm_cli.py`, or the module `apm_cli`) is
+# followed anywhere later in the segment by a state subcommand. There is no list of wrappers to fall behind
+# (`eval`, `timeout 30s`, `uv run`, `parallel` all run it), and an expansion that is empty at run time
+# (`apm $X note 1`) cannot hide the subcommand. Brace expansions are expanded first (`apm no{t,}e 1`), and
+# one too large to read is denied. `debt` counts unless the word after it starts with `check`, which only
+# reads: `debt baseline` rewrites the ratchet's baseline, and an action added later is denied until
+# classified. The cost is that text naming such a call (`echo apm note`, `grep apm issue docs`) is denied
+# too; a message argument is masked first, so a commit message that only names one is allowed. Known
+# limits: the subcommand built at run time (`apm $CMD 1`), and the program named at run time (`$APM note 1`).
 _STATE_SUBCOMMANDS = frozenset("issue task allow question resolve setup approve note review github init gate".split())
 # The subcommands a worker may run; every other one is denied above. A test walks the parser.
 WORKER_READ_ONLY = ("brief", "metrics", "coverage", "audit", "debt check")
-_APM_PROGRAMS = frozenset({"apm", "apm_cli.py"})
+_APM_PROGRAMS = frozenset({"apm", "apm_cli.py", "apm_cli"})
 _STATE_REASON = (
     "workers do not change APM state; report to the manager instead "
     "(to search for the text, use the Grep tool: it does not go through the shell)"
@@ -57,6 +58,13 @@ def _state_change(command: str) -> str | None:
     return None
 
 
+def _unreadable(command: str) -> str | None:
+    for segment in split_segments(mask_data(command)):
+        if unreadable_braces(segment):
+            return f"workers may not run a brace expansion too large for the guard to read: {segment}"
+    return None
+
+
 def _github_write(command: str) -> str | None:
     for segment in split_segments(mask_data(command)):
         reason = gh_write_reason(segment)
@@ -82,7 +90,8 @@ def worker_command_violation(command: str, event: Mapping[str, Any], cwd: Path, 
     """
     if not event.get("agent_id"):
         return None
-    return _state_change(command) or _github_write(command) or _apm_write(command, cwd, root)
+    return (_unreadable(command) or _state_change(command) or _github_write(command)
+            or _apm_write(command, cwd, root))
 
 
 def worker_file_violation(target: Path, event: Mapping[str, Any]) -> str | None:

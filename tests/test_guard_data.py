@@ -48,6 +48,8 @@ CODE = [
     "cmd //c -m 'rd /s /q x'",
     "env X=1 bash -c -m 'rm -rf x'",
     "x=$(sh -c -m 'rm -rf x')",
+    "ksh -c -m 'rm -rf x'",
+    "mksh -c --body 'rm -rf x'",
 ]
 
 
