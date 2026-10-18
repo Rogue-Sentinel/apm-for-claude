@@ -18,6 +18,24 @@ def _review(sub) -> None:
     parser.add_argument("--evidence", required=True)
 
 
+def _github(sub) -> None:
+    from apm.cli_parser import KINDS  # lazy: cli_parser imports this module
+
+    parser = sub.add_parser("github", help="file and close GitHub issues, mirrored into the ledger")
+    actions = parser.add_subparsers(dest="action", required=True)
+    file = actions.add_parser("file", help="file an issue and record it as queued")
+    file.add_argument("--title", required=True)
+    file.add_argument("--body-file", required=True, metavar="PATH")
+    file.add_argument("--label", action="append", default=[], metavar="L")
+    file.add_argument("--kind", choices=KINDS)
+    file.add_argument("--lane", metavar="NAME")
+    file.add_argument("--parent", type=int, metavar="P", help="make this a sub-issue of issue P")
+    close = actions.add_parser("close", help="close a shipped issue and record it as merged")
+    close.add_argument("number", type=int)
+    close.add_argument("--pr", required=True, metavar="URL")
+
+
 def add_workflow_parsers(sub) -> None:
     _note(sub)
     _review(sub)
+    _github(sub)

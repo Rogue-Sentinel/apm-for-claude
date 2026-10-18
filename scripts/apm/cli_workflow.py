@@ -52,6 +52,12 @@ def review(project: Project, args: argparse.Namespace) -> None:
     mutate(project, args.number, apply)
 
 
+def github(project: Project, args: argparse.Namespace) -> int:
+    from apm.cli_github import github as handle  # lazy: cli_github imports `mutate` from this module
+
+    return handle(project, args)
+
+
 WORKFLOW_HANDLERS: dict[str, Callable[[Project, argparse.Namespace], int | None]] = {
-    "note": note, "review": review,
+    "note": note, "review": review, "github": github,
 }
