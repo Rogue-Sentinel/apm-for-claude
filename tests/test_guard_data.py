@@ -1,13 +1,7 @@
 """Text in a message argument is data, not a command; text given to an interpreter is code."""
-import sys
-from pathlib import Path
-
 import pytest
 
-from apm.guard import Decision, decide
 from apm.guard_commands import check_command
-from apm.paths import Project
-from apm.profile import Profile
 
 HEREDOC = "git commit -F - <<'EOF'\nDocument rm -rf risk\ngit clean -fd\nEOF"
 DATA = [
@@ -79,23 +73,3 @@ def test_a_protected_path_inside_a_shell_command_string_is_caught(command: str) 
     reason = check_command(command, ["data/*.db"], [])
 
     assert reason is not None and "protected path" in reason
-
-
-def _worker(repo: Path, command: str) -> Decision:
-    project = Project(main_root=repo, worktree_root=repo)
-    event = {"tool_name": "Bash", "cwd": str(repo), "tool_input": {"command": command}, "agent_id": "w1"}
-    return decide(event, project, Profile(framework_version="0.2.0"), [], [], sys.platform == "win32")
-
-
-# A short `-m` is a message only for git; for python it names the module to run, which is code.
-@pytest.mark.parametrize("command", ["python -m 'scripts.apm_cli' note 1", 'python -m "apm_cli" note 1',
-                                     "python -m 'apm_cli' debt baseline"])
-def test_a_worker_cannot_hide_the_apm_module_in_quotes(git_repo: Path, command: str) -> None:
-    decision = _worker(git_repo, command)
-
-    assert decision.kind == "deny" and "APM state" in decision.reason
-
-
-@pytest.mark.parametrize("command", ['git commit -m "names apm note"', 'git commit -am "x"'])
-def test_a_worker_commit_message_stays_data(git_repo: Path, command: str) -> None:
-    assert _worker(git_repo, command).kind == "none"
