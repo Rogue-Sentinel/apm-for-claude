@@ -8,6 +8,7 @@ import shlex
 from collections.abc import Iterator, Sequence
 from pathlib import Path
 
+from .guard_data import mask_data
 from .guard_paths import matches_any
 
 READ_ONLY_PREFIXES = (
@@ -19,13 +20,19 @@ _NO_EXEMPT = ("$(", "`", "<(", ">(")
 # The options git takes before its subcommand. The alternatives are disjoint (a
 # value-taking option never matches the generic one, and a value is either quoted
 # or not), so a long run of options cannot backtrack exponentially.
-_GIT_OPTION = r"(?:-[cC]|--git-dir|--work-tree)"
-_GIT_VALUE = r"""(?:"[^"]*"|'[^']*'|[^\s"']\S*)"""
+_GIT_OPTION = r"(?:-[cC]|--git-dir|--work-tree|--namespace|--super-prefix|--config-env)"
+_GIT_VALUE = r"""(?:"[^"]*"|'[^']*'|(?:\\.|[^\s"'\\])(?:\\.|[^\s\\])*)"""
 _GIT = (
-    r"(?<![\w-])git(?:\.exe)?\s+(?:" + _GIT_OPTION + r"(?:=|\s+)" + _GIT_VALUE + r"\s+"
+    r"""(?<![\w-])git(?:\.exe)?["']?\s+(?:""" + _GIT_OPTION + r"(?:=|\s+)" + _GIT_VALUE + r"\s+"
     r"|(?!" + _GIT_OPTION + r"(?:[=\s]|$))-\S+\s+)*"
 )
 _END = r"(?=\s|$)"
+# xargs deletes only when the command it runs, its first word that is not an option or an option's
+# value, is a delete: `xargs grep rm` searches for "rm".
+_XARGS = (
+    r"(?<![\w-])xargs(?![\w-])(?:\s+(?:-[IEnPdLsa]\s+\S+|--(?:max-args|max-procs|delimiter|arg-file"
+    r"|max-chars|max-lines|replace|eof)\s+\S+|-\S*))*\s+"
+)
 _PS_DELETE = r"(?<![\w-])(?:Remove-Item|ri|rmdir|rd|del|erase)(?![\w-])"
 _CMD_DELETE = r"(?<![\w-])(?:rmdir|rd|del|erase)(?![\w-])"
 
@@ -54,7 +61,7 @@ DESTRUCTIVE: tuple[tuple[re.Pattern[str], str], ...] = (
     _p(r"\bdrop\s+(?:table|database|schema)\b", "SQL drop"),
     _p(r"\btruncate\s+table\b", "SQL truncate"),
     _p(r"(?<![\w-])dropdb(?![\w-])", "dropdb"),
-    _p(r"(?<![\w-])xargs(?![\w-]).*(?<![\w-])(?:rm|del|erase|Remove-Item)(?![\w-])", "xargs delete"),
+    _p(_XARGS + r"(?:\S*/)?(?:rm|del|erase|Remove-Item)(?![\w-])", "xargs delete"),
     _p(_PS_DELETE + r".*\s-r[a-z]*(?=[\s:]|$)", "recursive PowerShell delete"),
     _p(_CMD_DELETE + r".*\s//?s\b", "recursive cmd delete"),
 )
@@ -175,7 +182,8 @@ def check_command(
     cwd: Path | None = None,
     root: Path | None = None,
 ) -> str | None:
-    """Return the reason for the first violating segment, or None."""
+    """Return the reason for the first violating segment, or None. Message arguments are data."""
+    command = mask_data(command)
     if _PIPED_DELETE.search(command):
         return f"destructive command (piped recursive delete): {command}"
     segments = (g for g in split_segments(command) if not _is_exempt(g, allowed_prefixes))

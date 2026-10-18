@@ -40,6 +40,21 @@ BLOCKED = [
     "rm '-r' build",
     'rm -r"f" build',
     'git "reset" --hard',
+    r"git -C /c/Users/darby/x\ y reset --hard",
+    r"git --git-dir=/c/a\ b/.git clean -fd",
+    r"git --work-tree /c/a\ b -c core.x=1 push --force",
+    '"C:/Program Files/Git/cmd/git.exe" -C x reset --hard',
+    "'C:/Program Files/Git/cmd/git.exe' clean -fd",
+    "git --namespace foo reset --hard",
+    "git --super-prefix=a/ --namespace foo clean -fd",
+    "ls | xargs rm",
+    "ls | xargs -n 1 rm -f",
+    "ls | xargs -I {} rm {}",
+    "ls | xargs -I{} rm {}",
+    "ls | xargs -0 -r rm",
+    "ls | xargs --max-args 1 rm",
+    "ls | xargs erase",
+    "ls | xargs -P 4 -n 1 del",
 ]
 ALLOWED = [
     "git push origin feat",
@@ -53,6 +68,13 @@ ALLOWED = [
     f'git -C "{SPACED}" log --oneline',
     "ls | xargs echo",
     "rd //q build",
+    "git ls-files | xargs grep rm",
+    "ls | xargs grep -n del",
+    "ls | xargs -n 1 grep erase",
+    "ls | xargs -I {} echo rm {}",
+    r"git -C /c/Users/darby/x\ y status",
+    "git --namespace foo status",
+    '"C:/Program Files/Git/cmd/git.exe" -C x status',
 ]
 
 

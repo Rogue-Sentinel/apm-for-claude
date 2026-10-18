@@ -1,0 +1,40 @@
+{
+  "accepted": [],
+  "classes": {},
+  "files": {
+    "tests/test_guard.py": 243
+  },
+  "functions": {
+    "tests/test_cli.py::test_mutations_store_fields_and_log_events": 19
+  },
+  "limits": {
+    "file": 200,
+    "function": 15,
+    "public_methods": 7
+  },
+  "scope": {
+    "builtin": true,
+    "exclude": [
+      "**/node_modules/**",
+      "**/vendor/**",
+      "**/third_party/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.min.js",
+      "**/*.generated.*",
+      ".apm/**"
+    ],
+    "include": []
+  },
+  "sources": {},
+  "totals": {
+    "excess_file_lines": 43,
+    "excess_function_lines": 4,
+    "long_files": 1,
+    "long_functions": 1,
+    "unmeasured_files": 0,
+    "wide_classes": 0
+  },
+  "unmeasured": [],
+  "version": 1
+}

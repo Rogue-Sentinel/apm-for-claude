@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .guard_commands import protected_reason, split_segments
+from .guard_data import mask_data
 from .guard_paths import matches_any
 from .paths import worktree_relative
 from .profile import WORKER_PROTECTED
@@ -20,8 +21,8 @@ _DASHES = r"""(?:--\s+)?["']?"""
 _BASELINE = r"""debt["']?\s+""" + _DASHES + r"""baseline"""
 _MUTATIONS = _DASHES + r"(?:issue|task|allow|question|resolve|setup|approve|" + _BASELINE + r")(?![\w-])"
 _APM_MUTATION = re.compile(
-    r"""^["']?(?:[^\s"']*[/\\])?apm["']?\s+""" + _MUTATIONS
-    + r"""|(?<![\w.-])(?i:apm_cli\.py)["']?\s+""" + _MUTATIONS
+    r"""(?:^|(?i:\s-\w*c|\s-command|\s/c)\s+)["']?(?:[^\s"']*[/\\])?apm["']?\s+""" + _MUTATIONS
+    + r"""|(?<![\w.-])(?i:apm_cli\.py)\\*["']?\s+""" + _MUTATIONS
 )
 
 
@@ -33,10 +34,10 @@ def _state_change(command: str) -> str | None:
 
 
 def _apm_write(command: str, cwd: Path, root: Path) -> str | None:
-    for segment in split_segments(command):
+    for segment in split_segments(mask_data(command)):
         reason = protected_reason(segment, WORKER_PROTECTED, cwd, root)
         if reason:
-            return f"workers do not write .apm/; {reason}"
+            return f"workers do not write .apm/ or the Claude settings; {reason}"
     return None
 
 
@@ -51,5 +52,5 @@ def worker_file_violation(target: Path, event: Mapping[str, Any]) -> str | None:
     """Why a worker may not write `target`: it is under `.apm/` of its checkout."""
     found = worktree_relative(Path(os.path.realpath(str(target)))) if event.get("agent_id") else None
     if found and matches_any(WORKER_PROTECTED, found[1]):
-        return f"workers do not write .apm/; {found[1]} is a protected path"
+        return f"workers do not write .apm/ or the Claude settings; {found[1]} is a protected path"
     return None

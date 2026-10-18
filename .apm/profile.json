@@ -1,0 +1,12 @@
+{
+  "framework_version": "0.2.0",
+  "max_workers": 3,
+  "models": {
+    "auditor": "haiku",
+    "debugger": "opus",
+    "implementer": "sonnet",
+    "planner": "opus",
+    "reviewer": "opus"
+  },
+  "protected_paths": []
+}

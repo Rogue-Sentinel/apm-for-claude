@@ -30,7 +30,25 @@ def _write(repo: Path, path: str, tool: str = "Write", **extra: object) -> dict:
 
 
 def test_worker_protected_paths_cover_the_apm_directory() -> None:
-    assert WORKER_PROTECTED == (".apm/**",)
+    assert ".apm/**" in WORKER_PROTECTED
+
+
+def test_worker_protected_paths_cover_the_claude_settings() -> None:
+    assert {".claude/settings.json", ".claude/settings.local.json"} <= set(WORKER_PROTECTED)
+
+
+@pytest.mark.parametrize("path", [".claude/settings.json", ".claude/settings.local.json", ".apm/profile.json"])
+@pytest.mark.parametrize("tool", ["Write", "Edit", "NotebookEdit"])
+def test_worker_cannot_loosen_its_own_guard(git_repo: Path, path: str, tool: str) -> None:
+    assert _decide(_write(git_repo, path, tool, agent_id="w1"), git_repo).kind == "deny"
+    assert _decide(_write(git_repo, path, tool), git_repo).kind == "none"
+
+
+@pytest.mark.parametrize("command", ["echo {} > .claude/settings.json", "rm .claude/settings.json",
+                                     "cp x .apm/profile.json"])
+def test_worker_cannot_loosen_its_guard_by_command(git_repo: Path, command: str) -> None:
+    assert _decide(_bash(git_repo, command, agent_id="w1"), git_repo).kind == "deny"
+    assert _decide(_bash(git_repo, command), git_repo).kind == "none"
 
 
 def test_the_new_subcommands_are_cli_calls() -> None:

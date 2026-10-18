@@ -9,7 +9,7 @@ from typing import Any
 
 ALWAYS_PROTECTED: tuple[str, ...] = (".git/**", ".apm/state/**")
 # A worker never writes the profile or the debt baseline, whatever an allowlist says.
-WORKER_PROTECTED: tuple[str, ...] = (".apm/**",)
+WORKER_PROTECTED: tuple[str, ...] = (".apm/**", ".claude/settings.json", ".claude/settings.local.json")
 DEFAULT_MODELS: dict[str, str] = {
     "auditor": "haiku",
     "planner": "opus",
