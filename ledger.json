@@ -92,9 +92,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 2 review (opus): 0 must-fix; differential check vs real bash 355929 cases, 0 mismatches; 2 suggestions deferred.",
           "id": "2r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 2 review",
           "worker": "reviewer"
         },
@@ -650,6 +651,11 @@
     {
       "at": "2026-10-18T20:46:59.232561+00:00",
       "event": "task 11/3r running",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:48:03.466912+00:00",
+      "event": "task 11/2r done",
       "issue": 11
     }
   ]
