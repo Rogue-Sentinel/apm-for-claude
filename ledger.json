@@ -134,9 +134,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Final review (opus) cc82b1d..8f0d2fb: 2 must-fix: (1) CR + git commit heredoc + unmatched -m quote now allowed, base denied: return the command whole on CR; (2) ADR 0005 misdescribes the cat rule and claims a missing pin. 23 deferred findings decided (see the review in the plan).",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         }
@@ -784,6 +785,11 @@
       "at": "2026-10-18T21:11:52.410355+00:00",
       "event": "filed 15 https://github.com/Rogue-Sentinel/apm-for-claude/issues/15",
       "issue": 15
+    },
+    {
+      "at": "2026-10-18T21:11:54.660607+00:00",
+      "event": "task 11/review failed",
+      "issue": 11
     }
   ]
 }
