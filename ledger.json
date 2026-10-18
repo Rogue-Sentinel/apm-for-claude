@@ -216,10 +216,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "2",
-          "status": "pending",
-          "title": "guard_redirects and protected_reason"
+          "model": "sonnet",
+          "status": "running",
+          "title": "guard_redirects and protected_reason",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1102,6 +1104,11 @@
     {
       "at": "2026-10-18T23:10:51.044139+00:00",
       "event": "task 14/1 done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:10:53.360547+00:00",
+      "event": "task 14/2 running",
       "issue": 14
     }
   ]
