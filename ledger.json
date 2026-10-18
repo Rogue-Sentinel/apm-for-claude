@@ -217,9 +217,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 2 review must-fix M1: PowerShell '*>' / '*>>' (e.g. 'git fetch origin *>$null') is split so '*' is glob-expanded against protected globs; fix: op group [&*]?[<>][<>&]* with a unit case and decide-level pins.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "failed",
           "title": "guard_redirects and protected_reason",
           "worker": "implementer"
         },
@@ -1176,6 +1177,11 @@
     {
       "at": "2026-10-18T23:23:22.644720+00:00",
       "event": "task 14/2r done",
+      "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:23:24.907293+00:00",
+      "event": "task 14/2 failed",
       "issue": 14
     }
   ]
