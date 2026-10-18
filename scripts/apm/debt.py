@@ -10,10 +10,10 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from apm.debt_compare import (
-    KINDS, compare_items, compare_limits, compare_sources, compare_totals, compare_unmeasured, merge,
+    KINDS, compare_items, compare_limits, compare_sources, compare_scope, compare_totals, compare_unmeasured, merge,
 )
 from apm.metrics import Report
-from apm.standard_config import Limits
+from apm.standard_config import Limits, MetricsConfig
 
 VERSION = 1
 
@@ -59,7 +59,13 @@ def _totals(functions: Mapping, files: Mapping, classes: Mapping, unmeasured: li
     }
 
 
-def snapshot(report: Report, limits: Limits, sources: Mapping[str, Mapping[str, int]] | None = None) -> dict:
+def _scope(scope: MetricsConfig | None) -> dict:
+    config = scope or MetricsConfig()
+    return {"include": list(config.include), "exclude": list(config.exclude)}
+
+
+def snapshot(report: Report, limits: Limits, sources: Mapping[str, Mapping[str, int]] | None = None,
+             scope: MetricsConfig | None = None) -> dict:
     functions, classes = _functions(report, limits), _classes(report, limits)
     files = {f.path: f.lines for f in report.over_files(limits)}
     unmeasured = sorted(f.path for f in report.unmeasured())
@@ -67,6 +73,7 @@ def snapshot(report: Report, limits: Limits, sources: Mapping[str, Mapping[str, 
         "version": VERSION,
         "limits": {"function": limits.function, "file": limits.file, "public_methods": limits.public_methods},
         "totals": _totals(functions, files, classes, unmeasured, limits),
+        "scope": _scope(scope),
         "unmeasured": unmeasured,
         "functions": functions, "files": files, "classes": classes,
         "sources": {name: dict(numbers) for name, numbers in (sources or {}).items()},
@@ -94,7 +101,7 @@ def compare(base: dict, current: dict) -> Comparison:
     """Everything in `current` that is worse than `base`, and everything that got better."""
     if _unsupported(base, current):
         return Comparison(_unsupported(base, current), ())
-    parts = [compare_limits(base, current), compare_totals(base, current),
+    parts = [compare_limits(base, current), compare_scope(base, current), compare_totals(base, current),
              compare_unmeasured(base, current), compare_sources(base, current),
              *(compare_items(base, current, kind) for kind in KINDS)]
     return Comparison(*(tuple(lines) for lines in merge(parts)))

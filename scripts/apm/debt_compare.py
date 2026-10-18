@@ -6,6 +6,8 @@ import re
 from collections.abc import Callable, Mapping
 from typing import NamedTuple
 
+from apm.standard_config import DEFAULT_EXCLUDES
+
 Items = Mapping[str, int]
 Item = tuple[str, str, int]  # (same-file group, key, number)
 
@@ -123,6 +125,22 @@ def compare_limits(base: Mapping, current: Mapping) -> Findings:
     missing = [f"limit missing: {name}" for name in sorted(old.keys() ^ now.keys())]
     found = _numbers(old, now, "limit loosened", "limit tightened")
     return Findings(missing + found.regressions, found.improvements, [])
+
+
+def _scope_of(snapshot: Mapping) -> tuple[set[str], set[str]]:
+    scope = snapshot.get("scope") or {"include": [], "exclude": list(DEFAULT_EXCLUDES)}
+    return set(scope.get("include", [])), set(scope.get("exclude", []))
+
+
+def compare_scope(base: Mapping, current: Mapping) -> Findings:
+    """Measuring less than the base did hides debt. An empty include list means every file."""
+    (old_in, old_out), (now_in, now_out) = _scope_of(base), _scope_of(current)
+    lines = [f"now excludes {glob}" for glob in sorted(now_out - old_out)]
+    if now_in and not old_in:
+        lines.append("include list is no longer empty (it used to mean every file)")
+    elif now_in:
+        lines += [f"no longer includes {glob}" for glob in sorted(old_in - now_in)]
+    return Findings([f"measurement scope narrowed: {line}" for line in lines], [], [])
 
 
 def compare_totals(base: Mapping, current: Mapping) -> Findings:
