@@ -37,10 +37,12 @@
       "status": "building",
       "tasks": [
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "1",
-          "status": "pending",
-          "title": "Failing tests, pins, ADR 0005"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Failing tests, pins, ADR 0005",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -528,6 +530,11 @@
     {
       "at": "2026-10-18T20:26:10.779344+00:00",
       "event": "task 11/6 updated",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:26:13.216244+00:00",
+      "event": "task 11/1 running",
       "issue": 11
     }
   ]
