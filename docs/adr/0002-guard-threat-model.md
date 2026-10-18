@@ -25,8 +25,9 @@ on purpose, a quoted module name, indirection through a variable. No worker in t
 past the guard. The reviews had no stated threat model, so the brief asked for "any way past the guard", and
 a search with no bound against a check that cannot be complete never ends.
 
-Patching those constructed inputs was not free. The patches caused real regressions against `main`: routine
-commands that were allowed before were denied, and the fixes were later reverted.
+Patching those constructed inputs was not free. The patches caused real regressions against `main`: commands
+that `main` denied, such as a protected-path write after an escaped line ending, were allowed. Those patches were
+reworked or reverted. They also added false positives on routine work.
 
 ## Decision
 
