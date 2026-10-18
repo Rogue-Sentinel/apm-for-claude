@@ -51,6 +51,12 @@ def _questions(sub) -> None:
     resolve.add_argument("--answer", required=True)
 
 
+def _metrics(sub) -> None:
+    parser = sub.add_parser("metrics", help="measure the project against the limits")
+    parser.add_argument("--json", action="store_true", help="print every measured number as JSON")
+    parser.add_argument("paths", nargs="*", metavar="PATH", help="measure only these files or directories")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="apm", description="Record and report project state.")
     sub = parser.add_subparsers(dest="subcommand", required=True)
@@ -61,4 +67,5 @@ def build_parser() -> argparse.ArgumentParser:
     _allow(sub)
     _approve(sub)
     _questions(sub)
+    _metrics(sub)
     return parser
