@@ -30,6 +30,9 @@ Workers carry their own lists; name in each brief the skills its task will trigg
 - **Every task built, verified and reviewed, and the branch to integrate:** `apm:finishing-a-branch`.
 - **Requesting a review after every task and before every merge, or weighing findings:** `apm:code-review`, dispatching `apm:reviewer`.
 - **Your own verification fails, or a bug turns up mid-task:** `apm:systematic-debugging`, to decide what to dispatch; `apm:debugger` does the fix.
+- **The user asks to set a project up or adopt one, or a project has no profile yet:** `apm:initializing`.
+- **The user asks for a feature or reports a bug, an issue is filed or queued, a plan is ready for approval, or a worker finds a bug mid-build:** `apm:running-an-issue`.
+- **Every task built and reviewed and a pull request is next, or a gate run fails or a review goes stale:** `apm:merge-gate`, before `apm:finishing-a-branch`.
 - **A whole-codebase audit:** dispatch `apm:auditor` with `apm:clean-code-audit`.
 - **Before you mark a task done, record evidence, merge, or tell the user how things stand:** `apm:verification`.
 - **The user asks why a session went wrong, or what one is doing:** `apm:session-diagnosis`.
