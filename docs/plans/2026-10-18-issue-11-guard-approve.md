@@ -425,3 +425,29 @@ reviewed per task; they are not protected paths.)
   echo one segment. The check's label or protected token still says what was found.
 - **Three copies of the approve instruction** (manager, finishing-a-branch, worktrees) can drift; Task 5's tests pin
   the shared phrase in each.
+
+## Approval (2026-10-18)
+
+*Approved by the user in chat: "Approved: the narrow backslash rule, Bash-only approvals, the cat-heredoc rule, and
+ADR 0002 read as 'never allow a command that does what the guard must stop', recorded in ADR 0005."*
+
+## Pre-flight scan
+
+| Tasks | Shared file or interface | Producer vs consumer | Found |
+|---|---|---|---|
+| 1 ↔ 2 | `is_cli_call`, `WIN_TARGET` | Task 1's unit and decide tests call `is_cli_call(command, cwd, windows)` and `decide`; Task 2 keeps both signatures | agrees |
+| 1 ↔ 3 | `tests/test_guard_echo.py` | Task 1 creates it; Task 3 appends one unit test and one pin | same file, Task 3 after Task 1 |
+| 1 ↔ 3 | the echo text | Task 1 asserts `"destructive command (recursive rm): {command}. Ask the user in chat"`; Task 3 makes `_command_violation` return `f"{reason}: {command.strip()}"`, then `_ASK_USER` follows | agrees, if `_ASK_USER` starts with ". Ask the user in chat" (checked in Task 3's verification) |
+| 1 ↔ 4 | heredoc tests, the hook test | Task 1's heredoc cases; Task 4's `_CAT_HEREDOC` is first-line, `cat`, `.md`/`.txt`, quoted tag | agrees |
+| 1 ↔ 5 | worker state denial | Task 1's `test_a_worker_denial_ends_with_the_command_as_typed` (owned by Task 3) and Task 5's new `_STATE_REASON` text | Task 5 changes the reason before the `: command` suffix, so `endswith(": " + command)` still holds; checked in Task 5's verification |
+| 2, 3, 4 | files | Task 2: `guard_cli.py`; Task 3: `guard.py`, `guard_commands.py`, `guard_workers.py`, `guard_github.py`, `tests/test_guard_echo.py`; Task 4: `guard_data.py` | disjoint, may run in parallel |
+| 3 ↔ 5 | `guard.py`, `guard_workers.py` | Task 3: `_command_violation`, `_state_dir_write`, reason producers; Task 5: `_ASK_USER`, `_STATE_REASON` | same files, Task 5 after Task 3 |
+| 1 | self | FAIL-now tests each name the task that turns them green; pins pass now | consistent |
+| 2 | self | `_UNSAFE` drops only `\`; criteria require `$`, backtick, `\n`, `\r` stay | consistent |
+| 3 | self | no verdict changes; the state-directory pin guards the double echo | consistent |
+| 4 | self | the mask applies before the shell-string check, first line only; pins cover code-feeding heredocs | consistent |
+| 5 | self | text-only changes, pinned by new tests; `tests/test_agents.py` pins kept | consistent |
+| 6 | self | the gate | consistent |
+
+Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task review applies to Tasks 1–5
+(safety-critical). No test asserts nothing; no duplicated logic is mandated.
