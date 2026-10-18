@@ -195,7 +195,12 @@
           "text": "Planner: non-read-only commands whose quoted text names a protected path (echo 'x => docs/y') are denied today by the unquoted reading; existing and coarse, outside this issue."
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-18T23:02:37.745707+00:00",
+          "text": "User approved the plan in chat: 'do both 14 and 19'."
+        }
+      ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-14-glued-redirect.md",
       "questions": [],
@@ -1022,6 +1027,11 @@
       "at": "2026-10-18T23:01:41.600395+00:00",
       "event": "filed 19 https://github.com/Rogue-Sentinel/apm-for-claude/issues/19",
       "issue": 19
+    },
+    {
+      "at": "2026-10-18T23:02:37.745733+00:00",
+      "event": "decision 14 User approved the plan in chat: 'do both 14 and 19'.",
+      "issue": 14
     }
   ]
 }
