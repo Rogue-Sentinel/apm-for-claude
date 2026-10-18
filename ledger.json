@@ -60,6 +60,11 @@
           "attempts": 0,
           "id": "5",
           "status": "pending"
+        },
+        {
+          "attempts": 0,
+          "id": "6",
+          "status": "pending"
         }
       ],
       "title": "The guard blocks apm approve for a destructive command, so a user's approval can't be recorded",
@@ -482,6 +487,11 @@
     {
       "at": "2026-10-18T20:25:53.705347+00:00",
       "event": "task 11/5 pending",
+      "issue": 11
+    },
+    {
+      "at": "2026-10-18T20:25:56.034414+00:00",
+      "event": "task 11/6 pending",
       "issue": 11
     }
   ]
