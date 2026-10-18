@@ -277,6 +277,13 @@ test_cli_audit.py, test_init_apply.py, test_cli_init.py, test_gate*.py, test_cli
 - [ ] **Step 3: Implement.** **Step 4: Run** them, plus `tests/test_cli*.py`. Expected: PASS.
 - [ ] **Step 5: Commit** `"Record decisions, concerns, sub-issues and the final review"`.
 
+*Ruling during Task 5: `tests/test_cli_metrics.py::test_the_requirement_table_keeps_plan_one_behavior` asserts the
+table equals Plan 1's five rows exactly, which this task's mandated six rows break. The test gains the six rows
+in its expected table, so it stays an exact check (not loosened to a subset); listed in the PR as a test changed
+on purpose. Also carried into Task 6: `cli_parser` now imports `cli_parser_workflow`, so `KINDS` is imported
+lazily or moved, never imported at module top from `cli_parser` into `cli_parser_workflow`. Cost if wrong: one
+test edit.*
+
 ### Task 6: Filing and closing GitHub issues
 
 **Files:**
@@ -678,3 +685,5 @@ in `docs/platform-notes.md`. Cost if wrong: two paragraphs of skill text.*
   rather than sharing them; sharing would touch a file outside the task. The final review decides.
 - Task 1: the worker added an unknown-key check (a typo such as `gate_timout` raises `ProfileError`), matching
   `standard_config`; the brief did not ask for it. `lane_for([])` returns `None`. The final review decides.
+- Task 5: `set_parent` rejects self and unknown parents, not longer cycles (a under b under a). The final review decides.
+- Task 5: `_mutate` moved to `cli_workflow.mutate` (refactor commit 84fdbd5) to avoid a circular import.
