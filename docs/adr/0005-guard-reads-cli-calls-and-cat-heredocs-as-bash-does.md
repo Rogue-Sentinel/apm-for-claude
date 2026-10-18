@@ -22,8 +22,10 @@ approval, and the guard denies the recording. Four causes, each confirmed on the
 4. **A heredoc body is data only for `git commit -F -`.** The body of `cat > body.md <<'EOF'` is split on
    newlines and each line is scanned as a command, so an issue body that quotes `git rm -r -q x` is denied.
 
-ADR-0002 sets the threat model: a cooperative manager or worker making a mistake. This record applies its
-rule 2 (no verdict loosens for a command that does what the guard must stop) to two narrow deny-to-allow cases.
+ADR-0002 sets the threat model: a cooperative manager or worker making a mistake. Its rule 2, read
+literally, makes any denial that becomes an allow a must-fix, which no false-positive fix can meet. This record
+reads that rule for this change, as the user approved on 2026-10-18, and applies the reading to two narrow
+deny-to-allow cases.
 
 ## Decision
 
@@ -41,7 +43,9 @@ rule 2 (no verdict loosens for a command that does what the guard must stop) to 
   tool.
 - **A denial echoes the command as typed**, once, not the masked segment.
 
-How ADR-0002 rule 2 was applied. Exactly two classes of denial become allows:
+How ADR-0002 rule 2 was read. Read literally, it makes any denial that becomes an allow a must-fix, which no
+false-positive fix can meet. The user approved, on 2026-10-18, reading it for this change as: never allow a
+command that does what the guard must stop. Under that reading exactly two classes of denial become allows:
 
 - (a) A plain CLI call whose backslashes bash reads literally. The CLI only records text; it runs nothing the
   threat model names.

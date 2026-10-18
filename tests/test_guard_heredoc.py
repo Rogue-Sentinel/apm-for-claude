@@ -66,6 +66,12 @@ def test_the_file_a_heredoc_writes_is_still_checked(git_repo: Path) -> None:
     assert (worker.kind, main.kind) == ("deny", "deny")
 
 
+def test_the_file_a_reverse_order_heredoc_writes_is_still_checked(git_repo: Path) -> None:
+    worker = _decide(git_repo, "cat <<'EOF' > .apm/notes.md\nx\nEOF", agent_id="w1")
+    main = _decide(git_repo, "cat <<'EOF' > docs/x.md\nx\nEOF", protected=("docs/**",))
+    assert (worker.kind, main.kind) == ("deny", "deny")
+
+
 def test_a_worker_filing_the_issue_body_is_denied_for_the_cli_call(git_repo: Path) -> None:
     command = "cat > body.md <<'EOF'\nThe guard denied `git rm -r -q x`.\nEOF\n"
     decision = _decide(git_repo, command + f"{CLI} github file --title T --body-file body.md", agent_id="w1")
