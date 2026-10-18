@@ -56,7 +56,7 @@ def test_the_document_exists(path):
 @pytest.mark.parametrize("path", DOCS, ids=lambda p: p.name)
 def test_every_command_it_shows_is_a_real_subcommand(path):
     named = _named_commands(_text(path))
-    assert named, "no commands shown"
+    assert named or path == README, "no commands shown"
     bad = [word for word in named if not _subcommands(build_parser(), [word])]
     assert not bad, f"not subcommands: {bad}"
 
@@ -93,7 +93,7 @@ def test_the_readme_links_to_the_tutorial_the_spec_the_coverage_table_and_the_de
 
 def test_the_readme_states_what_the_plugin_needs_and_how_to_install_it():
     text = _text(README)
-    for needed in ("Python 3.12", "git", "`gh`", "rogue-sentinel", "apm setup"):
+    for needed in ("Python 3.12", "git", "`gh`", "rogue-sentinel", "/apm:setup"):
         assert needed in text, needed
 
 
@@ -117,3 +117,58 @@ def test_the_test_first_cycle_runs_targeted_tests_not_the_whole_suite():
     steps = _text(SKILLS_DIR / "test-first" / "references" / "cycle-steps.md")
     assert "**whole** suite" not in steps
     assert "`<CLI> gate`" in steps
+
+
+_RUNS_APM = re.compile(r"\b(?:run|type|enter|execute)\b[^.\n]*`apm ", re.IGNORECASE)
+_MANAGER_RUNS = "The manager runs"
+
+
+@pytest.mark.parametrize("path", DOCS, ids=lambda p: p.name)
+def test_no_python_command_line_is_shown_to_the_user(path):
+    text = _text(path)
+    bad = [line for line in _code_lines(text) if line.lstrip().startswith("python ")]
+    assert not bad, f"the user is never asked to run python: {bad}"
+    assert "apm_cli.py" not in text, "the script path belongs to the manager"
+
+
+@pytest.mark.parametrize("path", DOCS, ids=lambda p: p.name)
+def test_the_user_is_never_told_to_run_apm_in_a_shell(path):
+    text = _text(path)
+    bad = [line for line in _code_lines(text) if line.lstrip().startswith("apm ")]
+    assert not bad, f"apm in a shell: {bad}"
+    assert not _RUNS_APM.findall(text), "prose tells the user to run apm"
+
+
+def test_the_readme_and_tutorial_section_one_set_up_from_chat():
+    assert "/apm:setup" in _text(README)
+    assert "/apm:setup" in section(_text(TUTORIAL), HEADINGS[0])
+
+
+def test_the_setup_slash_command_exists_with_a_quoted_description():
+    path = ROOT / "commands" / "setup.md"
+    assert path.is_file(), f"{path} is missing"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    assert lines[0].strip() == "---", "no frontmatter"
+    front = lines[1:lines.index("---", 1)]
+    assert any(re.match(r"description: \"[^\"]+\"$", line) for line in front), front
+
+
+def _cli_blocks_without_a_label(text: str) -> list[int]:
+    """Line numbers of fenced blocks that start a line with <CLI> but have no label just above."""
+    lines, bad, start = text.splitlines(), [], None
+    for number, line in enumerate(lines):
+        if not line.lstrip().startswith("```"):
+            continue
+        if start is None:
+            start = number
+            continue
+        body = lines[start + 1:number]
+        labeled = any(_MANAGER_RUNS in above for above in lines[max(0, start - 2):start])
+        if any(row.lstrip().startswith("<CLI> ") for row in body) and not labeled:
+            bad.append(start + 1)
+        start = None
+    return bad
+
+
+def test_every_cli_block_in_the_tutorial_is_labeled_as_what_the_manager_runs():
+    assert _cli_blocks_without_a_label(_text(TUTORIAL)) == []
