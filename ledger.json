@@ -58,7 +58,8 @@
         {
           "attempts": 0,
           "id": "3",
-          "status": "pending"
+          "status": "pending",
+          "title": "Count C++ public methods"
         },
         {
           "attempts": 0,
@@ -169,6 +170,11 @@
     {
       "at": "2026-10-18T19:16:24.406779+00:00",
       "event": "task 9/2 updated",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:16:26.771198+00:00",
+      "event": "task 9/3 updated",
       "issue": 9
     }
   ]
