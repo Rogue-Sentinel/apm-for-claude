@@ -478,4 +478,13 @@ Rubric check: Task 1 commits red tests on purpose (the plan says so). Per-task r
 - Task 5 review: `tests/test_approve_instructions.py` `_safety_section` reads to the end of the file instead of the next `## `.
 - Task 5 review (found elsewhere): `guard_github.py` `_REASON` still ends with the Grep tool only; it does not mention Write or Edit, unlike `_STATE_REASON`.
 
+## Final review (2026-10-18)
+
+Whole-branch review (opus) of cc82b1d..8f0d2fb: two must-fix findings, five Review Focus lines met, the structural criteria met apart from the gate, and a scorecard of about 8/10 for base and branch.
+
+- **M1:** `git commit -F - <<'EOF'\nsubject -m 'x\nEOF\r\nEOF\nrm -rf build; echo 'done'` is denied at base and allowed on the branch. Leaving the heredoc unmasked on a CR lets `_ARGUMENT` swallow the code after it. Fix: return the command whole at the top of `mask_data` when it holds `\r`, and pin the command as a deny.
+- **M2:** ADR 0005 claims a pin for "a heredoc not on the first line" that does not exist, and leaves out `>>`, either order, the unquoted `[\w./:~-]` target, the end at the first tag line, and the CR rule. Fix: add the pin `"cd docs\ncat > body.md <<'EOF'\nrm -rf build\nEOF"` (deny), and describe the rule in full.
+
+*The reviewer decided all 23 deferred findings. These are fixed before merge: Task 1 #2 and #4 (folded into M2), Task 4 re-review CR (M1), Task 4 ADR omissions (M2), and the ADR CR rule (M2). The stale guard_data comments were already resolved. The rest stay deferred, each for the reason the reviewer gave. One correction: the deferred note naming `test_guard_debt.py:65` is wrong, because file-write reasons get no echo; only the two `test_guard_continuations.py` asserts were weakened. Suggestion taken with the fixes: a known-limits line in `guard_cli.py` for a script path that starts with `\`. Found elsewhere: the unmatched `-m '` weakness on main is filed as #15.*
+
 *Ruling during Task 4: must-fix 1 (a CR on the end-tag line lets the mask run past bash's end of the heredoc on Git Bash) is upheld as must-fix: it is a line-ending accident on the user's own platform, not a crafted input, and it loosens a verdict outside class (b). The same defect in the existing `git commit -F -` mask (found elsewhere, present at base) is fixed in the same round as its own commit, because it is the same file, the same cause and the same one-line fix, and it only tightens. Cost if wrong: commands holding a CR are scanned whole, which can deny a few more heredocs.*
