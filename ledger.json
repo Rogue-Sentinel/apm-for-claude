@@ -189,7 +189,12 @@
     "14": {
       "allowlist": [],
       "branch": "issue-14-glued-redirect",
-      "concerns": [],
+      "concerns": [
+        {
+          "at": "2026-10-18T22:58:17.684440+00:00",
+          "text": "Planner: non-read-only commands whose quoted text names a protected path (echo 'x => docs/y') are denied today by the unquoted reading; existing and coarse, outside this issue."
+        }
+      ],
       "decisions": [],
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-14-glued-redirect.md",
@@ -996,6 +1001,11 @@
       "at": "2026-10-18T22:58:15.480330+00:00",
       "event": "decision 13 Planner (issue 14): build #14 first; #13 should reuse guard_redirects.space_redirects (e.g. a writes_a_file helper) so _is_read_only does not regain #14's glued-redirect blind spot.",
       "issue": 13
+    },
+    {
+      "at": "2026-10-18T22:58:17.684470+00:00",
+      "event": "concern 14 Planner: non-read-only commands whose quoted text names a protected path (echo 'x => docs/y') are denied today by the unquoted reading; existing and coarse, outside this issue.",
+      "issue": 14
     }
   ]
 }
