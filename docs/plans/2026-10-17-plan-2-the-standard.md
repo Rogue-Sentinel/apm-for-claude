@@ -258,7 +258,8 @@ tests/test_metrics_*.py, test_debt*.py, test_coverage.py, test_skills*.py
     It also has `layers: tuple[Mapping[str, Any], ...] = ()`, the layer map that the `clean-architecture` skill
     reads. Each entry is `{"name", "paths": [globs], "may_import": [layer names]}`. The loader checks that shape. *Added after Task 8.*
   - `load_standard(profile: Profile | None) -> Standard`. It reads `profile.extra["standard"]`
-    (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`), uses the defaults when there's no profile or no key, and raises
+    (`limits`, `metrics`, `debt_sources`, `adr_dir`, `review_patterns`, `ui`, `layers`; `review_patterns` is
+    checked for shape only, and an unknown dimension name is left for the review to report), uses the defaults when there's no profile or no key, and raises
     `ProfileError` for a non-positive limit, a non-string glob, a source without a name or command, or a
     regex that doesn't compile or doesn't have exactly one group. A profile's `metrics.exclude` replaces the
     defaults, and a profile may add to them with `metrics.extra_exclude`.
