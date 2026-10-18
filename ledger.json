@@ -364,7 +364,7 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-19-memory-folder.md",
       "questions": [],
-      "status": "queued",
+      "status": "building",
       "tasks": [],
       "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/19"
@@ -1303,6 +1303,11 @@
       "at": "2026-10-18T23:43:48.428484+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/22",
       "issue": 14
+    },
+    {
+      "at": "2026-10-18T23:44:14.557521+00:00",
+      "event": "issue 19 status building",
+      "issue": 19
     }
   ]
 }
