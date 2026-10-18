@@ -81,9 +81,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Step 4: 258 passed in the worktree and on the branch after merge 6b1bbc5; manager's own RED run of the new tests against 792b97b: test_debt_classes 6 failed / 3 passed (the 3 are guards that hold today), test_cli_debt_classes collection error (no TRACK_HINT); metrics 0/59 fn, 0/6 files over; debt_classes imports nothing from apm; debt check nothing worse.",
           "id": "5",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Newly measured classes are not new debt",
           "worker": "implementer"
         },
@@ -258,6 +259,11 @@
     {
       "at": "2026-10-18T19:31:00.693774+00:00",
       "event": "task 9/5 running",
+      "issue": 9
+    },
+    {
+      "at": "2026-10-18T19:36:20.786752+00:00",
+      "event": "task 9/5 done",
       "issue": 9
     }
   ]
