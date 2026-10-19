@@ -386,9 +386,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Stopped for the night at the user's request while the worker was mid-task; its worktree (agent-a76faaccbedd1a354, if created) may hold partial, unreviewed work: inspect before resuming or start Task 3 fresh from 0fc870c.",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "pending",
           "title": "Honest denial remedies",
           "worker": "implementer"
         },
@@ -1478,6 +1479,11 @@
     {
       "at": "2026-10-19T00:13:13.407072+00:00",
       "event": "task 19/3 running",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-19T00:17:56.421242+00:00",
+      "event": "task 19/3 pending",
       "issue": 19
     }
   ]
