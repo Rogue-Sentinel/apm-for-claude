@@ -43,6 +43,13 @@ this project. Workers may not.**
   folder path itself does not. The path is normalized and resolved with `realpath` first, so `..` and a
   case-folded Windows path are read as they land. The `.apm/state/` check still comes first, and a path in the
   folder that sits inside a git checkout is still matched against the protected globs.
+- **A linked folder opens nothing.** The folder opens only when it is a real folder: no part of its path below
+  the config dir is a symlink or a junction. The guard resolves the config dir first, because `~/.claude` may
+  legitimately sit behind a link, then compares the `realpath` of the folder with its normalized path (both
+  case-folded on Windows). Any link below the config dir makes them differ. A `memory` folder, or its
+  `projects/<slug>` parent, that is a link to a broader folder, such as a notes vault, gets the old denial for
+  both the link path and the link target. Otherwise the target's `realpath` would put everything under the vault
+  in reach of the file tools. A `memory` folder that does not exist is not a link, and no file is under it.
 
 How ADR-0002 rule 2 is read. Read literally, it makes any denial that becomes an allow a must-fix, which no
 false-positive fix can meet. The user approved, on 2026-10-18, reading it for this change as ADR-0005 did: never
@@ -55,7 +62,8 @@ exactly one class of denial becomes an allow:
 
 Every other verdict is unchanged. The tests pin the realistic neighbors: a worker's write (Write, Edit and
 NotebookEdit), the rest of the config dir (`settings.json`, `settings.local.json`, `CLAUDE.md`, a plugin file),
-another project's memory folder, the worktree slug's memory folder, the slug folder itself, the siblings
+another project's memory folder, the worktree slug's memory folder, a file in the slug folder
+(`<slug>/session.jsonl`), a memory folder or slug folder that is a link, the siblings
 `memory2/` and `memory-old/`, `..` out of the folder, the folder path itself, the folder under `~/.claude` when
 `CLAUDE_CONFIG_DIR` points elsewhere, and the in-project protections (`.git/**`, `.apm/state/**`, profile paths).
 
@@ -74,6 +82,10 @@ the relative path to approve. The denial texts change in a later task of the sam
   - A checkout reached through a symlink, where `realpath` differs from the path Claude Code used.
   - A symlink or junction inside the memory folder that points out of it. `realpath` follows it, and the target
     is outside the folder.
+  - A mapped or `subst` drive, where `.resolve()` can turn `Z:\` into a UNC path, so the slug differs from the
+    one Claude Code used.
+  - On Windows, a `CLAUDE_CONFIG_DIR` written without a drive (`/c/Users/...`). `is_absolute()` rejects it, so
+    the hook falls back to `~/.claude`.
 - On macOS, a case-variant path to the memory folder is denied, which is only a false positive.
 - If `~/.claude` is itself a git repository, this project's protected globs apply under it, which is again only
   false positives.

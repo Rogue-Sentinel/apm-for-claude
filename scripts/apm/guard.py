@@ -1,6 +1,7 @@
 """The guard's decision: allow or deny a tool call."""
 from __future__ import annotations
 
+import os
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,7 +9,7 @@ from typing import Any, Literal
 
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
-from .guard_paths import check_write, is_under, memory_folder, same_path
+from .guard_paths import check_write, is_under, is_unlinked, memory_folder, same_path
 from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
 from .profile import Profile
@@ -48,10 +49,12 @@ def _split_allowlist(allowlist: Sequence[Any]) -> tuple[list[str], list[str]]:
 def _write_roots(
     project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
 ) -> list[Path]:
-    """The temp roots, plus this project's memory folder for the main session."""
+    """The temp roots, plus this project's memory folder for the main session. The config dir may
+    sit behind a link, so it is resolved first; the folder opens only when nothing below it is a link."""
     if worker or config_dir is None:
         return list(temp_roots)
-    return [*temp_roots, memory_folder(project.main_root, config_dir)]
+    folder = memory_folder(project.main_root, Path(os.path.realpath(config_dir)))
+    return [*temp_roots, *([folder] if is_unlinked(folder) else [])]
 
 
 def _roots_for(

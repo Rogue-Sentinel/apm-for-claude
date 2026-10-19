@@ -52,6 +52,11 @@ def memory_folder(main_root: Path, config_dir: Path) -> Path:
     return config_dir / "projects" / slug / "memory"
 
 
+def is_unlinked(path: Path | str) -> bool:
+    """True when no part of `path` is a symlink or junction (a missing part is not a link)."""
+    return _real(path) == os.path.normcase(os.path.normpath(str(path)))
+
+
 def _in_scope(target: Path, project: Project, temp_roots: Sequence[Path]) -> bool:
     roots = [project.main_root, project.worktree_root, *temp_roots]
     return any(is_under(target, root) for root in roots)
