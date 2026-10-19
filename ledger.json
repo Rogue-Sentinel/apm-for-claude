@@ -359,6 +359,10 @@
         {
           "at": "2026-10-18T23:17:19.113773+00:00",
           "text": "User approved the #19 plan in chat ('19 is approved'): main session may write this project's own memory folder (ADR 0006, the ADR 0005 reading of ADR 0002 applied to this one class), workers stay blocked, denials offer only approvals that can work; includes the manager's pre-approval addition for the state-directory command denial."
+        },
+        {
+          "at": "2026-10-19T00:17:58.656686+00:00",
+          "text": "Paused for the night by the user. Tasks 1-2 merged on issue-19-memory-folder (0fc870c, local only, not pushed); Task 3 (denial remedies) next, then the final review, gate 19, PR and merge."
         }
       ],
       "kind": "bug",
@@ -1484,6 +1488,11 @@
     {
       "at": "2026-10-19T00:17:56.421242+00:00",
       "event": "task 19/3 pending",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-19T00:17:58.656708+00:00",
+      "event": "decision 19 Paused for the night by the user. Tasks 1-2 merged on issue-19-memory-folder (0fc870c, local only, not pushed); Task 3 (denial remedies) next, then the final review, gate 19, PR and merge.",
       "issue": 19
     }
   ]
