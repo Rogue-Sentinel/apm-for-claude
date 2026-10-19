@@ -377,10 +377,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Must-fix (manager ruling on S1): a memory folder that is a junction/symlink to a broader folder opens that folder; the root must open only when it is a real folder. See the plan, Task 2 ruling.",
+          "evidence": "Branch after merge 0fc870c: guard*/hook*/docs/own_limits all pass except Task 3's 5 remedy-text cases; fix round 1 (linked memory folder fails closed; 487966d) re-reviewed clean; real XP12 memory folder computed and unlinked; debt check nothing worse.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Open the memory folder, ADR 0006",
           "worker": "implementer"
         },
@@ -1466,6 +1466,11 @@
     {
       "at": "2026-10-19T00:13:08.069451+00:00",
       "event": "task 19/2r done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-19T00:13:11.047961+00:00",
+      "event": "task 19/2 done",
       "issue": 19
     }
   ]
