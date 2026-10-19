@@ -9,7 +9,7 @@ from typing import Any, Literal
 
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
-from .guard_paths import check_write, is_under, is_unlinked, memory_folder, same_path
+from .guard_paths import is_under, is_unlinked, memory_folder, same_path, write_denial
 from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
 from .profile import Profile
@@ -18,13 +18,24 @@ PREFIX = "APM guard: "
 _FILE_KEYS = {"Write": "file_path", "Edit": "file_path", "NotebookEdit": "notebook_path"}
 _COMMAND_TOOLS = ("Bash", "PowerShell")
 _CLI = cli_command(PLUGIN_ROOT)
-_ASK_USER = (
-    ". Ask the user in chat; if they approve this exact action, record it with "
-    f'{_CLI} approve --command "<the exact full command>" --reason "<why>" '
-    "(or --path <glob> for a file write), then retry."
-    " Run the approve call with the Bash tool, on its own, with the command in single quotes "
-    "if it holds a double quote."
-)
+_REMEDIES = {
+    "command": (
+        ". Ask the user in chat; if they approve this exact action, record it with "
+        f'{_CLI} approve --command "<the exact full command>" --reason "<why>", then retry.'
+        " Run the approve call with the Bash tool, on its own, with the command in single quotes "
+        "if it holds a double quote."
+    ),
+    "protected": (
+        ". Ask the user in chat; if they approve this exact write, record it with "
+        f'{_CLI} approve --path "<the path named above, as written>" --reason "<why>", then retry.'
+        " Run the approve call with the Bash tool, on its own."
+    ),
+    "outside": ". No approval lifts this for a file tool. Ask the user in chat to make the change themselves.",
+    "state": (
+        f". No approval lifts this: APM state changes only through the CLI ({_CLI}), "
+        "never by editing its files."
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -73,14 +84,16 @@ def _file_violation(
     temp_roots: Sequence[Path],
     windows: bool,
     config_dir: Path | None,
-) -> str | None:
+) -> tuple[str, str] | None:
     raw = (event.get("tool_input") or {}).get(_FILE_KEYS.get(str(event.get("tool_name")), ""))
     if not isinstance(raw, str):
         return None
     target = to_native_path(raw, Path(event.get("cwd") or project.worktree_root), windows)
+    if reason := worker_file_violation(target, event):
+        return reason, ""
     roots = _roots_for(target, project, temp_roots, config_dir, bool(event.get("agent_id")))
-    return worker_file_violation(target, event) or check_write(
-        target, project, profile.protected_globs(), allowed_globs, roots)
+    denial = write_denial(target, project, profile.protected_globs(), allowed_globs, roots)
+    return (denial[1], _REMEDIES[denial[0]]) if denial else None
 
 
 def _state_dir_write(command: str, cwd: Path, project: Project) -> str | None:
@@ -96,14 +109,14 @@ def _cwd(event: Mapping[str, Any], project: Project, windows: bool) -> Path:
 def _command_violation(
     command: str, event: Mapping[str, Any], project: Project, profile: Profile,
     prefixes: Sequence[str], windows: bool,
-) -> str | None:
+) -> tuple[str, str] | None:
     cwd = _cwd(event, project, windows)
-    reason = (
-        worker_command_violation(command, event, cwd, project.worktree_root)
-        or _state_dir_write(command, cwd, project)
-        or check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
-    )
-    return f"{reason}: {command.strip()}" if reason else None
+    if reason := worker_command_violation(command, event, cwd, project.worktree_root):
+        return f"{reason}: {command.strip()}", _REMEDIES["command"]
+    if reason := _state_dir_write(command, cwd, project):
+        return f"{reason}: {command.strip()}", _REMEDIES["state"]
+    reason = check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
+    return (f"{reason}: {command.strip()}", _REMEDIES["command"]) if reason else None
 
 
 def _violation(
@@ -114,7 +127,8 @@ def _violation(
     temp_roots: Sequence[Path],
     windows: bool,
     config_dir: Path | None,
-) -> str | None:
+) -> tuple[str, str] | None:
+    """Return (reason, remedy) for a denied call, or None. The remedy offers only an approval that works."""
     globs, prefixes = _split_allowlist(allowlist)
     command = (event.get("tool_input") or {}).get("command")
     if event.get("tool_name") in _COMMAND_TOOLS and isinstance(command, str):
@@ -166,10 +180,11 @@ def decide(
         return Decision("none")
     globs = [] if worker else _split_allowlist(approvals)[0]
     rules = [*allowlist, *({"path": glob} for glob in globs)]
-    reason = _violation(event, project, profile, rules, temp_roots, windows, config_dir)
-    if reason is None:
+    violation = _violation(event, project, profile, rules, temp_roots, windows, config_dir)
+    if violation is None:
         return Decision("none")
-    return Decision("deny", PREFIX + reason + ("" if worker else _ASK_USER))
+    reason, remedy = violation
+    return Decision("deny", PREFIX + reason + ("" if worker else remedy))
 
 
 def to_hook_output(decision: Decision) -> dict | None:

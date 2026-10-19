@@ -6,6 +6,7 @@ import re
 from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from .paths import Project, worktree_relative
 
@@ -68,6 +69,23 @@ def _protected(relative: str, globs: Sequence[str], allowed_globs: Sequence[str]
     return None
 
 
+def write_denial(
+    target: Path,
+    project: Project,
+    globs: Sequence[str],
+    allowed_globs: Sequence[str],
+    temp_roots: Sequence[Path],
+) -> tuple[Literal["state", "outside", "protected"], str] | None:
+    """Return which check blocks writing `target` and why, or None when it may proceed."""
+    if is_under(target, project.state_dir):
+        return "state", f"{target} is inside the APM state directory"
+    if not _in_scope(target, project, temp_roots):
+        return "outside", f"{target} is outside the project"
+    found = worktree_relative(Path(os.path.realpath(str(target))))
+    reason = _protected(found[1], globs, allowed_globs) if found else None
+    return ("protected", reason) if reason else None
+
+
 def check_write(
     target: Path,
     project: Project,
@@ -76,9 +94,5 @@ def check_write(
     temp_roots: Sequence[Path],
 ) -> str | None:
     """Return why writing `target` is blocked, or None when it may proceed."""
-    if is_under(target, project.state_dir):
-        return f"{target} is inside the APM state directory"
-    if not _in_scope(target, project, temp_roots):
-        return f"{target} is outside the project"
-    found = worktree_relative(Path(os.path.realpath(str(target))))
-    return _protected(found[1], globs, allowed_globs) if found else None
+    denial = write_denial(target, project, globs, allowed_globs, temp_roots)
+    return denial[1] if denial else None
