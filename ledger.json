@@ -407,10 +407,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 2 review (opus): 0 must-fix as graded; manager upgraded S1 (linked memory folder opens its target) to must-fix; S2/S3/S5 deferred, S4 rides along; see the plan ruling.",
+          "evidence": "Scoped re-review: S1 must-fix and S4 addressed, no regression, 0 open; 2 new suggestions deferred.",
           "id": "2r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 2 review",
           "worker": "reviewer"
         }
@@ -1461,6 +1461,11 @@
     {
       "at": "2026-10-19T00:09:21.947703+00:00",
       "event": "task 19/2r running",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-19T00:13:08.069451+00:00",
+      "event": "task 19/2r done",
       "issue": 19
     }
   ]
