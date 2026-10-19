@@ -376,11 +376,11 @@
           "worker": "implementer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Must-fix (manager ruling on S1): a memory folder that is a junction/symlink to a broader folder opens that folder; the root must open only when it is a real folder. See the plan, Task 2 ruling.",
           "id": "2",
           "model": "sonnet",
-          "status": "failed",
+          "status": "running",
           "title": "Open the memory folder, ADR 0006",
           "worker": "implementer"
         },
@@ -1451,6 +1451,11 @@
     {
       "at": "2026-10-19T00:05:40.920511+00:00",
       "event": "task 19/2 failed",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-19T00:05:43.162084+00:00",
+      "event": "task 19/2 running",
       "issue": 19
     }
   ]
