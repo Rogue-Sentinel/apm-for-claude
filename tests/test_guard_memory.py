@@ -85,7 +85,7 @@ def test_a_worktree_session_may_not_write_its_own_slug_memory_folder(
     assert _run(repo / ".claude" / "worktrees" / "w1", str(own_slug), env) == "deny"
 
 
-@pytest.mark.parametrize("environ", [{},{"CLAUDE_CONFIG_DIR": ""}, {"CLAUDE_CONFIG_DIR": "cfg"}],
+@pytest.mark.parametrize("environ", [{}, {"CLAUDE_CONFIG_DIR": ""}, {"CLAUDE_CONFIG_DIR": "cfg"}],
                          ids=["unset", "empty", "relative"])
 def test_without_an_absolute_config_dir_the_folder_under_home_is_used(
     repo: Path, tmp_path: Path, environ: dict[str, str]
@@ -145,3 +145,53 @@ def test_in_project_protections_are_unchanged(
 ) -> None:
     _init(git_repo, protected_paths=["data/*.db"])
     assert _run(git_repo, str(git_repo / relative), env) == verdict
+
+
+def test_the_memory_folder_path_itself_stays_denied(
+    repo: Path, cfg: Path, env: dict[str, str]
+) -> None:
+    assert _run(repo, str(_memory(cfg, repo)), env, "Write") == "deny"
+
+
+def test_a_worker_may_not_edit_a_notebook_in_the_memory_folder(
+    repo: Path, cfg: Path, env: dict[str, str]
+) -> None:
+    target = _memory(cfg, repo) / "notes.ipynb"
+    assert _run(repo, str(target), env, "NotebookEdit", agent_id="w1") == "deny"
+
+
+def _link(link: Path, target: Path) -> None:
+    """Make `link` a directory link to `target`: a symlink, else a Windows junction."""
+    import os
+    link.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.symlink(target, link, target_is_directory=True)
+    except OSError:
+        try:
+            import _winapi
+            _winapi.CreateJunction(str(target), str(link))
+        except (ImportError, OSError) as exc:
+            pytest.skip(f"neither a symlink nor a junction can be created here: {exc}")
+
+
+@pytest.mark.parametrize("linked", ["memory", "slug"])
+@pytest.mark.parametrize("where", ["vault/Other/note.md", "through-the-link/x.md"])
+def test_a_linked_memory_folder_opens_nothing(
+    repo: Path, cfg: Path, env: dict[str, str], tmp_path: Path, linked: str, where: str
+) -> None:
+    vault = tmp_path / "vault"
+    (vault / "Other").mkdir(parents=True)
+    folder = _memory(cfg, repo)
+    _link(folder if linked == "memory" else folder.parent, vault)
+    target = (tmp_path / where) if where.startswith("vault") else folder / "x.md"
+    assert _run(repo, str(target), env, "Write") == "deny"
+
+
+def test_a_config_dir_behind_a_link_still_opens_the_memory_folder(
+    repo: Path, tmp_path: Path
+) -> None:
+    real = tmp_path / "real-cfg"
+    real.mkdir()
+    _link(tmp_path / "linked-cfg", real)
+    target = _memory(tmp_path / "linked-cfg", repo) / "MEMORY.md"
+    assert _run(repo, str(target), {"CLAUDE_CONFIG_DIR": str(tmp_path / "linked-cfg")}) == "none"

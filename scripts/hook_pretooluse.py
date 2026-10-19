@@ -45,11 +45,18 @@ def _rules(project: Project) -> tuple[list[dict], list[dict]]:
     return active_allowlist(ledger), live_approvals(ledger, datetime.now(timezone.utc))
 
 
-def _guard(event: dict, project: Project) -> tuple[int, str]:
+def _config_dir(environ: Mapping[str, str]) -> Path:
+    """Claude Code's config dir: CLAUDE_CONFIG_DIR when it is set and absolute, else ~/.claude."""
+    value = environ.get("CLAUDE_CONFIG_DIR") or ""
+    return Path(value) if value and Path(value).is_absolute() else Path.home() / ".claude"
+
+
+def _guard(event: dict, project: Project, environ: Mapping[str, str]) -> tuple[int, str]:
     profile = load_profile(project.profile_path)
     temp_roots = [Path(tempfile.gettempdir())]
     allowlist, approvals = _rules(project)
-    decision = decide(event, project, profile, allowlist, temp_roots, os.name == "nt", approvals)
+    decision = decide(event, project, profile, allowlist, temp_roots, os.name == "nt", approvals,
+                      config_dir=_config_dir(environ))
     output = to_hook_output(decision)
     return 0, json.dumps(output) if output else ""
 
@@ -62,7 +69,7 @@ def run(stdin: str, environ: Mapping[str, str]) -> tuple[int, str]:
     if event is None:
         return _deny("hook input is not a JSON object")
     try:
-        return _guard(event, project)
+        return _guard(event, project, environ)
     except Exception as exc:  # fail closed: any error in an initialized project denies
         return _deny(exc)
 
