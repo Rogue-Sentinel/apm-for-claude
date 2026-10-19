@@ -385,10 +385,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "3",
-          "status": "pending",
-          "title": "Honest denial remedies"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Honest denial remedies",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1471,6 +1473,11 @@
     {
       "at": "2026-10-19T00:13:11.047961+00:00",
       "event": "task 19/2 done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-19T00:13:13.407072+00:00",
+      "event": "task 19/3 running",
       "issue": 19
     }
   ]
