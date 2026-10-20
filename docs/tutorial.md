@@ -349,7 +349,7 @@ explains each key. Every key shown exists. Leave out anything you do not need.
 
 ```json
 {
-  "framework_version": "0.3.1",
+  "framework_version": "0.3.2",
   "protected_paths": ["config/production.yml", "migrations/**"],
   "max_workers": 2,
   "models": {"implementer": "sonnet", "reviewer": "opus"},
