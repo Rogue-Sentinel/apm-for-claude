@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from apm.guard import Decision, decide
-from apm.paths import Project
+from apm.paths import PLUGIN_ROOT, Project, cli_command
 from apm.profile import Profile
 
 WINDOWS = sys.platform == "win32"
@@ -79,3 +79,49 @@ def test_a_worker_denial_offers_no_remedy(git_repo: Path, kind: str) -> None:
     decision = _decide(git_repo, outside if kind == "file" else _bash("rm -rf build", agent_id="w1"))
     assert decision.kind == "deny"
     assert "Ask the user" not in decision.reason
+
+
+CLI = cli_command(PLUGIN_ROOT)
+COMMAND_REMEDY = (
+    f'. Ask the user in chat; if they approve this exact action, record it with {CLI} approve --command '
+    '"<the exact full command>" --reason "<why>", then retry. Run the approve call with the Bash tool, '
+    "on its own, with the command in single quotes if it holds a double quote."
+)
+PROTECTED_REMEDY = (
+    f'. Ask the user in chat; if they approve this exact write, record it with {CLI} approve --path '
+    '"<the path named above, as written>" --reason "<why>", then retry. Run the approve call with the '
+    "Bash tool, on its own."
+)
+OUTSIDE_REMEDY = ". No approval lifts this for a file tool. Ask the user in chat to make the change themselves."
+STATE_REMEDY = (
+    f". Ask the user in chat. No approval lifts this: APM state changes only through the CLI ({CLI}), "
+    "never by editing its files."
+)
+
+
+def test_a_command_in_the_state_directory_offers_no_approval(git_repo: Path) -> None:
+    state_dir = git_repo / ".apm" / "state"
+    state_dir.mkdir(parents=True)
+    reason = _decide(git_repo, {**_bash("touch x"), "cwd": str(state_dir)}).reason
+    assert "approve --command" not in reason
+    assert "No approval lifts this" in reason
+
+
+def test_a_command_denial_carries_the_command_remedy_in_full(git_repo: Path) -> None:
+    assert _decide(git_repo, _bash("rm -rf build")).reason.endswith(COMMAND_REMEDY)
+
+
+def test_a_protected_denial_carries_the_path_remedy_in_full(git_repo: Path) -> None:
+    event = _file_event("Edit", git_repo / "data" / "fleet.db")
+    reason = _decide(git_repo, event, protected=("data/*.db",)).reason
+    assert reason.endswith("data/fleet.db is a protected path" + PROTECTED_REMEDY)
+
+
+def test_an_outside_denial_carries_the_outside_remedy_in_full(git_repo: Path) -> None:
+    reason = _decide(git_repo, _file_event("Edit", git_repo.parent / "outside" / "x.md")).reason
+    assert reason.endswith("is outside the project" + OUTSIDE_REMEDY)
+
+
+def test_a_state_denial_carries_the_state_remedy_in_full(git_repo: Path) -> None:
+    reason = _decide(git_repo, _file_event("Edit", git_repo / ".apm" / "state" / "ledger.json")).reason
+    assert reason.endswith("is inside the APM state directory" + STATE_REMEDY)

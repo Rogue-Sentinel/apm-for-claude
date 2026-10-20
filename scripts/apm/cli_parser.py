@@ -39,7 +39,7 @@ def _approve(sub) -> None:
     parser = sub.add_parser("approve", help="record the user's one-off approval, good for 10 minutes")
     target = parser.add_mutually_exclusive_group(required=True)
     target.add_argument("--command", metavar="CMD", help="the exact command the user approved")
-    target.add_argument("--path", metavar="GLOB", help="the path the user approved writing")
+    target.add_argument("--path", metavar="GLOB", help="the path the user approved writing, relative to the checkout root, as the denial names it")
     parser.add_argument("--reason", required=True)
 
 
