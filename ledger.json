@@ -375,7 +375,7 @@
         "head": "be15eae50bb1f9fa259810fac89e420e3f2e025b",
         "open": 0
       },
-      "status": "building",
+      "status": "integrating",
       "tasks": [
         {
           "attempts": 2,
@@ -1587,6 +1587,11 @@
     {
       "at": "2026-10-20T22:59:55.016573+00:00",
       "event": "review 19 0 open at be15eae",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:59:57.232720+00:00",
+      "event": "issue 19 status integrating",
       "issue": 19
     }
   ]
