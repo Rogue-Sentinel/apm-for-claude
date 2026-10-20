@@ -70,7 +70,9 @@ another project's memory folder, the worktree slug's memory folder, a file in th
 **A file-tool write outside the project stays unapprovable, and the denial stops offering an approval for it.**
 Letting an absolute `--path` glob reach outside the project would add a second, wider class of allows for every
 path a user might approve. A `--path` approval is checkout-relative, so the denial for a protected file names
-the relative path to approve. The denial texts change in a later task of the same issue, with their own tests.
+the relative path to approve. The denial for such a write says no approval lifts it and asks the user to make the change;
+the denial for a protected file names the checkout-relative path to approve; and the denial for APM state
+points to the CLI. Each is a remedy in `guard._REMEDIES`, pinned by `tests/test_guard_remedies.py`.
 
 ## Consequences
 
