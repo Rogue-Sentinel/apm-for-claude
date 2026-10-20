@@ -438,6 +438,14 @@
           "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Final review fix",
+          "worker": "implementer"
         }
       ],
       "title": "The guard blocks Claude's own memory folder, and a --path approval can't unblock it",
@@ -1546,6 +1554,11 @@
     {
       "at": "2026-10-20T22:57:02.270136+00:00",
       "event": "task 19/review failed",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:57:04.617465+00:00",
+      "event": "task 19/fix running",
       "issue": 19
     }
   ]
