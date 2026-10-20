@@ -507,6 +507,12 @@
           "status": "running",
           "title": "Bump the version to 0.3.2",
           "worker": "implementer"
+        },
+        {
+          "attempts": 0,
+          "id": "2",
+          "status": "pending",
+          "title": "Merge gate"
         }
       ],
       "title": "Release apm 0.3.2 with the #14 and #19 fixes",
@@ -1658,6 +1664,11 @@
     {
       "at": "2026-10-20T23:04:38.286404+00:00",
       "event": "task 25/1 running",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:04:40.742702+00:00",
+      "event": "task 25/2 pending",
       "issue": 25
     }
   ]
