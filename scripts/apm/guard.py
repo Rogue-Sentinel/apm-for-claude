@@ -32,7 +32,7 @@ _REMEDIES = {
     ),
     "outside": ". No approval lifts this for a file tool. Ask the user in chat to make the change themselves.",
     "state": (
-        f". No approval lifts this: APM state changes only through the CLI ({_CLI}), "
+        f". Ask the user in chat. No approval lifts this: APM state changes only through the CLI ({_CLI}), "
         "never by editing its files."
     ),
 }

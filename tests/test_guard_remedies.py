@@ -93,7 +93,10 @@ PROTECTED_REMEDY = (
     "Bash tool, on its own."
 )
 OUTSIDE_REMEDY = ". No approval lifts this for a file tool. Ask the user in chat to make the change themselves."
-STATE_REMEDY = f". No approval lifts this: APM state changes only through the CLI ({CLI}), never by editing its files."
+STATE_REMEDY = (
+    f". Ask the user in chat. No approval lifts this: APM state changes only through the CLI ({CLI}), "
+    "never by editing its files."
+)
 
 
 def test_a_command_in_the_state_directory_offers_no_approval(git_repo: Path) -> None:
