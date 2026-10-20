@@ -293,8 +293,8 @@ A denial reads like this:
 
 ```
 APM guard: destructive command (recursive rm): rm -rf build. Ask the user in chat; if they approve this exact
-action, record it with <CLI> approve --command "<the exact full command>" --reason "<why>" (or --path <glob>
-for a file write), then retry.
+action, record it with <CLI> approve --command "<the exact full command>" --reason "<why>", then retry. Run
+the approve call with the Bash tool, on its own, with the command in single quotes if it holds a double quote.
 ```
 
 **What you say:** the manager stops and asks you in chat, naming the exact command and why it wants it:
