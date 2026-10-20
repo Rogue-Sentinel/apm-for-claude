@@ -514,6 +514,14 @@
           "id": "2",
           "status": "pending",
           "title": "Merge gate"
+        },
+        {
+          "attempts": 1,
+          "id": "review",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Whole-branch review",
+          "worker": "reviewer"
         }
       ],
       "title": "Release apm 0.3.2 with the #14 and #19 fixes",
@@ -1675,6 +1683,11 @@
     {
       "at": "2026-10-20T23:06:43.611917+00:00",
       "event": "task 25/1 done",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:06:55.590100+00:00",
+      "event": "task 25/review running",
       "issue": 25
     }
   ]
