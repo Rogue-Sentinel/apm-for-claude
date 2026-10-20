@@ -485,6 +485,17 @@
       "title": "The guard scans commit and PR heredoc bodies, and cat<<'EOF' bodies with no blank, as commands",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/21"
     },
+    "25": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "feature",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "Release apm 0.3.2 with the #14 and #19 fixes",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/25"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -1612,6 +1623,11 @@
       "at": "2026-10-20T23:03:57.350777+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/24",
       "issue": 19
+    },
+    {
+      "at": "2026-10-20T23:04:14.842320+00:00",
+      "event": "filed 25 https://github.com/Rogue-Sentinel/apm-for-claude/issues/25",
+      "issue": 25
     }
   ]
 }
