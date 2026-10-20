@@ -390,10 +390,10 @@
         },
         {
           "attempts": 1,
-          "evidence": "Stopped for the night at the user's request while the worker was mid-task; its worktree (agent-a76faaccbedd1a354, if created) may hold partial, unreviewed work: inspect before resuming or start Task 3 fresh from 0fc870c.",
+          "evidence": "Paused worker's commit 9010496 verified: 1 failed (#11 pin test_the_state_directory_denial_reads_as_before expects 'Ask the user in chat' after the echo), 1170 passed; a plan conflict, not a code defect. Ruling: see the plan, Task 3 amendment.",
           "id": "3",
           "model": "sonnet",
-          "status": "pending",
+          "status": "failed",
           "title": "Honest denial remedies",
           "worker": "implementer"
         },
@@ -1493,6 +1493,11 @@
     {
       "at": "2026-10-19T00:17:58.656708+00:00",
       "event": "decision 19 Paused for the night by the user. Tasks 1-2 merged on issue-19-memory-folder (0fc870c, local only, not pushed); Task 3 (denial remedies) next, then the final review, gate 19, PR and merge.",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:37:23.806782+00:00",
+      "event": "task 19/3 failed",
       "issue": 19
     }
   ]
