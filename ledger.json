@@ -518,9 +518,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 25 at 9d2ddf4: merge gate: passed",
           "id": "2",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -1718,6 +1719,11 @@
     {
       "at": "2026-10-20T23:11:45.526430+00:00",
       "event": "task 25/2 running",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:11:47.916511+00:00",
+      "event": "task 25/2 done",
       "issue": 25
     }
   ]
