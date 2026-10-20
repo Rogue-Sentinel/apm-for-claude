@@ -1,5 +1,6 @@
 """Through the hook: the main session writes its project's memory folder; nothing else around it opens."""
 import json
+import os
 import re
 from pathlib import Path
 
@@ -161,17 +162,13 @@ def test_a_worker_may_not_edit_a_notebook_in_the_memory_folder(
 
 
 def _link(link: Path, target: Path) -> None:
-    """Make `link` a directory link to `target`: a symlink, else a Windows junction."""
-    import os
+    """Make `link` a directory link to `target`: a symlink, else a Windows junction. Fails if neither works."""
     link.parent.mkdir(parents=True, exist_ok=True)
     try:
         os.symlink(target, link, target_is_directory=True)
     except OSError:
-        try:
-            import _winapi
-            _winapi.CreateJunction(str(target), str(link))
-        except (ImportError, OSError) as exc:
-            pytest.skip(f"neither a symlink nor a junction can be created here: {exc}")
+        import _winapi
+        _winapi.CreateJunction(str(target), str(link))
 
 
 @pytest.mark.parametrize("linked", ["memory", "slug"])
