@@ -487,11 +487,13 @@
     },
     "25": {
       "allowlist": [],
+      "branch": "issue-25-release-0.3.2",
       "concerns": [],
       "decisions": [],
       "kind": "feature",
+      "plan": "docs/plans/2026-10-20-issue-25-release-0.3.2.md",
       "questions": [],
-      "status": "queued",
+      "status": "building",
       "tasks": [],
       "title": "Release apm 0.3.2 with the #14 and #19 fixes",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/25"
@@ -1627,6 +1629,11 @@
     {
       "at": "2026-10-20T23:04:14.842320+00:00",
       "event": "filed 25 https://github.com/Rogue-Sentinel/apm-for-claude/issues/25",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:04:33.858459+00:00",
+      "event": "issue 25 status building",
       "issue": 25
     }
   ]
