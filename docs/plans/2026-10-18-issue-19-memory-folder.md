@@ -428,3 +428,9 @@ Rubric check: Task 1 commits red tests on purpose. Tasks 1–3 are safety-critic
 - Task 3 review: `_command_violation` builds `f"{reason}: {command.strip()}"` three times; pick the pair first, format once.
 - Task 3 review: `docs/platform-notes.md:29` (historical note) says "or a path glob" without saying it is checkout-relative.
 - Task 3 review (found elsewhere): a main-session write to a linked worktree's own `.apm/state/x.json` is treated as a protected path and can be approved, while manager.md says `.apm/state/` writes cannot; same at base, no plausible case. A `--path` approval is not tied to a checkout (same at base).
+
+## Final review (2026-10-20)
+
+Whole-branch review (opus) c7604bc..e3da047: 1 must-fix (the `_link` test helper skipped instead of failing; fixed in 72ac92d), S1 (manager.md told the manager to ask the user to hand-edit `.apm/state/`; now points to the CLI) and S2 (ADR 0006 tense) fixed in 5036d34; scoped re-review: all addressed, 0 open, ready for the gate. Scorecard 7/10 base, 8/10 branch.
+
+*Deferred decisions by the final reviewer: Task 1 S5 done (ADR lines); Task 1 S4, Task 2 S2/S3/S5, the `os.path.realpath` layering, Task 3 state-command full pin, triple f-string, platform-notes:29, and the worktree `.apm/state/` approvable-as-protected case all stay deferred, each for the reason in the review (none loosens a verdict; the last is the same at base and is a candidate separate issue).*
