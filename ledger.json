@@ -406,9 +406,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 19 at be15eae: PASS clean tree, base merged, layers, test (full suite), debt, review, plan (8 criteria); merge gate: passed",
           "id": "4",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -1599,6 +1600,11 @@
     {
       "at": "2026-10-20T23:03:41.330670+00:00",
       "event": "task 19/4 running",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T23:03:43.771252+00:00",
+      "event": "task 19/4 done",
       "issue": 19
     }
   ]
