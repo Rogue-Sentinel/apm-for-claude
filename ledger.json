@@ -368,6 +368,13 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-18-issue-19-memory-folder.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-20T22:59:55.016554+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch review (opus) c7604bc..e3da047, fix e3da047..55fc88a re-reviewed: 0 open; every structural criterion met apart from the gate.",
+        "head": "be15eae50bb1f9fa259810fac89e420e3f2e025b",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -1575,6 +1582,11 @@
     {
       "at": "2026-10-20T22:59:52.576901+00:00",
       "event": "task 19/review done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:59:55.016573+00:00",
+      "event": "review 19 0 open at be15eae",
       "issue": 19
     }
   ]
