@@ -498,6 +498,13 @@
       "kind": "feature",
       "plan": "docs/plans/2026-10-20-issue-25-release-0.3.2.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-20T23:07:46.360004+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch review (sonnet): 0 findings; every structural criterion met apart from the gate.",
+        "head": "9d2ddf49d600a5f87c001fef0f787511e6687477",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -1694,6 +1701,11 @@
     {
       "at": "2026-10-20T23:07:43.602909+00:00",
       "event": "task 25/review done",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:07:46.360034+00:00",
+      "event": "review 25 0 open at 9d2ddf4",
       "issue": 25
     }
   ]
