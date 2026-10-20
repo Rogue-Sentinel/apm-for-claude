@@ -1,5 +1,5 @@
 {
-  "framework_version": "0.3.1",
+  "framework_version": "0.3.2",
   "max_workers": 3,
   "models": {
     "auditor": "haiku",
