@@ -502,9 +502,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "3 strings bumped + manager's profile commit; test_setup/test_docs/test_cli 70 passed in the worktree and on the branch; git grep finds no 0.3.1 outside plans/specs/platform-notes/tests; debt check nothing worse.",
           "id": "1",
           "model": "haiku",
-          "status": "running",
+          "status": "done",
           "title": "Bump the version to 0.3.2",
           "worker": "implementer"
         },
@@ -1669,6 +1670,11 @@
     {
       "at": "2026-10-20T23:04:40.742702+00:00",
       "event": "task 25/2 pending",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:06:43.611917+00:00",
+      "event": "task 25/1 done",
       "issue": 25
     }
   ]
