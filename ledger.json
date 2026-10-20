@@ -441,9 +441,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Fix (72ac92d no skip, 5036d34 wording): 170 passed, 0 skipped, in the worktree and on the branch after merge; debt check nothing worse.",
           "id": "fix",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix",
           "worker": "implementer"
         }
@@ -1559,6 +1560,11 @@
     {
       "at": "2026-10-20T22:57:04.617465+00:00",
       "event": "task 19/fix running",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:59:15.901209+00:00",
+      "event": "task 19/fix done",
       "issue": 19
     }
   ]
