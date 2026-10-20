@@ -505,7 +505,7 @@
         "head": "9d2ddf49d600a5f87c001fef0f787511e6687477",
         "open": 0
       },
-      "status": "building",
+      "status": "integrating",
       "tasks": [
         {
           "attempts": 1,
@@ -1706,6 +1706,11 @@
     {
       "at": "2026-10-20T23:07:46.360034+00:00",
       "event": "review 25 0 open at 9d2ddf4",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:07:48.724677+00:00",
+      "event": "issue 25 status integrating",
       "issue": 25
     }
   ]
