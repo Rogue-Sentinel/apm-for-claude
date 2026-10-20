@@ -431,11 +431,11 @@
           "worker": "reviewer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Final review (opus) c7604bc..e3da047: 1 must-fix (the _link test helper pytest.skip hides the linked-folder safety pins; let it fail); S1 manager.md tells the manager to ask the user to hand-edit .apm/state (should say through the CLI) and S2 ADR 0006 stale tense, both folded into the fix; 11 deferred decided.",
           "id": "review",
           "model": "opus",
-          "status": "failed",
+          "status": "running",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -1565,6 +1565,11 @@
     {
       "at": "2026-10-20T22:59:15.901209+00:00",
       "event": "task 19/fix done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:59:18.293856+00:00",
+      "event": "task 19/review running",
       "issue": 19
     }
   ]
