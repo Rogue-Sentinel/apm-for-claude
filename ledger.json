@@ -517,9 +517,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Whole-branch review (sonnet): no findings.",
           "id": "review",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Whole-branch review",
           "worker": "reviewer"
         }
@@ -1688,6 +1689,11 @@
     {
       "at": "2026-10-20T23:06:55.590100+00:00",
       "event": "task 25/review running",
+      "issue": 25
+    },
+    {
+      "at": "2026-10-20T23:07:43.602909+00:00",
+      "event": "task 25/review done",
       "issue": 25
     }
   ]
