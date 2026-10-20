@@ -390,10 +390,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Paused worker's commit 9010496 verified: 1 failed (#11 pin test_the_state_directory_denial_reads_as_before expects 'Ask the user in chat' after the echo), 1170 passed; a plan conflict, not a code defect. Ruling: see the plan, Task 3 amendment.",
+          "evidence": "1437 passed in the worktree; targeted run on the branch after merge e3da047 all pass; state-remedy ruling applied (bd6191b); per-task review clean; metrics 0/49 fn, 0/4 files over; debt check nothing worse.",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Honest denial remedies",
           "worker": "implementer"
         },
@@ -1522,6 +1522,11 @@
     {
       "at": "2026-10-20T22:50:21.445263+00:00",
       "event": "task 19/3r done",
+      "issue": 19
+    },
+    {
+      "at": "2026-10-20T22:50:24.911226+00:00",
+      "event": "task 19/3 done",
       "issue": 19
     }
   ]
