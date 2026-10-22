@@ -528,9 +528,12 @@
           "status": "pending"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "6b",
-          "status": "pending"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Refuse a --path that can never match",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1882,6 +1885,11 @@
     {
       "at": "2026-10-22T23:25:30.798193+00:00",
       "event": "task 20/1 running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:26:02.815946+00:00",
+      "event": "task 20/6b running",
       "issue": 20
     }
   ]
