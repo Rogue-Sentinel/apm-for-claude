@@ -543,9 +543,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 1 review (opus): 3 must-fix pin gaps (MF1-3), 5 suggestions deferred; cleared Tasks 2-3 to start.",
           "id": "1r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 1 review",
           "worker": "reviewer"
         }
@@ -1909,6 +1910,11 @@
     {
       "at": "2026-10-22T23:32:33.974586+00:00",
       "event": "task 20/1r running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:40:36.351471+00:00",
+      "event": "task 20/1r done",
       "issue": 20
     }
   ]
