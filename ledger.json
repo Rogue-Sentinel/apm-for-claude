@@ -495,9 +495,12 @@
       "status": "building",
       "tasks": [
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "1",
-          "status": "pending"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Failing tests and routine pins",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1874,6 +1877,11 @@
     {
       "at": "2026-10-22T23:25:28.472276+00:00",
       "event": "task 20/7 pending",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:25:30.798193+00:00",
+      "event": "task 20/1 running",
       "issue": 20
     }
   ]
