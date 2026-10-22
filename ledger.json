@@ -493,7 +493,13 @@
         }
       ],
       "status": "building",
-      "tasks": [],
+      "tasks": [
+        {
+          "attempts": 0,
+          "id": "1",
+          "status": "pending"
+        }
+      ],
       "title": "Shell commands that write outside the project are never checked by the guard",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/20"
     },
@@ -1793,6 +1799,11 @@
     {
       "at": "2026-10-22T23:25:10.742950+00:00",
       "event": "issue 20 status building",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:25:12.937858+00:00",
+      "event": "task 20/1 pending",
       "issue": 20
     }
   ]
