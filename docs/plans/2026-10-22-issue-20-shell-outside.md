@@ -737,3 +737,8 @@ reviewed per task; they are not protected paths. The ADR 0002 and 0006 status-li
 | 7 | self | the gate | consistent |
 
 Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verified by the unchanged suite). Tasks 1 to 6 are safety-critical, and each gets its own review. Task 6b is covered by the final review.
+
+*Ruling during Task 1 (2026-10-22): the plan marked the routine `gh pr create`, `gh issue create` and `gh issue list > file` pins for both sessions, but a worker is already denied them by `guard_github` ("workers do not write to GitHub"), an existing denial this issue must not change. Those pins run for the main session only (`test_gh_calls_the_main_session_makes_stay_allowed`), and the worker heredoc-in-substitution pin uses `git commit -m "$(cat <<EOF ...)"` instead. Cost if wrong: none; the worker denial is pinned by existing tests.*
+
+## Deferred findings
+- Task 1 (found elsewhere): the installed worker rules read text inside a quoted argument or a heredoc as a command: a worker's `sed 's/ - .*//'` filter was denied as an `.apm/` write, and a Python heredoc naming `gh issue create` as a GitHub write. Existing false positives on routine work; candidate issue after #13.
