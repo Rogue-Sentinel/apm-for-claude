@@ -742,3 +742,10 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 
 ## Deferred findings
 - Task 1 (found elsewhere): the installed worker rules read text inside a quoted argument or a heredoc as a command: a worker's `sed 's/ - .*//'` filter was denied as an `.apm/` write, and a Python heredoc naming `gh issue create` as a GitHub write. Existing false positives on routine work; candidate issue after #13.
+- Task 1 review (S1): `test_guard_outside.py:140` asserts `"notes.md" in reason`, which the echoed command satisfies; assert the resolved target in parentheses.
+- Task 1 review (S2): the worktree hook test runs for the main session only; make it both sessions.
+- Task 1 review (S3, for Task 5): once Task 5 defines `SHELL_TEMP_ROOTS`, drop `raising=False` from the hook fixture's patch, so a rename cannot silently undo the isolation.
+- Task 1 review (S4): the placeholder helper replaces `@M` before `@M2` by order, and a tmp path holding `@` would be corrupted; a single regex pass or `{O}` placeholders would avoid it.
+- Task 1 review (S5): optional PowerShell pins: `git rev-parse HEAD 2>$null`, `New-Item -ItemType Directory -Force docs | Out-Null`, `Set-Content -Path docs/a.md -Value x -Encoding utf8`.
+
+*Ruling after the Task 1 review: its three must-fix gaps (MF1 the sed pin's literal `\n`, MF2 heredoc-body pins a skipped `strip_heredoc_bodies` would fail, MF3 quoted absolute paths with spaces) touch only Task 1's files and only add or correct pins. Tasks 2 and 3 share no file with them and change no verdict, and the reviewer cleared them, so they run in parallel with the Task 1 fix round; Task 4 waits for the fixed pins and their re-review. Task 5's brief carries S3. Cost if wrong: Tasks 2 and 3 might need a rebase onto the fixed tests, which they do not read.*
