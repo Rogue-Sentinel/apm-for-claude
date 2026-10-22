@@ -621,6 +621,39 @@ passing). `O` is `other.as_posix()`, `S` is `scratch.as_posix()`, `M` is `memory
   `tests/test_cli_init.py`, `tests/test_init_apply.py`, `tests/test_docs.py`, `tests/test_agents.py`. Expected: PASS.
 - [ ] **Step 6: Commit** `"Let a project name folders outside it that shell commands may write"`.
 
+### Task 6b: Refuse a `--path` approval that can never match
+
+*Added at approval (2026-10-22): the user asked to fold this existing bug into #20, not to leave it for later.*
+
+**Files:**
+- Modify: `scripts/apm/cli_handlers.py` (`approve` and `allow` check `--path` before recording)
+- Test: `tests/test_cli_path_approvals.py` (create)
+
+**Interfaces:**
+- Produces: `approve --path P` and `allow N --path P` refuse a `P` that can never match a write, with a `UsageError`
+  (the CLI's usage-error exit) whose message is exactly:
+  `--path must be relative to the checkout root, as the denial names it (got <P>); a write outside the project cannot be approved`.
+  Nothing is written to the ledger when it refuses. A `P` can never match when, with `\` read as `/`, it is absolute
+  (`/x`), has a drive (`C:x`, `C:/x`), is a UNC or `//` path, starts with `~`, or has a `..` segment.
+  `--command` is unchanged.
+
+- [ ] **Step 1: Write the failing tests** in `tests/test_cli_path_approvals.py`, through `apm_cli.main` in an initialized
+  tmp project (copy the fixture pattern of `tests/test_hook_approve.py`; do not import it):
+  - `test_a_path_that_can_never_match_is_refused` (parametrized on `approve` and `allow 1`, and on
+    `/abs/x.md`, `C:/Users/x/MEMORY.md`, `C:\Users\x\MEMORY.md`, `//server/share/x`, `~/x.md`, `../other/x.md`,
+    `docs/../../x.md`): exit is the usage-error code, the message above is printed, and the ledger has no new entry.
+  - `test_a_checkout_relative_path_is_recorded` (parametrized on `data/fleet.db`, `docs/**`, `.git/config`): exit 0
+    and the approval or allow entry holds the path as given.
+- [ ] **Step 2: Run** `python -m pytest -q tests/test_cli_path_approvals.py`. Expected: the refusal cases FAIL (exit 0,
+  recorded); the accepted cases pass.
+- [ ] **Step 3: Implement** one small pure helper in `cli_handlers.py` (or a sibling module if the file would pass its
+  limits) and call it from `approve` and `allow` before the ledger write.
+- [ ] **Step 4: Run** `python -m pytest -q tests/test_cli_path_approvals.py tests/test_cli.py tests/test_hook_approve.py
+  tests/test_guard_remedies.py tests/test_own_limits.py`. Expected: PASS.
+- [ ] **Step 5: Commit** `"Refuse a --path approval that can never match"`.
+
+Task 6b touches no guard file and shares no file with Tasks 2 to 6; it may run in parallel with Tasks 2 and 3.
+
 ### Task 7: Run the merge gate
 
 - [ ] **Step 1: Run** `<CLI> gate 20`. Expected: PASS: the full suite once, `<CLI> debt check` passing, and every
@@ -685,3 +718,22 @@ reviewed per task; they are not protected paths. The ADR 0002 and 0006 status-li
 - #14 and #19 are merged on this base (05f044c); this plan reuses `space_redirects`' quoting rules, `memory_folder`,
   `is_unlinked` and #19's roots (moved, not copied, in Task 2).
 - #13 (queued) touches `guard_commands._is_read_only`; this plan does not. Build #13 after this.
+
+## Approval (2026-10-22)
+
+*The user approved this in chat: "Fold the approve --path fix into #20, and build #13 immediately after #20. Approve #20 with option B (both sessions)." So both the main session and workers get the outside-write rule, as written, with `write_roots` and ADR 0007 recording the decision. The approve --path fix is added as Task 6b. #13 is built right after this issue, before anything else in the queue, reusing `split_redirects` and `is_device`.*
+
+## Pre-flight scan
+
+| Tasks | Shared file or interface | Producer vs consumer | Found |
+|---|---|---|---|
+| 1 ↔ 2–6 | the four Task 1 test files | Task 1 creates them; Tasks 4 to 6 turn their FAIL-now cases green, and Task 2 changes no verdict | agrees |
+| 2 ↔ 3 | files | Task 2: `guard_paths.py`, `guard.py`, `guard_commands.py`. Task 3: `guard_words.py`, `guard_redirects.py`, `guard_data.py` | disjoint; may run in parallel |
+| 3 ↔ 4 | `path_words`, `split_redirects`, `is_device`, `strip_heredoc_bodies` | Task 3 produces them, Task 4's `guard_targets.py` consumes them | in order |
+| 2, 4 ↔ 5 | `in_scope`, `allowed_roots`, `roots_for`, `is_exempt`, `join_continuations`, and the target readers | Tasks 2 and 4 produce them, Task 5's `guard_outside.py` consumes them | in order |
+| 5 ↔ 6 | `guard_outside.py`, `guard.py`, `agents/manager.md` | Task 5 creates `Reach`; Task 6 adds `write_roots` to it and the remedy | same files, in order |
+| 6b | `cli_handlers.py`, a new test file | touches no file of Tasks 2 to 6 | disjoint; may run in parallel with Tasks 2 and 3 |
+| 1–6, 6b | self | each task names its files and its targeted tests | consistent |
+| 7 | self | the gate | consistent |
+
+Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verified by the unchanged suite). Tasks 1 to 6 are safety-critical, and each gets its own review. Task 6b is covered by the final review.
