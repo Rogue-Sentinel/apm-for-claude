@@ -476,7 +476,12 @@
           "text": "Release with #20 adds denials in XP12: its profile needs write_roots for ~/vab, C:/vaR and the X-Plane folders before upgrading; the user edits that repo."
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-22T23:25:08.451688+00:00",
+          "text": "User approved #20 with option B (both sessions), Task 6b (--path refusal) folded in, #13 next."
+        }
+      ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-22-issue-20-shell-outside.md",
       "questions": [
@@ -1778,6 +1783,11 @@
     {
       "at": "2026-10-22T23:25:06.106786+00:00",
       "event": "resolve 20 #0",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:25:08.451720+00:00",
+      "event": "decision 20 User approved #20 with option B (both sessions), Task 6b (--path refusal) folded in, #13 next.",
       "issue": 20
     }
   ]
