@@ -177,6 +177,10 @@
         {
           "at": "2026-10-18T22:58:15.480303+00:00",
           "text": "Planner (issue 14): build #14 first; #13 should reuse guard_redirects.space_redirects (e.g. a writes_a_file helper) so _is_read_only does not regain #14's glued-redirect blind spot."
+        },
+        {
+          "at": "2026-10-22T23:07:20.177984+00:00",
+          "text": "Planner (#20): build #13 after #20; _is_read_only can use split_redirects and is_device."
         }
       ],
       "kind": "bug",
@@ -1755,6 +1759,11 @@
       "at": "2026-10-22T23:07:17.770714+00:00",
       "event": "question 20 #0",
       "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:07:20.178005+00:00",
+      "event": "decision 13 Planner (#20): build #13 after #20; _is_read_only can use split_redirects and is_device.",
+      "issue": 13
     }
   ]
 }
