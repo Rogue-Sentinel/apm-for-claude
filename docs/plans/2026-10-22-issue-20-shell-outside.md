@@ -749,3 +749,7 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 - Task 1 review (S5): optional PowerShell pins: `git rev-parse HEAD 2>$null`, `New-Item -ItemType Directory -Force docs | Out-Null`, `Set-Content -Path docs/a.md -Value x -Encoding utf8`.
 
 *Ruling after the Task 1 review: its three must-fix gaps (MF1 the sed pin's literal `\n`, MF2 heredoc-body pins a skipped `strip_heredoc_bodies` would fail, MF3 quoted absolute paths with spaces) touch only Task 1's files and only add or correct pins. Tasks 2 and 3 share no file with them and change no verdict, and the reviewer cleared them, so they run in parallel with the Task 1 fix round; Task 4 waits for the fixed pins and their re-review. Task 5's brief carries S3. Cost if wrong: Tasks 2 and 3 might need a rebase onto the fixed tests, which they do not read.*
+
+*Ruling on the Task 2 review: its one suggestion (guard_commands.py "over 200") counted physical lines (242); the limit is lines of logic, which `metrics` puts at 153, so the file is within the limit and nothing is deferred. Cost if wrong: none.*
+
+*Ruling on Task 3 deviations: (a) `split_redirects` also reads `>|` as an operator, so its target is checked. The plan listed `>|` as a known limit; reading it only adds denials of real outside writes. (b) The heredoc head reader does not treat `<<` inside a one-line quoted string as a heredoc start, so `echo "a <<EOF"` cannot hide a following real write; pinned. Both tighten; cost if wrong: none.*
