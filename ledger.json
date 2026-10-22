@@ -465,11 +465,12 @@
     },
     "20": {
       "allowlist": [],
+      "branch": "issue-20-shell-outside",
       "concerns": [],
       "decisions": [],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "Shell commands that write outside the project are never checked by the guard",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/20"
@@ -1731,6 +1732,11 @@
       "at": "2026-10-20T23:11:59.825304+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/26",
       "issue": 25
+    },
+    {
+      "at": "2026-10-22T22:35:10.313367+00:00",
+      "event": "issue 20 status planning",
+      "issue": 20
     }
   ]
 }
