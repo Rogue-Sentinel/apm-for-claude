@@ -566,6 +566,14 @@
           "status": "done",
           "title": "Task 2 review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "3r",
+          "model": "opus",
+          "status": "running",
+          "title": "Task 3 review",
+          "worker": "reviewer"
         }
       ],
       "title": "Shell commands that write outside the project are never checked by the guard",
@@ -1982,6 +1990,11 @@
     {
       "at": "2026-10-22T23:54:10.903762+00:00",
       "event": "task 20/2 done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:54:13.177978+00:00",
+      "event": "task 20/3r running",
       "issue": 20
     }
   ]
