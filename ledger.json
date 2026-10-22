@@ -513,6 +513,11 @@
           "attempts": 0,
           "id": "4",
           "status": "pending"
+        },
+        {
+          "attempts": 0,
+          "id": "5",
+          "status": "pending"
         }
       ],
       "title": "Shell commands that write outside the project are never checked by the guard",
@@ -1834,6 +1839,11 @@
     {
       "at": "2026-10-22T23:25:19.702113+00:00",
       "event": "task 20/4 pending",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:25:21.850501+00:00",
+      "event": "task 20/5 pending",
       "issue": 20
     }
   ]
