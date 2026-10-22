@@ -492,7 +492,7 @@
           "text": "Does the main session get the outside-write rule for shell commands (B, recommended), only workers (A), or only other checkouts and the config dir (C)?"
         }
       ],
-      "status": "awaiting-approval",
+      "status": "building",
       "tasks": [],
       "title": "Shell commands that write outside the project are never checked by the guard",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/20"
@@ -1788,6 +1788,11 @@
     {
       "at": "2026-10-22T23:25:08.451720+00:00",
       "event": "decision 20 User approved #20 with option B (both sessions), Task 6b (--path refusal) folded in, #13 next.",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:25:10.742950+00:00",
+      "event": "issue 20 status building",
       "issue": 20
     }
   ]
