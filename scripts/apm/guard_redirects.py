@@ -15,15 +15,10 @@ from __future__ import annotations
 
 import re
 
-_PIECE = re.compile(
-    r"""
-    "(?:\\.|[^"\\])*"      # a double-quoted string
-    |'[^']*'               # a single-quoted string
-    |\\.                   # an escaped character
-    |(?P<op>[&*]?[<>][<>&]*)  # a run of redirect characters, PowerShell's `*>` whole
-    """,
-    re.DOTALL | re.VERBOSE,
-)
+_QUOTED = r""""(?:\\.|[^"\\])*"|'[^']*'"""  # a double-quoted string or a single-quoted string
+_ESCAPED = r"\\."  # an escaped character
+_OPERATOR = r"[&*]?[<>][<>&]*"  # a run of redirect characters, PowerShell's `*>` whole
+_PIECE = re.compile(f"{_QUOTED}|{_ESCAPED}|(?P<op>{_OPERATOR})", re.DOTALL)
 
 
 def _spaced(match: re.Match[str]) -> str:
