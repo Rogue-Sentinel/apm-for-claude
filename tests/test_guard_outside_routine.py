@@ -91,7 +91,19 @@ def test_an_escaped_blank_in_a_bash_path_is_read_as_bash_reads_it(tmp_path: Path
 
 
 @BOTH
-@_stays_allowed("sed -i 's|#include <a>|#include <a>\n#include <b>|' src/x.cpp", "grep -E 'a|b>c' docs",
+@_stays_allowed("cd \"{root}/docs\" && git add a.md && git commit -m x", "cd \"{native}\\docs\" && git commit -am x",
+                "git -C \"{root}\" commit -am x", "echo x > \"{root}/docs/a.md\"")
+def test_a_quoted_absolute_path_with_blanks_inside_the_project_stays_allowed(
+    tmp_path: Path, extra: dict, command: str
+) -> None:
+    spaced = World.build(tmp_path, "my repo")
+    filled = command.replace("{root}", spaced.repo.as_posix()).replace("{native}", str(spaced.repo))
+
+    assert spaced.decide(filled, extra).kind == "none"
+
+
+@BOTH
+@_stays_allowed("sed -i 's|#include <a>|#include <a>\\n#include <b>|' src/x.cpp", "grep -E 'a|b>c' docs",
                 "grep '>' @O/x.md", 'grep "a > b" @O/x.md', 'git commit -m "write > ~/x"', 'echo "a > @O/x"',
                 "echo 'see ../x > y'")
 def test_a_quoted_pipe_or_redirect_sign_is_not_a_write(world: World, extra: dict, command: str) -> None:
@@ -101,6 +113,7 @@ def test_a_quoted_pipe_or_redirect_sign_is_not_a_write(world: World, extra: dict
 @BOTH
 @_stays_allowed("python - <<'PY'\nif a > b: print(a)\nopen('/x') > 0\nPY",
                 "cat > docs/n.md <<'EOF'\n> quoted ../x\nEOF",
+                "cat > docs/n.md <<EOF\n> /etc/x is quoted here\nEOF", "python - <<'PY'\nx > /y\nPY",
                 "git commit -m \"$(cat <<'EOF'\n> see /etc/x\nEOF\n)\"")
 def test_a_heredoc_body_no_shell_runs_is_not_read_as_commands(world: World, extra: dict, command: str) -> None:
     assert world.decide(command, extra).kind == "none"
