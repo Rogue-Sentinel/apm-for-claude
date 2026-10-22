@@ -529,9 +529,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "RED 14 failed (recorded, exit 0) / 6 passed; GREEN 64 passed in the worktree and on the branch after merge 5e48e24; exit 2 with the exact message, ledger unchanged on refusal; cli_handlers.py within limits; debt check nothing worse. Covered by the final review (not safety-critical).",
           "id": "6b",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Refuse a --path that can never match",
           "worker": "implementer"
         },
@@ -1890,6 +1891,11 @@
     {
       "at": "2026-10-22T23:26:02.815946+00:00",
       "event": "task 20/6b running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:29:47.287758+00:00",
+      "event": "task 20/6b done",
       "issue": 20
     }
   ]
