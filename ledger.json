@@ -504,9 +504,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "2",
-          "status": "pending"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Pure move: public write roots and helpers",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1926,6 +1929,11 @@
     {
       "at": "2026-10-22T23:40:40.883065+00:00",
       "event": "task 20/1 running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:40:43.124122+00:00",
+      "event": "task 20/2 running",
       "issue": 20
     }
   ]
