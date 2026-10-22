@@ -496,9 +496,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Task 1 review must-fix: MF1 sed pin uses a real newline; MF2 no heredoc pin fails if strip_heredoc_bodies is skipped; MF3 no quoted spaced absolute path pin. See the plan.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "failed",
           "title": "Failing tests and routine pins",
           "worker": "implementer"
         },
@@ -1915,6 +1916,11 @@
     {
       "at": "2026-10-22T23:40:36.351471+00:00",
       "event": "task 20/1r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:40:38.642390+00:00",
+      "event": "task 20/1 failed",
       "issue": 20
     }
   ]
