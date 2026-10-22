@@ -481,9 +481,9 @@
       "plan": "docs/plans/2026-10-22-issue-20-shell-outside.md",
       "questions": [
         {
-          "answer": null,
+          "answer": "Option B: both sessions get the rule. Also fold the approve --path fix in (Task 6b); build #13 right after #20.",
           "blocks": [],
-          "resolved": false,
+          "resolved": true,
           "text": "Does the main session get the outside-write rule for shell commands (B, recommended), only workers (A), or only other checkouts and the config dir (C)?"
         }
       ],
@@ -1773,6 +1773,11 @@
     {
       "at": "2026-10-22T23:07:22.469770+00:00",
       "event": "concern 20 Release with #20 adds denials in XP12: its profile needs write_roots for ~/vab, C:/vaR and the X-Plane folders before upgrading; the user edits that repo.",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:25:06.106786+00:00",
+      "event": "resolve 20 #0",
       "issue": 20
     }
   ]
