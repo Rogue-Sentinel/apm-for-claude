@@ -81,6 +81,12 @@ _GLOB_CHARS = frozenset("*?[")
 _GLOB_LIMIT = 2000
 
 
+def join_continuations(command: str) -> str:
+    """Join continued lines: an odd run of backslashes before a newline, or of PowerShell backticks
+    (the last backtick stays), becomes a space. An even run is literal and is left as it is."""
+    return _BACKTICK_CONTINUATION.sub(r"\1` ", _BACKSLASH_CONTINUATION.sub(r"\1 ", command))
+
+
 def split_segments(command: str, *, join: bool = False) -> list[str]:
     """Split a command line on `&&`, `||`, `;`, `|`, `&` and newlines; with `join`, join continued lines first.
 
@@ -89,7 +95,7 @@ def split_segments(command: str, *, join: bool = False) -> list[str]:
     still blocks an exemption. An even run is literal, so the newline still ends the command.
     """
     if join:
-        command = _BACKTICK_CONTINUATION.sub(r"\1` ", _BACKSLASH_CONTINUATION.sub(r"\1 ", command))
+        command = join_continuations(command)
     parts = (part.strip() for part in _SPLIT.split(command))
     return [part for part in parts if part]
 
@@ -199,7 +205,7 @@ def protected_reason(
     return None
 
 
-def _is_exempt(segment: str, allowed_prefixes: Sequence[str]) -> bool:
+def is_exempt(segment: str, allowed_prefixes: Sequence[str]) -> bool:
     if any(marker in segment for marker in _NO_EXEMPT):
         return False
     for prefix in allowed_prefixes:
@@ -231,6 +237,6 @@ def segments_reason(
     root: Path | None = None,
 ) -> str | None:
     """Return the reason for the first segment, not covered by an allowed prefix, that is denied."""
-    checked = (g for g in segments if not _is_exempt(g, allowed_prefixes))
+    checked = (g for g in segments if not is_exempt(g, allowed_prefixes))
     reasons = (destructive_reason(g) or protected_reason(g, globs, cwd, root) for g in checked)
     return next((reason for reason in reasons if reason), None)
