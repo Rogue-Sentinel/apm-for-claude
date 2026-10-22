@@ -512,9 +512,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "3",
-          "status": "pending"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Redirect targets and heredoc bodies",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -1934,6 +1937,11 @@
     {
       "at": "2026-10-22T23:40:43.124122+00:00",
       "event": "task 20/2 running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:40:45.317929+00:00",
+      "event": "task 20/3 running",
       "issue": 20
     }
   ]
