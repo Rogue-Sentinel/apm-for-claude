@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any
 
 from apm import ledger as lg
 from apm.briefing import render_briefing
+from apm.cli_errors import UsageError
 from apm.cli_standard import HANDLERS as STANDARD_HANDLERS
 from apm.cli_workflow import WORKFLOW_HANDLERS
 from apm.cli_workflow import mutate as _mutate
@@ -59,7 +61,21 @@ def task(project: Project, args: argparse.Namespace) -> None:
     _mutate(project, args.number, apply)
 
 
+def _require_checkout_relative(path: str | None) -> None:
+    """Refuse a path glob that is absolute, has a drive, starts with `~` or climbs with `..`; none can ever match."""
+    if path is None:
+        return
+    slashed = path.replace("\\", "/")
+    if slashed.startswith(("/", "~")) or re.match(r"[A-Za-z]:", slashed) or ".." in slashed.split("/"):
+        raise UsageError(
+            f"--path must be relative to the checkout root, as the denial names it (got {path}); "
+            "a write outside the project cannot be approved"
+        )
+
+
 def allow(project: Project, args: argparse.Namespace) -> None:
+    _require_checkout_relative(args.path)
+
     def apply(ledger: dict) -> str:
         lg.add_allow(ledger, args.number, path=args.path, command=args.command, reason=args.reason)
         kind, value = ("path", args.path) if args.path else ("command", args.command)
@@ -69,6 +85,8 @@ def allow(project: Project, args: argparse.Namespace) -> None:
 
 
 def approve(project: Project, args: argparse.Namespace) -> None:
+    _require_checkout_relative(args.path)
+
     def apply(ledger: dict) -> str:
         now = datetime.now(timezone.utc)
         cwd = to_native_path(os.getcwd(), Path.cwd(), os.name == "nt").as_posix()
