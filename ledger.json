@@ -470,7 +470,12 @@
     "20": {
       "allowlist": [],
       "branch": "issue-20-shell-outside",
-      "concerns": [],
+      "concerns": [
+        {
+          "at": "2026-10-22T23:07:22.469746+00:00",
+          "text": "Release with #20 adds denials in XP12: its profile needs write_roots for ~/vab, C:/vaR and the X-Plane folders before upgrading; the user edits that repo."
+        }
+      ],
       "decisions": [],
       "kind": "bug",
       "plan": "docs/plans/2026-10-22-issue-20-shell-outside.md",
@@ -1764,6 +1769,11 @@
       "at": "2026-10-22T23:07:20.178005+00:00",
       "event": "decision 13 Planner (#20): build #13 after #20; _is_read_only can use split_redirects and is_device.",
       "issue": 13
+    },
+    {
+      "at": "2026-10-22T23:07:22.469770+00:00",
+      "event": "concern 20 Release with #20 adds denials in XP12: its profile needs write_roots for ~/vab, C:/vaR and the X-Plane folders before upgrading; the user edits that repo.",
+      "issue": 20
     }
   ]
 }
