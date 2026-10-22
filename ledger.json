@@ -559,9 +559,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 2 review (sonnet): pure move confirmed, 0 must-fix; its size note counted physical lines (ruled out).",
           "id": "2r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 2 review",
           "worker": "reviewer"
         }
@@ -1970,6 +1971,11 @@
     {
       "at": "2026-10-22T23:48:53.280162+00:00",
       "event": "task 20/2r running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:54:08.416359+00:00",
+      "event": "task 20/2r done",
       "issue": 20
     }
   ]
