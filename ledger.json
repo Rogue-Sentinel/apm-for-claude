@@ -470,7 +470,14 @@
       "decisions": [],
       "kind": "bug",
       "plan": "docs/plans/2026-10-22-issue-20-shell-outside.md",
-      "questions": [],
+      "questions": [
+        {
+          "answer": null,
+          "blocks": [],
+          "resolved": false,
+          "text": "Does the main session get the outside-write rule for shell commands (B, recommended), only workers (A), or only other checkouts and the config dir (C)?"
+        }
+      ],
       "status": "awaiting-approval",
       "tasks": [],
       "title": "Shell commands that write outside the project are never checked by the guard",
@@ -1742,6 +1749,11 @@
     {
       "at": "2026-10-22T23:07:15.350128+00:00",
       "event": "issue 20 status awaiting-approval",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:07:17.770714+00:00",
+      "event": "question 20 #0",
       "issue": 20
     }
   ]
