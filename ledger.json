@@ -505,9 +505,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Pure move: 1309 passed before and after in the worktree; on the branch after merge 1cd9c71 the guard set passes except Task 1's 125 FAIL-now cases; debt check nothing worse.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Pure move: public write roots and helpers",
           "worker": "implementer"
         },
@@ -1976,6 +1977,11 @@
     {
       "at": "2026-10-22T23:54:08.416359+00:00",
       "event": "task 20/2r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-22T23:54:10.903762+00:00",
+      "event": "task 20/2 done",
       "issue": 20
     }
   ]
