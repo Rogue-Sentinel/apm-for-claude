@@ -1,7 +1,6 @@
 """The guard's decision: allow or deny a tool call."""
 from __future__ import annotations
 
-import os
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,7 +8,7 @@ from typing import Any, Literal
 
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
-from .guard_paths import is_under, is_unlinked, memory_folder, same_path, write_denial
+from .guard_paths import is_under, roots_for, same_path, write_denial
 from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
 from .profile import Profile
@@ -57,25 +56,6 @@ def _split_allowlist(allowlist: Sequence[Any]) -> tuple[list[str], list[str]]:
     return globs, prefixes
 
 
-def _write_roots(
-    project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
-) -> list[Path]:
-    """The temp roots, plus this project's memory folder for the main session. The config dir may
-    sit behind a link, so it is resolved first; the folder opens only when nothing below it is a link."""
-    if worker or config_dir is None:
-        return list(temp_roots)
-    folder = memory_folder(project.main_root, Path(os.path.realpath(config_dir)))
-    return [*temp_roots, *([folder] if is_unlinked(folder) else [])]
-
-
-def _roots_for(
-    target: Path, project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
-) -> list[Path]:
-    """The write roots for `target`; the memory folder opens only for paths strictly under it."""
-    roots = _write_roots(project, temp_roots, config_dir, worker)
-    return [*temp_roots, *(root for root in roots[len(temp_roots):] if not same_path(target, root))]
-
-
 def _file_violation(
     event: Mapping[str, Any],
     project: Project,
@@ -91,7 +71,7 @@ def _file_violation(
     target = to_native_path(raw, Path(event.get("cwd") or project.worktree_root), windows)
     if reason := worker_file_violation(target, event):
         return reason, ""
-    roots = _roots_for(target, project, temp_roots, config_dir, bool(event.get("agent_id")))
+    roots = roots_for(target, project, temp_roots, config_dir, bool(event.get("agent_id")))
     denial = write_denial(target, project, profile.protected_globs(), allowed_globs, roots)
     return (denial[1], _REMEDIES[denial[0]]) if denial else None
 
