@@ -595,9 +595,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Stopped for the night at the user's request mid-review; rerun the Task 5 review from scratch (package: scratchpad r20-t5.diff, range 9f5306d..a51e3fc).",
           "id": "5r",
           "model": "opus",
-          "status": "running",
+          "status": "pending",
           "title": "Task 5 review",
           "worker": "reviewer"
         }
@@ -2101,6 +2102,11 @@
     {
       "at": "2026-10-23T01:03:20.740923+00:00",
       "event": "task 20/5r running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T01:15:01.470138+00:00",
+      "event": "task 20/5r pending",
       "issue": 20
     }
   ]
