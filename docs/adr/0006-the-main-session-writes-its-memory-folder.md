@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted, 2026-10-18. Builds on ADR-0002 and ADR-0005.
+Accepted, 2026-10-18. Builds on ADR-0002 and ADR-0005. Amended by ADR-0007.
 
 ## Context
 

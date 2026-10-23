@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted, 2026-10-18.
+Accepted, 2026-10-18. Amended by ADR-0007.
 
 Builds on section 9 of the design spec, which names the guard as one layer of several.
 

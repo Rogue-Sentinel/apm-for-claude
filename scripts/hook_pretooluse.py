@@ -16,6 +16,10 @@ from apm.ledger import LedgerError, active_allowlist, live_approvals, load_ledge
 from apm.paths import Project, find_project  # noqa: E402
 from apm.profile import load_profile  # noqa: E402
 
+# Temp folders a shell names that Python's temp dir may not: Git Bash mounts `/tmp` on the Windows temp folder,
+# and macOS keeps `/tmp` apart from `tempfile.gettempdir()`. Shell commands only; the file tools never get these.
+SHELL_TEMP_ROOTS: tuple[Path, ...] = (Path("/tmp"),)
+
 
 def _deny(exc: BaseException | str) -> tuple[int, str]:
     output = to_hook_output(Decision("deny", f"APM guard error: {exc}"))
@@ -51,12 +55,20 @@ def _config_dir(environ: Mapping[str, str]) -> Path:
     return Path(value) if value and Path(value).is_absolute() else Path.home() / ".claude"
 
 
+def _home() -> Path | None:
+    """The home folder, or None when it cannot be found (then `~` in a command is only a name)."""
+    try:
+        return Path.home()
+    except RuntimeError:
+        return None
+
+
 def _guard(event: dict, project: Project, environ: Mapping[str, str]) -> tuple[int, str]:
     profile = load_profile(project.profile_path)
     temp_roots = [Path(tempfile.gettempdir())]
     allowlist, approvals = _rules(project)
     decision = decide(event, project, profile, allowlist, temp_roots, os.name == "nt", approvals,
-                      config_dir=_config_dir(environ))
+                      config_dir=_config_dir(environ), home=_home(), shell_temp=SHELL_TEMP_ROOTS)
     output = to_hook_output(decision)
     return 0, json.dumps(output) if output else ""
 
