@@ -11,14 +11,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from apm.guard import Decision, decide, to_hook_output  # noqa: E402
+from apm.guard import SHELL_TEMP_ROOTS, Decision, decide, to_hook_output  # noqa: E402
 from apm.ledger import LedgerError, active_allowlist, live_approvals, load_ledger  # noqa: E402
 from apm.paths import Project, find_project  # noqa: E402
 from apm.profile import load_profile  # noqa: E402
-
-# Temp folders a shell names that Python's temp dir may not: Git Bash mounts `/tmp` on the Windows temp folder,
-# and macOS keeps `/tmp` apart from `tempfile.gettempdir()`. Shell commands only; the file tools never get these.
-SHELL_TEMP_ROOTS: tuple[Path, ...] = (Path("/tmp"),)
 
 
 def _deny(exc: BaseException | str) -> tuple[int, str]:

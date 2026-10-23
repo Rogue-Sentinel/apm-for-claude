@@ -35,6 +35,9 @@ from .guard_targets import cd_target, command_readings, write_targets
 from .paths import Project, to_native_path
 
 OUTSIDE_REASON = "command writes outside the project and the temp folders"
+# Temp folders a shell names that Python's temp dir may not: Git Bash mounts `/tmp` on the Windows temp folder,
+# and macOS keeps `/tmp` apart from `tempfile.gettempdir()`. Shell commands only; the file tools never get these.
+SHELL_TEMP_ROOTS: tuple[Path, ...] = (Path("/tmp"),)
 # The home folder's spellings, followed by `/` or the end of the word.
 _HOME = re.compile(r"(?:~|\$HOME|\$\{HOME\}|\$env:(?:HOME|USERPROFILE))(?=/|\Z)", re.IGNORECASE)
 # The name of a file inside a folder a word ends in a separator for; only its being inside matters.

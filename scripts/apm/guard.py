@@ -8,7 +8,7 @@ from typing import Any, Literal
 
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
-from .guard_outside import Reach, outside_write
+from .guard_outside import SHELL_TEMP_ROOTS, Reach, outside_write
 from .guard_paths import is_under, roots_for, same_path, write_denial
 from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
@@ -160,10 +160,11 @@ def decide(
     approvals: Sequence[Any] = (),
     config_dir: Path | None = None,
     home: Path | None = None,
-    shell_temp: Sequence[Path] = (),
+    shell_temp: Sequence[Path] = SHELL_TEMP_ROOTS,
 ) -> Decision:
     """Return none or deny for a tool call. Live one-off `approvals` count only in the main session,
-    and so does the memory folder under `config_dir`. `home` and `shell_temp` serve shell commands only."""
+    and so does the memory folder under `config_dir`. `home` and `shell_temp` serve shell commands only;
+    `shell_temp` defaults to the roots the hook passes, so a direct caller gets the hook's verdict."""
     if project is None or profile is None:
         return Decision("none")
     worker = bool(event.get("agent_id"))

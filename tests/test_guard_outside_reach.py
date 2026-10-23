@@ -72,7 +72,8 @@ def _decide(tmp_path: Path, tool: str, command: str, extra: dict):
     event = {"tool_name": tool, "cwd": str(repo), "tool_input": {"command": command}, **extra}
     project = Project(main_root=repo, worktree_root=repo)
     profile = Profile(framework_version="0.3.0", protected_paths=())
-    return decide(event, project, profile, [], [tmp_path / "scratch"], WINDOWS, [], config_dir=tmp_path / "cfg")
+    return decide(event, project, profile, [], [tmp_path / "scratch"], WINDOWS, [], config_dir=tmp_path / "cfg",
+                  shell_temp=())
 
 
 @BOTH

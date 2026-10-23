@@ -43,7 +43,8 @@ class World:
         body = {"tool_name": "PowerShell", "cwd": str(self.repo), "tool_input": {"command": self.text(command)}}
         profile = Profile(framework_version="0.3.0", protected_paths=())
         project = Project(main_root=self.repo, worktree_root=self.repo)
-        return decide({**body, **extra}, project, profile, [], [self.scratch], WINDOWS, [], config_dir=self.cfg)
+        return decide({**body, **extra}, project, profile, [], [self.scratch], WINDOWS, [], config_dir=self.cfg,
+                      shell_temp=())
 
 
 @pytest.fixture

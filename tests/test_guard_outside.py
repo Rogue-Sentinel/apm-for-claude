@@ -52,7 +52,7 @@ class World:
         profile = Profile(framework_version="0.3.0", protected_paths=protected)
         project = Project(main_root=self.repo, worktree_root=self.repo)
         return decide({**body, **(extra or {})}, project, profile, list(allowlist), [self.scratch], WINDOWS,
-                      list(approvals), config_dir=self.cfg)
+                      list(approvals), config_dir=self.cfg, shell_temp=())
 
 
 @pytest.fixture
