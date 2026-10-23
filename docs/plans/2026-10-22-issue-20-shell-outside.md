@@ -756,3 +756,23 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 
 *Ruling after the Task 3 review: MF1 (the unterminated-quote fallback in `path_words` keeps quote characters, so a PowerShell `"C:\x\"` destination resolves inside the project), MF2 (the separator class `[A-Za-z0-9_.~-]` misreads a `\` before a non-ASCII letter, as in `C:\Users\Ömer`; amended to `[\w.~-]`, Unicode `\w`) and MF3 (pin `>|`) go to a Task 3 fix round. MF2 amends this plan's stated character class in Task 3 and Platform facts; it changes nothing the user approved. The manager's Task 3 brief said bodies fed to `python` must stay; that was a slip: the plan sets `python - <<PY` bodies aside (Task 3, Task 1 pins), and the plan stands. Carried to later briefs: Task 4 gets a unit case where `Copy-Item a "C:\x\"; Remove-Item b` splits into two segments or knowingly fails closed, and drops `>|` from its known limits; Task 5 gets the decide-level reproduction `Copy-Item README.md "<other>\"` must deny.*
 - Task 3 review (S1-S7): `#` comments read as code; an arithmetic shift or a comment can start a false heredoc; unlisted shells (`fish`, `csh`, `tcsh`, `nu`, `wsl`, `source /dev/stdin`) have bodies stripped; `_SHELL_NAMED` matches a shell name anywhere on the head line (fails closed); the `> $(f)` docstring wording; unpinned behavior (second heredoc, tag line inside a quoted string, `<<<`, `<(...)`, `tee >(gzip > out.gz)`); `\` before other characters merges path parts.
+
+*Ruling after the Task 4 review (2026-10-22). All five must-fix items go to a Task 4 fix round.*
+
+- *MF1: shell reserved words hide the program. `_program` skips a leading `if then else elif do while until !` (and `time`), kept out of `_WRAPPERS`.*
+- *MF2: a stray quote, such as an apostrophe in a `#` comment, stops all later cutting. The fix fails closed: when the PowerShell reading also leaves a quote open, the stray quote is read as a plain character and cutting continues.*
+- *MF3: two PowerShell paths ending in `\"` in one segment. **This amends Task 5's interface.** `guard_targets` gains `command_readings(text) -> list[list[str]]`. It returns the bash reading's segments, and also the PowerShell reading's segments when the text holds `\"`. Task 5 judges each reading separately, from a fresh cwd, and denies when any reading names an outside target, in the manner of `guard_commands.readings`/`first_denial`. `command_segments` stays and is the bash reading.*
+- *MF4: a PowerShell assignment hides the cmdlet. `_program` skips a leading `$name =` and `$name=`.*
+- *MF5: `git stash` with only options is a write. **This amends the plan's git table:** for `stash`, only `list` and `show` read. Task 4's own pin `("git stash", [])` becomes `["."]`.*
+
+*The docstring must name every known limit the review found, to meet this plan's structural criterion that docstrings name the known limits:*
+- *PowerShell script blocks and the cmdlets the module does not read (`ForEach-Object { … }`, `Rename-Item`, `Clear-Content`, `Expand-Archive -DestinationPath`, `Invoke-WebRequest -OutFile`);*
+- *`git --git-dir`/`--work-tree` and `git config --global`;*
+- *the values of wrapper options (`sudo -u bob`, `env -u VAR`).*
+
+*Cost if wrong: more denials of outside writes, and none of routine work inside the project.*
+
+- Task 4 review (S1, manager leans fix in the final review): the destination family ignores PowerShell value options. `Copy-Item src\* D:\X -Include *.dll` names `*.dll` and misses `D:\X`. Skip the values of `-filter`, `-include`, `-exclude` and `-credential`.
+- Task 4 review (S3, for Task 6): `path_words` reads `\` followed by a blank as an escape in PowerShell text. `Copy-Item -Destination C:\vab\ -Path a` gives `C:/vab -Path`, a false deny once `write_roots` opens `C:/vab`. Pin it in Task 6.
+- Task 4 review (S4): git reads missing from `_GIT_READS`: `ls-remote`, `remote get-url`, `config --get`, `check-ignore`, `show-branch`, `cherry`, `count-objects`, `var`. Each is a false deny in another checkout only, which Risks accepts.
+- Task 4 review (S7, S8): smaller misreads that do no harm (`cp -tdir`, `Tee-Object -Variable`, `mkdir -m`, `touch -d`), and docstring wording about the re-read and about cutting inside `$(...)`.
