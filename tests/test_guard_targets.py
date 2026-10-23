@@ -240,3 +240,33 @@ ASSIGNMENTS = [
 @pytest.mark.parametrize(("command", "expected"), ASSIGNMENTS)
 def test_a_powershell_assignment_does_not_hide_the_cmdlet(command, expected):
     assert _written(command) == expected
+
+
+COMMENTS = [
+    ("cp a ../o/ # done", ["../o/"]),
+    ("mkdir -p ~/vab/x  # make the folder", ["~/vab/x"]),
+    ("# it's done\necho 'z' > ../o/f", ["../o/f"]),
+    ("git log --format='#%h' > out.txt", ["out.txt"]),
+    ("echo ${#arr[@]} > n.txt", ["n.txt"]),
+    ("echo $# > n.txt", ["n.txt"]),
+    ("echo a;# done\ncp a ../o/", ["../o/"]),
+    ("(# done\ncp a ../o/)", ["../o/"]),
+    ("Copy-Item a b <# note #>", ["b"]),
+    ("<# it's #> cp a ../o/", ["../o/"]),
+    ("<# one\ntwo #>\ncp a ../o/", ["../o/"]),
+]
+
+
+@pytest.mark.parametrize(("command", "expected"), COMMENTS)
+def test_a_comment_is_not_read_as_a_command_or_an_argument(command, expected):
+    assert _written(command) == expected
+
+
+def test_a_hash_inside_a_word_is_not_a_comment():
+    command = "curl http://x/a#b -o ../o/f --format=#%h"
+
+    assert command_segments(command) == [command]
+
+
+def test_a_hash_inside_quotes_is_not_a_comment():
+    assert command_segments("echo 'a # b' && echo \"c # d\" ; e") == ["echo 'a # b'", 'echo "c # d"', "e"]

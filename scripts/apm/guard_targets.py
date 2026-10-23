@@ -5,7 +5,9 @@ quotes and escapes, so a `|` inside `sed 's|a|b|'` or a `;` inside a string cuts
 gives that bash reading and, when the text holds `\\"`, a second, PowerShell reading, because the two disagree on
 `"C:\\x\\"`: the whole text is cut again, not one segment, and the caller judges each reading. `write_targets` names
 the words a segment writes (its redirects, then what the program writes), as written: the caller resolves them.
-`cd_target` names where a `cd` goes. The program is found past `NAME=value`, a PowerShell `$x =`, the wrappers
+`cd_target` names where a `cd` goes. Comments are stripped before cutting, in both readings: a `#` that starts a
+word (at the start, or after a blank, `;`, `&`, `|` or `(`) runs to the end of its line, and PowerShell's
+`<# ... #>` is a comment too; a `#` inside a word (`http://x#frag`, `${#a}`, `$#`) or in quotes is not. The program is found past `NAME=value`, a PowerShell `$x =`, the wrappers
 `sudo`, `env`, `command`, `nohup`, `time` and the clause words `if then else elif do while until !`.
 
 Known limits (inputs built to evade, or writes this check does not name): writes a program makes itself (`python -c`
@@ -17,10 +19,9 @@ list above (`xargs`, `find -exec`, `timeout`) and the values of wrapper options 
 command string another shell runs (`bash -c '...'`), `$(...)` and `eval`; `git --git-dir`, `git --work-tree` and
 `git config --global`; `popd`, `cd -` and a subshell's `cd` (which this reading keeps past the `)`, failing closed);
 PowerShell parameter abbreviations (`-Dest`), arrays (`-Path a,b`), `Join-Path` expressions and `''` quoting; a `\\;`
-before a PowerShell command (read as bash's escaped `;`, so no cut); a trailing `#` comment on a command line (its
-words are read as arguments, so `cp a ../o/ # done` names `done`); a stray quote, read as a plain character (the
-text is still cut, but a second stray quote can pair with it and hide the cuts between them); a positional
-PowerShell value read as a target (failing closed).
+before a PowerShell command (read as bash's escaped `;`, so no cut); a stray quote outside a comment, read as a plain
+character (the text is still cut, but a second stray quote can pair with it and hide the cuts between them); a
+positional PowerShell value read as a target (failing closed).
 """
 from __future__ import annotations
 
@@ -33,7 +34,10 @@ from .guard_words import path_words
 
 # Pieces that hide an operator: a quoted string, a quote never closed (`open`), an escaped character, and the
 # redirect operators that hold a `&` or `|` (`2>&1`, `&>f`, `>|f`). What is left of `cut` is an operator.
-_PIECES = r"""(?P<string>{double}|'[^']*')|(?P<open>["'])|\\.|[<>]&|&>|>\||(?P<cut>&&|\|\||;|\n|&|\|)"""
+_PIECES = (
+    r"""(?P<comment><#.*?#>|(?<![^\s;&|(])\#[^\n]*)|(?P<string>{double}|'[^']*')|(?P<open>["'])"""
+    r"""|\\.|[<>]&|&>|>\||(?P<cut>&&|\|\||;|\n|&|\|)"""
+)
 _BASH = re.compile(_PIECES.format(double=r'"(?:\\.|[^"\\])*"'), re.DOTALL)
 _POWERSHELL = re.compile(_PIECES.format(double=r'"[^"]*"'), re.DOTALL)
 
@@ -62,7 +66,8 @@ _GIT_LISTING = frozenset({"list", "show"})
 
 
 def _pieces(joined: str, pattern: re.Pattern[str]) -> list[str]:
-    spans = [found.span() for found in pattern.finditer(joined) if found["cut"]]
+    joined = pattern.sub(lambda found: " " if found["comment"] else found[0], joined)
+    spans =[found.span() for found in pattern.finditer(joined) if found["cut"]]
     starts = [0] + [end for _, end in spans]
     stops = [start for start, _ in spans] + [len(joined)]
     return [piece for piece in (joined[a:b].strip() for a, b in zip(starts, stops)) if piece]
