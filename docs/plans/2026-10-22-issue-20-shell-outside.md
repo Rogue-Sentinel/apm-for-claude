@@ -782,3 +782,10 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 - Task 4 re-review (suggestion): PowerShell backtick escapes are not read, so a string holding `` `" `` and ` #` can lose a redirect in the bash reading. Name this as a known limit or pin it.
 - Task 4 re-review (suggestion): the PowerShell reading can invent a target from a bash string that holds `\"`, an operator and then a write program (`echo "x \"a\" && rm ../o/f"`). This fails closed. Name it in the docstring.
 - Task 4 re-review (nits): `guard_targets.py:70` reads `spans =[`, and docstring line 10 is too long.
+
+*Ruling during Task 5 (2026-10-22): the existing #11 test `tests/test_guard_heredoc.py::test_a_heredoc_written_to_a_text_file_is_data[cat > /tmp/body.md ...]` calls `decide` directly without a shell temp root, so `/tmp/body.md` became an outside write. In the real hook `SHELL_TEMP_ROOTS` always includes `/tmp`, so the verdict there is unchanged. This plan forbids editing an existing test, so the interface is amended instead: `decide(..., shell_temp=SHELL_TEMP_ROOTS)` defaults to the hook's shell temp roots, defined in the module the hook imports from (or in `guard.py`, imported by the hook). Only this issue's new test helpers (Task 1's four files and `tests/test_guard_outside_reach.py`) pass `shell_temp=()` explicitly, so their outside cases still hold on Linux, where `tmp_path` lies under `/tmp`. Cost if wrong: one default value.*
+
+*Accepted Task 5 deviations: (1) `$Home`, `$HOME` and `${HOME}` are read without regard to case, which only adds denials. (2) A write word ending in `/` or `\` is judged as a path inside that folder, so `cp notes.md <memory>/` writes a file under the memory folder; the main session's `mkdir -p <memory>/` is then allowed while `mkdir -p <memory>` stays denied, and a recursive delete stays denied as destructive. This is recorded in the docstring and in ADR 0007.*
+
+- Task 5 (concern): `_violation` takes 9 parameters; consider a small context object when Task 6 adds `write_roots`.
+- Task 5 (concern): no test pins the fresh cwd per reading; the worker could not build a realistic command where it changes the verdict.
