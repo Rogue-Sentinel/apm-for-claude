@@ -582,11 +582,11 @@
           "worker": "reviewer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Task 4 review (opus): 5 must-fix (MF1 reserved words, MF2 stray quote, MF3 two \\\" paths, MF4 PowerShell assignment, MF5 git stash); ruling amends Task 5's interface (command_readings) and the git table; suggestions deferred.",
           "id": "4r",
           "model": "opus",
-          "status": "done",
+          "status": "running",
           "title": "Task 4 review",
           "worker": "reviewer"
         }
@@ -2065,6 +2065,11 @@
     {
       "at": "2026-10-23T00:26:43.875684+00:00",
       "event": "task 20/4 running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:37:40.515782+00:00",
+      "event": "task 20/4r running",
       "issue": 20
     }
   ]
