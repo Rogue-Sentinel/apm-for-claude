@@ -513,11 +513,11 @@
           "worker": "implementer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Task 3 review must-fix MF1-MF3; see the plan's Task 3 ruling.",
           "id": "3",
           "model": "sonnet",
-          "status": "failed",
+          "status": "running",
           "title": "Redirect targets and heredoc bodies",
           "worker": "implementer"
         },
@@ -2007,6 +2007,11 @@
     {
       "at": "2026-10-23T00:01:16.429378+00:00",
       "event": "task 20/3 failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:01:18.878134+00:00",
+      "event": "task 20/3 running",
       "issue": 20
     }
   ]
