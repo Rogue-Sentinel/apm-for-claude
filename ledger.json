@@ -532,9 +532,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Built and verified, not merged: worktree agent-ad5a63e4e595e6549, commits 02fdba1 + a51e3fc; 2034 targeted passed, debt check nothing worse. Waiting on its per-task review.",
           "id": "5",
           "model": "opus",
-          "status": "running",
+          "status": "pending",
           "title": "Deny shell writes outside; ADR 0007",
           "worker": "implementer"
         },
@@ -2107,6 +2108,11 @@
     {
       "at": "2026-10-23T01:15:01.470138+00:00",
       "event": "task 20/5r pending",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T01:15:03.838401+00:00",
+      "event": "task 20/5 pending",
       "issue": 20
     }
   ]
