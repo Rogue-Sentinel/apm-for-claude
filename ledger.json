@@ -522,11 +522,11 @@
           "worker": "implementer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Task 4 review must-fix MF1-MF5; see the plan's Task 4 ruling.",
           "id": "4",
           "model": "sonnet",
-          "status": "failed",
+          "status": "running",
           "title": "Name the paths each segment writes",
           "worker": "implementer"
         },
@@ -2060,6 +2060,11 @@
     {
       "at": "2026-10-23T00:26:41.599564+00:00",
       "event": "task 20/4 failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:26:43.875684+00:00",
+      "event": "task 20/4 running",
       "issue": 20
     }
   ]
