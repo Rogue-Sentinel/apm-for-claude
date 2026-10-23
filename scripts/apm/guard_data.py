@@ -40,6 +40,19 @@ _SHELL_STRING = re.compile(
 )
 
 
+# Any heredoc: its head line (a `<<` outside quotes, not `<<<`), its body to the first line that is the tag, and that
+# line. The text before the `<<` is read possessively, a quoted string of one line whole, so a `<<` inside quotes
+# starts no heredoc; a quote left open on the line (`"$(cat <<'EOF'`) is read as a plain character.
+_HEAD_SKIP = r""""(?:\\.|[^"\\\n])*"|'[^'\n]*'|\\[^\n]|<<<|(?!<<)[^\n]"""
+_ANY_HEREDOC = re.compile(
+    r"""(?P<head>^(?:""" + _HEAD_SKIP + r""")*+<<-?[ \t]*(?P<quote>['"]?)(?P<tag>\w+)(?P=quote)[^\n]*\n)"""
+    r"(?P<body>.*?)(?P<end>^[ \t]*(?P=tag)[ \t]*$)",
+    re.DOTALL | re.MULTILINE,
+)
+# A shell named on the head line reads the body as commands: `bash`, `sh` and the rest, by path, with `.exe`, in any case.
+_SHELL_NAMED = re.compile(r"(?<![\w.-])(?:bash|sh|zsh|dash|ksh|mksh|pwsh|powershell|cmd)(?!\w)", re.IGNORECASE)
+
+
 def _expands(text: str) -> bool:
     return "$(" in text or "`" in text
 
@@ -73,3 +86,26 @@ def mask_data(command: str) -> str:
     if _SHELL_STRING.search(command.replace('"', "").replace("'", "")):
         return command
     return _ARGUMENT.sub(_mask_argument, _HEREDOC.sub(_mask_heredoc, command))
+
+
+def _set_aside(found: re.Match[str]) -> str:
+    if _SHELL_NAMED.search(found.group("head")) or (not found.group("quote") and _expands(found.group("body"))):
+        return found.group(0)
+    return found.group("head") + found.group("end")
+
+
+def strip_heredoc_bodies(command: str) -> str:
+    """Remove the body of each heredoc that no shell runs; keep its head line and its end-tag line.
+
+    A body is kept when the head line names a shell (`bash <<'EOF'`, `... | sh`), or the tag is unquoted and the
+    body expands (`$(` or a backtick). A command holding a CR is returned whole. The outside-write check reads
+    the result: a body no shell runs is data to its program (a Python script, a message), and reading it as
+    commands produced the false positives measured for issue #20 (`>` inside a script). Only that check uses
+    this; the destructive and protected checks still read every body, as ADR 0005 says.
+
+    Known limits: a body written to a file and run later (`cat <<'EOF' > run.sh`, then `bash run.sh`) is set
+    aside; a shell fed by a heredoc on a later line (`cat <<'EOF' |` newline `sh`) is not seen; a head line with
+    two heredocs sets aside the first body only."""
+    if "\r" in command:
+        return command
+    return _ANY_HEREDOC.sub(_set_aside, command)
