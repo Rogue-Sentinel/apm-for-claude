@@ -14,6 +14,8 @@ WRITES = [
     ("echo x >& out.log", ["out.log"], ["echo", "x"]),
     ("cat < in.txt > out.txt", ["out.txt"], ["cat"]),
     ("cat <<'EOF' > body.md", ["body.md"], ["cat"]),
+    ("x >| out.log", ["out.log"], ["x"]),
+    ("x >|f", ["f"], ["x"]),
     (r'cmd > "C:\Users\me\a b.md"', ["C:/Users/me/a b.md"], ["cmd"]),
 ]
 
