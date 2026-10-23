@@ -522,9 +522,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "4",
-          "status": "pending"
+          "model": "sonnet",
+          "status": "running",
+          "title": "Name the paths each segment writes",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -2027,6 +2030,11 @@
     {
       "at": "2026-10-23T00:08:32.645303+00:00",
       "event": "task 20/3 done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:08:35.025547+00:00",
+      "event": "task 20/4 running",
       "issue": 20
     }
   ]
