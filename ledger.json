@@ -523,10 +523,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 4 review must-fix MF1-MF5; see the plan's Task 4 ruling.",
+          "evidence": "133 targeted pass; on the branch after merge 9f5306d only Task 1's 125 FAIL-now cases fail; fix round 1 (b4fc66d, 82f99c2) re-reviewed clean; guard_targets.py 148 lines of logic; debt check nothing worse.",
           "id": "4",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Name the paths each segment writes",
           "worker": "implementer"
         },
@@ -2075,6 +2075,11 @@
     {
       "at": "2026-10-23T00:43:14.387566+00:00",
       "event": "task 20/4r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:43:16.743828+00:00",
+      "event": "task 20/4 done",
       "issue": 20
     }
   ]
