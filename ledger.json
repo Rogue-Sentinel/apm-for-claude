@@ -569,9 +569,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 3 review (opus): 3 must-fix (MF1 quote fallback, MF2 non-ASCII separator, MF3 >| pin), 7 suggestions deferred; ruling in the plan.",
           "id": "3r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 3 review",
           "worker": "reviewer"
         }
@@ -1995,6 +1996,11 @@
     {
       "at": "2026-10-22T23:54:13.177978+00:00",
       "event": "task 20/3r running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:01:13.851699+00:00",
+      "event": "task 20/3r done",
       "issue": 20
     }
   ]
