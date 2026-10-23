@@ -776,3 +776,9 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 - Task 4 review (S3, for Task 6): `path_words` reads `\` followed by a blank as an escape in PowerShell text. `Copy-Item -Destination C:\vab\ -Path a` gives `C:/vab -Path`, a false deny once `write_roots` opens `C:/vab`. Pin it in Task 6.
 - Task 4 review (S4): git reads missing from `_GIT_READS`: `ls-remote`, `remote get-url`, `config --get`, `check-ignore`, `show-branch`, `cherry`, `count-objects`, `var`. Each is a false deny in another checkout only, which Risks accepts.
 - Task 4 review (S7, S8): smaller misreads that do no harm (`cp -tdir`, `Tee-Object -Variable`, `mkdir -m`, `touch -d`), and docstring wording about the re-read and about cutting inside `$(...)`.
+
+*Recorded after the Task 4 re-review (2026-10-22). MF1–MF5 are addressed. During the round the worker also found a fail-open, `cp a ../o/ # done` naming `done` as the destination, and the manager added its fix to the same round: comments are stripped before cutting, in both readings. Open must-fix: 0.*
+- Task 4 re-review (suggestion): a `#` right after an escaped blank (`echo a\ #b > ../o/f`) is read as a comment. Fix: add `(?<!\\\s)` to the comment alternative.
+- Task 4 re-review (suggestion): PowerShell backtick escapes are not read, so a string holding `` `" `` and ` #` can lose a redirect in the bash reading. Name this as a known limit or pin it.
+- Task 4 re-review (suggestion): the PowerShell reading can invent a target from a bash string that holds `\"`, an operator and then a write program (`echo "x \"a\" && rm ../o/f"`). This fails closed. Name it in the docstring.
+- Task 4 re-review (nits): `guard_targets.py:70` reads `spans =[`, and docstring line 10 is too long.
