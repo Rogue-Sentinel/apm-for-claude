@@ -531,9 +531,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "5",
-          "status": "pending"
+          "model": "opus",
+          "status": "running",
+          "title": "Deny shell writes outside; ADR 0007",
+          "worker": "implementer"
         },
         {
           "attempts": 0,
@@ -2080,6 +2083,11 @@
     {
       "at": "2026-10-23T00:43:16.743828+00:00",
       "event": "task 20/4 done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:43:18.912606+00:00",
+      "event": "task 20/5 running",
       "issue": 20
     }
   ]
