@@ -514,10 +514,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 3 review must-fix MF1-MF3; see the plan's Task 3 ruling.",
+          "evidence": "56 new unit tests pass; worktree guard set 1359 passed; on the branch after merge 7bbb1fa only Task 1's 125 FAIL-now cases fail; fix round 1 (caa8007) re-reviewed clean; debt check nothing worse.",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Redirect targets and heredoc bodies",
           "worker": "implementer"
         },
@@ -2022,6 +2022,11 @@
     {
       "at": "2026-10-23T00:08:30.155398+00:00",
       "event": "task 20/3r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-23T00:08:32.645303+00:00",
+      "event": "task 20/3 done",
       "issue": 20
     }
   ]
