@@ -1,20 +1,26 @@
 """Read a shell command the way the outside-write check needs: its segments, the words each writes, and `cd`.
 
 `command_segments` cuts a command at `&&`, `||`, `;`, `|`, a newline and a lone `&`, only where these stand outside
-quotes and escapes, so a `|` inside `sed 's|a|b|'` or a `;` inside a string cuts nothing. `write_targets` names the
-words a segment writes (its redirects, then what the program writes), as written: the caller resolves them.
-`cd_target` names where a `cd` goes. A segment whose double quote never closes under bash's escapes is read again
-with `\\` as a plain character, as PowerShell reads it, so `Copy-Item a "C:\\x\\"; Remove-Item b` is two segments and
-`C:/x/` is a target of the first.
+quotes and escapes, so a `|` inside `sed 's|a|b|'` or a `;` inside a string cuts nothing. `command_readings`
+gives that bash reading and, when the text holds `\\"`, a second, PowerShell reading, because the two disagree on
+`"C:\\x\\"`: the whole text is cut again, not one segment, and the caller judges each reading. `write_targets` names
+the words a segment writes (its redirects, then what the program writes), as written: the caller resolves them.
+`cd_target` names where a `cd` goes. The program is found past `NAME=value`, a PowerShell `$x =`, the wrappers
+`sudo`, `env`, `command`, `nohup`, `time` and the clause words `if then else elif do while until !`.
 
 Known limits (inputs built to evade, or writes this check does not name): writes a program makes itself (`python -c`
 and scripts, `node -e`, `perl -i`, `cmake -B`, `curl -o`, `wget -O`, `tar -C`, `unzip -d`, `dd of=`, `install`, `ln`,
 `rsync`, `robocopy`, `xcopy`, `git clone <dir>`, `git worktree add <dir>`, `git format-patch -o`, .NET calls such as
-`[IO.File]::WriteAllText`); wrappers beyond `sudo`, `env`, `command`, `nohup` and `time` (`xargs`, `find -exec`,
-`timeout`); a command string another shell runs (`bash -c '...'`), `$(...)` and `eval`; `popd`, `cd -` and a
-subshell's `cd` (which this reading keeps past the `)`, failing closed); PowerShell parameter abbreviations
-(`-Dest`), arrays (`-Path a,b`), `Join-Path` expressions and `''` quoting; a `\\;` before a PowerShell command
-(read as bash's escaped `;`, so no cut); a positional PowerShell value read as a target (failing closed).
+`[IO.File]::WriteAllText`); PowerShell script blocks and cmdlets this module does not read (`ForEach-Object { ... }`,
+`Rename-Item`, `Clear-Content`, `Expand-Archive -DestinationPath`, `Invoke-WebRequest -OutFile`); wrappers beyond the
+list above (`xargs`, `find -exec`, `timeout`) and the values of wrapper options (`sudo -u bob`, `env -u VAR`); a
+command string another shell runs (`bash -c '...'`), `$(...)` and `eval`; `git --git-dir`, `git --work-tree` and
+`git config --global`; `popd`, `cd -` and a subshell's `cd` (which this reading keeps past the `)`, failing closed);
+PowerShell parameter abbreviations (`-Dest`), arrays (`-Path a,b`), `Join-Path` expressions and `''` quoting; a `\\;`
+before a PowerShell command (read as bash's escaped `;`, so no cut); a trailing `#` comment on a command line (its
+words are read as arguments, so `cp a ../o/ # done` names `done`); a stray quote, read as a plain character (the
+text is still cut, but a second stray quote can pair with it and hide the cuts between them); a positional
+PowerShell value read as a target (failing closed).
 """
 from __future__ import annotations
 
@@ -32,7 +38,10 @@ _BASH = re.compile(_PIECES.format(double=r'"(?:\\.|[^"\\])*"'), re.DOTALL)
 _POWERSHELL = re.compile(_PIECES.format(double=r'"[^"]*"'), re.DOTALL)
 
 _ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
+_VARIABLE = re.compile(r"\$[\w:]+=?")
 _WRAPPERS = frozenset({"sudo", "env", "command", "nohup", "time"})
+# Words that start a command's clause; the program follows them, and their own options (there are none) are not skipped.
+_RESERVED = frozenset({"if", "then", "else", "elif", "do", "while", "until", "!"})
 _EVERY_WORD = frozenset(
     "tee touch mkdir rm rmdir unlink set-content add-content ac out-file tee-object new-item ni md "
     "remove-item ri del erase rd".split()
@@ -48,31 +57,37 @@ _GIT_READS = frozenset(
     "status log diff show blame rev-parse ls-files ls-tree cat-file describe grep shortlog reflog rev-list "
     "merge-base for-each-ref show-ref name-rev help version".split()
 )
-_GIT_LISTS = frozenset("branch remote tag config worktree stash".split())
+_GIT_LISTS = frozenset("branch remote tag config worktree".split())
+_GIT_LISTING = frozenset({"list", "show"})
 
 
-def _cuts(text: str, pattern: re.Pattern[str]) -> tuple[list[tuple[int, int]], bool]:
-    spans: list[tuple[int, int]] = []
-    for found in pattern.finditer(text):
-        if found["open"]:
-            return spans, True
-        if found["cut"]:
-            spans.append(found.span())
-    return spans, False
-
-
-def command_segments(text: str) -> list[str]:
-    """`text` with continued lines joined, cut at the operators that stand outside quotes and escapes.
-
-    Pieces are stripped and empty pieces dropped. A quote left open ends the cutting under bash's reading; the
-    text is then cut again with `\\` plain inside double quotes, which closes `"C:\\x\\"`."""
-    joined = join_continuations(text)
-    spans, unclosed = _cuts(joined, _BASH)
-    if unclosed:
-        spans, _ = _cuts(joined, _POWERSHELL)
+def _pieces(joined: str, pattern: re.Pattern[str]) -> list[str]:
+    spans = [found.span() for found in pattern.finditer(joined) if found["cut"]]
     starts = [0] + [end for _, end in spans]
     stops = [start for start, _ in spans] + [len(joined)]
     return [piece for piece in (joined[a:b].strip() for a, b in zip(starts, stops)) if piece]
+
+
+def command_segments(text: str) -> list[str]:
+    """The bash reading: `text` with continued lines joined, cut at the operators outside quotes and escapes.
+
+    Pieces are stripped and empty pieces dropped. A quote that never closes is read as a plain character and the
+    cutting goes on, so a stray apostrophe in a comment stops nothing."""
+    return _pieces(join_continuations(text), _BASH)
+
+
+def command_readings(text: str) -> list[list[str]]:
+    """Each reading of `text` as a list of segments: the bash reading, then, when the text holds `\\"`, the
+    PowerShell reading.
+
+    PowerShell does not escape a quote with `\\`, so `"C:\\x\\"` is a closed string there and the `;` after it cuts.
+    The whole text is cut again with `\\` plain inside double quotes, and each `\\"` is rewritten to `/"` in the
+    segments so that `write_targets` reads the path (`C:/x/`). The caller judges each reading and acts on any."""
+    joined = join_continuations(text)
+    readings = [_pieces(joined, _BASH)]
+    if '\\"' in joined:
+        readings.append([piece.replace('\\"', '/"') for piece in _pieces(joined, _POWERSHELL)])
+    return readings
 
 
 def _unwrapped(words: list[str]) -> list[str]:
@@ -87,17 +102,38 @@ def _unwrapped(words: list[str]) -> list[str]:
     return words
 
 
+def _after_variable(words: list[str]) -> list[str]:
+    """The words after a leading PowerShell assignment (`$f = `, `$f=`, `$f =`), or the words as they are."""
+    head = _VARIABLE.match(words[0])
+    if head and head.group().endswith("="):
+        rest = [words[0][head.end():]] + words[1:]
+    elif head and len(words) > 1 and words[1].startswith("="):
+        rest = [words[1][1:]] + words[2:]
+    else:
+        return words
+    return [word for word in rest[:1] if word] + rest[1:]
+
+
+def _peel(words: list[str], wrapped: bool) -> tuple[list[str], bool] | None:
+    """One leading word that is not the program, dropped; None when the first word is the program."""
+    first = words[0].lower()
+    if first in _WRAPPERS:
+        return _unwrapped(words[1:]), True
+    if first in _RESERVED or _ASSIGNMENT.match(first) or (wrapped and first.startswith("-")):
+        return _unwrapped(words[1:]), wrapped
+    dropped = _after_variable(words)
+    return (_unwrapped(dropped), wrapped) if dropped is not words else None
+
+
 def _program(words: list[str]) -> tuple[str, list[str]]:
-    """The program's name (basename, lowercase, no `.exe`) and its arguments, past assignments and wrappers."""
-    words = _unwrapped(words)
-    wrapped = False
-    while words and (_ASSIGNMENT.match(words[0]) or words[0].lower() in _WRAPPERS or (wrapped and words[0][:1] == "-")):
-        wrapped = wrapped or words[0].lower() in _WRAPPERS
-        words = words[1:]
+    """The program's name (basename, lowercase, no `.exe`) and its arguments, past assignments, reserved words
+    (`do`, `then`, `!`) and wrappers."""
+    words, wrapped = _unwrapped(words), False
+    while words and (peeled := _peel(words, wrapped)) is not None:
+        words, wrapped = peeled
     if not words:
         return "", []
-    name = words[0].rsplit("/", 1)[-1].lower()
-    return name.removesuffix(".exe"), words[1:]
+    return words[0].rsplit("/", 1)[-1].lower().removesuffix(".exe"), words[1:]
 
 
 def _non_options(args: list[str]) -> list[str]:
@@ -165,7 +201,8 @@ def _git(args: list[str]) -> list[str]:
     directories, sub, after = _git_options(args)
     if sub is None or sub in _GIT_READS:
         return []
-    if sub in _GIT_LISTS and (not _non_options(after) or _non_options(after)[0] in ("list", "show")):
+    first = next(iter(_non_options(after)), None)
+    if (sub in _GIT_LISTS and first is None) or (sub in _GIT_LISTS | {"stash"} and first in _GIT_LISTING):
         return []
     return directories or ["."]
 

@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import pytest
 
-from apm.guard_targets import cd_target, command_segments, write_targets
+from apm.guard_data import mask_data, strip_heredoc_bodies
+from apm.guard_targets import cd_target, command_readings, command_segments, write_targets
 
 SEGMENTS = [
     ("a && b", ["a", "b"]),
@@ -111,7 +112,9 @@ GIT = [
     ("git", []),
     ("git -C a -C b commit", ["a", "b"]),
     ("git stash show -p", []),
-    ("git stash", []),
+    ("git stash", ["."]),
+    ("git stash list", []),
+    ("git -C ../o stash -u", ["../o"]),
     ("git stash pop", ["."]),
     ("git config user.name x", ["."]),
     ("git -C ../o -c a=b push", ["../o"]),
@@ -149,3 +152,91 @@ CD = [
 @pytest.mark.parametrize(("segment", "expected"), CD)
 def test_where_cd_goes(segment, expected):
     assert cd_target(segment) == expected
+
+
+def _readings(command):
+    """The readings Task 5 will judge: per reading, each segment's (cd word, written words)."""
+    text = strip_heredoc_bodies(mask_data(command))
+    return [[(cd_target(s), write_targets(s)) for s in reading] for reading in command_readings(text)]
+
+
+def _written(command, reading=0):
+    return [word for _, words in _readings(command)[reading] for word in words]
+
+
+def _goes(command):
+    return [cd for cd, _ in _readings(command)[0] if cd is not None]
+
+
+RESERVED = [
+    ('for f in *.log; do cp "$f" ~/vab/; done', ["~/vab/"]),
+    ("if [ -d build ]; then mkdir -p ~/vab/x; fi", ["~/vab/x"]),
+    ("if [ -d b ]; then echo y; else cp b ../o/; fi", ["../o/"]),
+    ('while read f; do mv "$f" ../o/; done', ["../o/"]),
+    ("! cp a ../o/", ["../o/"]),
+    ("until false; do touch ../o/t; done", ["../o/t"]),
+    ("if x; then git commit -am x; fi", ["."]),
+    ("time cp a ../o/", ["../o/"]),
+    ("if x; then ! rm ../o/f; fi", ["../o/f"]),
+]
+
+
+@pytest.mark.parametrize(("command", "expected"), RESERVED)
+def test_a_shell_reserved_word_does_not_hide_the_program(command, expected):
+    assert _written(command) == expected
+
+
+def test_a_cd_in_a_condition_is_still_a_cd():
+    assert _goes("if cd ../o; then git commit -am x; fi") == ["../o"]
+
+
+STRAY_QUOTES = [
+    ("# don't forget\ncd ../o && git commit -am x", ["."], ["../o"]),
+    (
+        "# Copy into X-Plane's plugin folder\ncp -r build/plugin \"D:/X-Plane 12/Resources/plugins/\"",
+        ["D:/X-Plane 12/Resources/plugins/"],
+        [],
+    ),
+]
+
+
+@pytest.mark.parametrize(("command", "written", "goes"), STRAY_QUOTES)
+def test_a_stray_quote_does_not_stop_the_cutting(command, written, goes):
+    assert (_written(command), _goes(command)) == (written, goes)
+
+
+QUOTED_BACKSLASH = [
+    ('Copy-Item -Path "build\\out\\" -Destination "C:\\Users\\darby\\vab\\" -Recurse', ["C:/Users/darby/vab/"]),
+    ('Copy-Item "docs\\" "C:\\vab\\"', ["C:/vab/"]),
+    ('Copy-Item a "docs\\"; Copy-Item c "C:\\vab\\"', ["docs/", "C:/vab/"]),
+]
+
+
+@pytest.mark.parametrize(("command", "expected"), QUOTED_BACKSLASH)
+def test_the_powershell_reading_names_a_path_ending_in_backslash_and_quote(command, expected):
+    assert _written(command, reading=1) == expected
+
+
+def test_a_text_without_backslash_quote_has_only_the_bash_reading():
+    assert command_readings("cp a ../o/ && ls") == [["cp a ../o/", "ls"]]
+
+
+def test_the_bash_reading_comes_first_and_the_powershell_reading_second():
+    command = 'Copy-Item a "C:\\x\\"; Remove-Item b'
+
+    assert command_readings(command) == [command_segments(command), ['Copy-Item a "C:\\x/"', "Remove-Item b"]]
+
+
+ASSIGNMENTS = [
+    ("$null = New-Item -ItemType Directory -Force C:\\Users\\darby\\vab\\x", ["C:/Users/darby/vab/x"]),
+    ("$f = New-Item -ItemType File -Path C:\\vab\\a.md", ["C:/vab/a.md"]),
+    ("$f=New-Item -Path ../o/a.md", ["../o/a.md"]),
+    ("$f =New-Item -Path ../o/a.md", ["../o/a.md"]),
+    ("$f = (New-Item -Path ../o/a.md)", ["../o/a.md"]),
+    ("$f = 3", []),
+]
+
+
+@pytest.mark.parametrize(("command", "expected"), ASSIGNMENTS)
+def test_a_powershell_assignment_does_not_hide_the_cmdlet(command, expected):
+    assert _written(command) == expected
