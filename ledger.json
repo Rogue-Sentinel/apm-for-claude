@@ -9,6 +9,13 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-24-issue-10-metrics-not-measured.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-24T18:59:44.613713+00:00",
+        "criteria_met": true,
+        "evidence": "Final whole-branch review and scoped re-review (opus): 0 open, every structural criterion met; 2 deferred findings in the plan.",
+        "head": "21664114a83a2f5440546733f0732c75fdcb2137",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -2871,6 +2878,11 @@
     {
       "at": "2026-10-24T18:59:42.017007+00:00",
       "event": "task 10/review done",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:59:44.613743+00:00",
+      "event": "review 10 0 open at 2166411",
       "issue": 10
     }
   ]
