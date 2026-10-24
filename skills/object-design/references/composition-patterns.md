@@ -56,6 +56,7 @@ type Stack:
 ```
 
 **Benefit:** `Stack` controls its own surface. A caller cannot index into the middle of a stack.
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
 
 ## 4. Mixins and traits
 
@@ -74,6 +75,7 @@ type User includes Serializable, Validatable, based on BaseModel
 
 Prefer a mixin that needs nothing from its host. One that reaches into the host's private state is
 inheritance by another name.
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
 
 ## When inheritance is still appropriate
 
@@ -85,6 +87,8 @@ inheritance by another name.
 | Behavior varies along many dimensions | use composition |
 | Combining behaviors from several sources | use composition |
 | A hierarchy deeper than three levels | refactor to composition |
+
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
 
 ## Deciding
 

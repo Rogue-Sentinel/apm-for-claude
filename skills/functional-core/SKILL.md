@@ -1,6 +1,6 @@
 ---
 name: functional-core
-description: "Use when code holds state, has side effects, reads the clock, randomness or the environment, signals absence or failure, or repeats a loop that differs in one operation, so the decisions become pure functions over values and the effects move to the edges."
+description: "Use when code holds state, has side effects, reads the clock, randomness or the environment, signals absence or failure, or repeats a loop that differs in one operation, so the decisions become pure functions over values and the effects move to the edges. Also use when the request mentions pure functions, immutability, referential transparency, higher-order functions (HOFs), map, filter and reduce, callbacks, functional error handling, Result, Either or Option types, the Maybe monad, replacing try-catch with types, or handling errors without exceptions."
 ---
 
 # A functional core
@@ -86,7 +86,8 @@ log("Total: " + total)
 
 The two rules in detail, the list of side effects, the purity test, immutable updates of objects,
 lists and nested values, the pure-core-and-impure-shell pattern and the table of pure alternatives
-are in [references/purity-rules.md](references/purity-rules.md).
+are in [references/purity-rules.md](references/purity-rules.md). Examples by language:
+[references/examples-by-language.md](references/examples-by-language.md).
 
 ## Higher-order functions
 
@@ -241,6 +242,8 @@ assert isTrialOver(account(startedAt: day 0), now: day 30) == false
   operations, when to use which, and the anti-patterns.
 - [references/result-and-option-by-language.md](references/result-and-option-by-language.md): what
   each language offers for absence and failure.
+- [references/examples-by-language.md](references/examples-by-language.md): the names the original
+  skills used as examples, by language.
 
 ## Common mistakes
 
@@ -248,7 +251,7 @@ assert isTrialOver(account(startedAt: day 0), now: day 30) == false
   boundary; they do not disappear.
 - **Deep-copying nested values needlessly.** Share the unchanged parts (structural sharing), or use
   an immutable collection.
-- **Making a measured hot path immutable without measuring** the cost first.
+- **Making a performance-critical hot path immutable without measuring** the cost first.
 - **Forgetting which operations mutate in place**: many languages' sort and splice change the list
   they are called on.
 - **Confusing a binding that cannot be reassigned with a value that cannot change.** The binding is

@@ -1,6 +1,6 @@
 ---
 name: solid
-description: "Use when you add or change a type, a module or an interface, when a type does too much or a new case means editing a growing conditional, when a subtype or a fake behaves differently from what its callers expect, or when business logic reaches for a concrete database, network or file system."
+description: "Use when you add or change a type, a module or an interface, when a type does too much or a new case means editing a growing conditional, when a subtype or a fake behaves differently from what its callers expect, or when business logic reaches for a concrete database, network or file system. Also use when the request mentions SRP, OCP, LSP, ISP or DIP, single responsibility, open-closed, Liskov substitution, interface segregation, dependency inversion, separation of concerns, multiple reasons to change, fat interfaces, depending on abstractions, decoupling, or inheritance hierarchies."
 ---
 
 # SOLID
@@ -159,6 +159,7 @@ Signs: a subtype fails where its parent does not; a subtype ignores a parent met
 nothing; code checks the concrete type before calling a method; a subtype validates its input more
 strictly than its parent; an override returns a different kind of value, or none, where the parent
 returns one; an "is-a" relationship that feels forced ("is a square a rectangle?").
+(Examples by language: [references/examples-by-language.md](references/examples-by-language.md).)
 
 Before:
 
@@ -260,6 +261,7 @@ Signs: business logic that imports a database driver, an HTTP client or the file
 directly; a constructor that creates its own dependencies (`this.db = new SqlClient()`); a type that
 cannot be tested without a running database or network; moving from one database to another means
 editing business logic; domain types that import framework types.
+(Examples by language: [references/examples-by-language.md](references/examples-by-language.md).)
 
 Before:
 
@@ -313,6 +315,8 @@ factory function, the table of when not to invert and the direction rule are in
   adapting a fat interface you do not own, and sizing.
 - [references/dip-patterns.md](references/dip-patterns.md): injection, interface ownership, the
   composition root, factories, and when not to invert.
+- [references/examples-by-language.md](references/examples-by-language.md): the names the original
+  skills used as examples, by language.
 
 ## Common mistakes
 
