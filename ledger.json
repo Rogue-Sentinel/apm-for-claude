@@ -1163,6 +1163,13 @@
           "status": "done",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 0,
+          "evidence": "gate 36 --base origin/main at e06bce0: all PASS; 3483 passed in 213.85s (0:03:33)",
+          "id": "2",
+          "status": "done",
+          "title": "Merge gate"
         }
       ],
       "title": "Release apm 0.3.4 with the #34 changes",
@@ -3409,6 +3416,11 @@
     {
       "at": "2026-10-24T20:55:13.498447+00:00",
       "event": "review 36 0 open at e06bce0",
+      "issue": 36
+    },
+    {
+      "at": "2026-10-24T20:59:02.483101+00:00",
+      "event": "task 36/2 done",
       "issue": 36
     }
   ]
