@@ -544,9 +544,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "6",
-          "status": "pending"
+          "model": "sonnet",
+          "status": "running",
+          "title": "write_roots profile key and remedy",
+          "worker": "implementer"
         },
         {
           "attempts": 1,
@@ -2157,6 +2160,11 @@
     {
       "at": "2026-10-24T15:08:36.818022+00:00",
       "event": "task 20/5 done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:08:39.408470+00:00",
+      "event": "task 20/6 running",
       "issue": 20
     }
   ]
