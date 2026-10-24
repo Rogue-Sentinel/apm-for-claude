@@ -635,10 +635,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Verified in worker worktree at 206290f: shared _VALUE_OPTIONS now skips bash short clusters. write_targets('mkdir -pv /c/other/d') == [] (was ['/c/other/d'] at 598c1fe); same for 'rm -iv', 'cp -pv a /c/other/b', 'mv -iv a /c/other/b', 'touch -ea'. Loosens routine bash writes. Also guard_outside docstring misstates the device-namespace limit; ADR line over 120 chars.",
+          "evidence": "Worker worktree c06d8b4 and feature branch 196a712: probe gives bash mkdir -pv/rm -iv/cp -pv/mv -iv/touch -ea outside paths as at 598c1fe; PowerShell Copy-Item ... -ErrorAction Stop -> D:/X-Plane 12/x.xpl, -EA, -Include, -Destination ... -EA all name the outside path; Copy-Item a docs\\b -ErrorAction Stop -> docs/b. Targeted: 2118 passed (both). debt check --base origin/main: nothing worse (both).",
           "id": "fix",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix",
           "worker": "implementer"
         }
@@ -2277,6 +2277,11 @@
     {
       "at": "2026-10-24T16:47:11.812640+00:00",
       "event": "task 20/fix running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:56:54.623337+00:00",
+      "event": "task 20/fix done",
       "issue": 20
     }
   ]
