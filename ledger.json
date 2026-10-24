@@ -663,9 +663,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 8b9dce3, merged, then docstring wrap 294a603. Probe (PowerShell reading): mkdir -pv ../o/d, rm -iv, cp -pv, mv -iv name ../o paths; cp a D:\\o\\b -EA Stop names D:/o/b; Copy-Item unchanged; bash reading unchanged. Targeted 2131 passed (worktree and feature branch). debt check --base origin/main nothing worse.",
           "id": "fix2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Re-review fixes: sibling prefix, bash-named programs in PowerShell",
           "worker": "implementer"
         }
@@ -2365,6 +2366,11 @@
     {
       "at": "2026-10-24T17:18:38.798177+00:00",
       "event": "task 20/fix2 running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:33:23.924541+00:00",
+      "event": "task 20/fix2 done",
       "issue": 20
     }
   ]
