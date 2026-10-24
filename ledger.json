@@ -813,6 +813,14 @@
           "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Final review fix: ADR 0008 wording",
+          "worker": "implementer"
         }
       ],
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
@@ -2606,6 +2614,11 @@
     {
       "at": "2026-10-24T18:30:48.299586+00:00",
       "event": "task 27/review failed",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:30:50.635996+00:00",
+      "event": "task 27/fix running",
       "issue": 27
     }
   ]
