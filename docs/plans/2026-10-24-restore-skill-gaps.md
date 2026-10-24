@@ -392,6 +392,9 @@ The behavioral test for the trigger phrases (`apm:writing-skills`, "Testing with
 Each of these is **dropped** unless the user rules for the option that needs it. The manager records
 each ruling in italics here before the build starts.
 
+*User's rulings at plan approval, 2026-10-24: A1, B1, C1, D1, E1 (keep ours), and F2 (add
+`/apm:branch-review [branch]`). Tasks 6 to 10 are dropped; Task 11 is built.*
+
 ### Task 6 (ruling a): the full suite after each test
 
 The originals run the full suite after each test (`tdd-test-first/SKILL.md:35`,
@@ -547,3 +550,26 @@ is a test edit, not a protected path, and is approved by that ruling.)
 ## Retrieval check
 
 *(Filled in by the manager in Tasks 1 and 5.)*
+
+## Pre-flight scan
+
+| Pair or task | Shared file or interface | Found |
+|---|---|---|
+| Task 2 / Task 3 | Both define `_names_term(text, term) -> bool` in their own test file, and both duplicate `_term_pattern` in `tests/test_skills.py` | A duplicated block of logic, which the review rubric treats as a defect. Ruling 1 below. |
+| Task 2 / Task 4 | none (disjoint skills and test files) | Clean. |
+| Task 3 / Task 4 | none | Clean. |
+| Task 11 / Tasks 2 to 4 | none (`commands/`, `README.md`, `docs/tutorial.md`, `tests/test_docs.py`) | Clean. |
+| Task 2 / Task 5 | Task 5 checks Task 2's descriptions | Order only: Task 5 after 2, 3, 4 merge. |
+| Task 2 self | Step 1 says the length-cap test "passes now"; Step 2 expects it to pass | Consistent (a pinning test). |
+| Task 3 self | `EXAMPLE_NAMES["solid"]` has `` `fs` ``, a plain substring that also matches inside other names | Harmless: the test asserts presence only. |
+| Task 4 self | Test asserts `branch review` in the description; the main description says "a scored quality review" | Consistent: the appended sentence adds "a branch review". |
+| Task 11 self | Command file frontmatter; the tutorial says `/apm:setup` is the only command | Consistent: Task 11 changes the tutorial line. |
+| Rubric check | Every test asserts something; no duplicated block except the row above | One finding (Ruling 1). |
+
+*Ruling 1, pre-flight: Task 2 moves `_term_pattern` from `tests/test_skills.py` into
+`tests/skill_helpers.py` as `term_pattern(term: str) -> re.Pattern[str]` (a pure move; the banned-term
+test imports it), and adds `names_term(text: str, term: str) -> bool` there (case-insensitive search
+with `term_pattern`). Task 2 owns `tests/skill_helpers.py`. Task 3 consumes `names_term` from
+`skill_helpers` and defines no helper of its own, so Task 3 runs after Task 2 is merged. Order: Task 1,
+Task 2, Task 4 and Task 11 first (at most three workers at once), then Task 3, then Task 5. Cost if
+wrong: Task 3 waits for Task 2, about 15 minutes.*
