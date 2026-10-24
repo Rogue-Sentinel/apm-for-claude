@@ -7,8 +7,9 @@ gives that bash reading and, when the text holds `\\"`, a second, PowerShell rea
 the words a segment writes (its redirects, then what the program writes), as written: the caller resolves them.
 `cd_target` names where a `cd` goes. Comments are stripped before cutting, in both readings: a `#` that starts a
 word (at the start, or after a blank, `;`, `&`, `|` or `(`) runs to the end of its line, and PowerShell's
-`<# ... #>` is a comment too; a `#` inside a word (`http://x#frag`, `${#a}`, `$#`) or in quotes is not. The program is found past `NAME=value`, a PowerShell `$x =`, the wrappers
-`sudo`, `env`, `command`, `nohup`, `time` and the clause words `if then else elif do while until !`.
+`<# ... #>` is a comment too; a `#` inside a word (`http://x#frag`, `${#a}`, `$#`) or in quotes is not. The program
+is found past `NAME=value`, a PowerShell `$x =`, the wrappers `sudo`, `env`, `command`, `nohup`, `time` and the
+clause words `if then else elif do while until !`.
 
 Known limits (inputs built to evade, or writes this check does not name): writes a program makes itself (`python -c`
 and scripts, `node -e`, `perl -i`, `cmake -B`, `curl -o`, `wget -O`, `tar -C`, `unzip -d`, `dd of=`, `install`, `ln`,
@@ -21,7 +22,12 @@ command string another shell runs (`bash -c '...'`), `$(...)` and `eval`; `git -
 PowerShell parameter abbreviations (`-Dest`), arrays (`-Path a,b`), `Join-Path` expressions and `''` quoting; a `\\;`
 before a PowerShell command (read as bash's escaped `;`, so no cut); a stray quote outside a comment, read as a plain
 character (the text is still cut, but a second stray quote can pair with it and hide the cuts between them); a
-positional PowerShell value read as a target (failing closed); a redirect target, which `split_redirects` reads the
+positional PowerShell value read as a target (failing closed), except the value of an option this module knows takes
+one (`-ErrorAction Stop`, `-Filter *.xpl`: see `_VALUE_OPTIONS`), which is skipped, so an option it does not know
+(`-Dest`, an abbreviation) can still hide the destination; `mv` and `Move-Item`, which count only the destination,
+so removing a source in another checkout is not seen; a `#` right after an escaped blank (`a\\ #b`), read as a
+comment; PowerShell backtick escapes, which are not read (only a backtick at the end of a line joins lines); a
+redirect target, which `split_redirects` reads the
 bash way for both tools, so in PowerShell's `> C:\\o\\ y` the `\\` before the blank is an escape and the target is
 `C:/o y`, not `C:/o/` (a program's words, by contrast, take the `powershell` reading).
 """
@@ -49,7 +55,8 @@ _LINE_END_BACKSLASH = re.compile(r"\\(?=\r?\n)")
 _ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
 _VARIABLE = re.compile(r"\$[\w:]+=?")
 _WRAPPERS = frozenset({"sudo", "env", "command", "nohup", "time"})
-# Words that start a command's clause; the program follows them, and their own options (there are none) are not skipped.
+# Words that start a command's clause; the program follows them, and their own options (there are none) are not
+# skipped.
 _RESERVED = frozenset({"if", "then", "else", "elif", "do", "while", "until", "!"})
 _EVERY_WORD = frozenset(
     "tee touch mkdir rm rmdir unlink set-content add-content ac out-file tee-object new-item ni md "
@@ -78,7 +85,7 @@ _GIT_LISTING = frozenset({"list", "show"})
 
 def _pieces(joined: str, pattern: re.Pattern[str]) -> list[str]:
     joined = pattern.sub(lambda found: " " if found["comment"] else found[0], joined)
-    spans =[found.span() for found in pattern.finditer(joined) if found["cut"]]
+    spans = [found.span() for found in pattern.finditer(joined) if found["cut"]]
     starts = [0] + [end for _, end in spans]
     stops = [start for start, _ in spans] + [len(joined)]
     return [piece for piece in (joined[a:b].strip() for a, b in zip(starts, stops)) if piece]

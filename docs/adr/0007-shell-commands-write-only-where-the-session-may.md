@@ -108,8 +108,10 @@ verdict given before this change, for the folders it names.
   home folder, a copy into another repository, a `cd` into one and a commit, a `..` or `/` overshoot) is now denied
   in both sessions and both tools.
 - **Main-session routines that break**, each denied until that project lists the folder under `write_roots` or the
-  user approves the one command: the XP12 deploys to the X-Plane folders, the out-of-tree builds and logs in
-  `~/vab` and `C:/vaR`, a clone into `~/tmp-ccs`. In this repository, copying a session-diagnosis report to a folder
+  user approves the one command: the XP12 deploys to the X-Plane folders when they name the folder as a literal
+  path, the out-of-tree builds and logs in `~/vab` and `C:/vaR`, a clone into `~/tmp-ccs`. A deploy that builds the
+  path in a variable (`$dst = "D:\X-Plane 12\..."; Copy-Item $src $dst`) is a named limit and stays allowed: the
+  variable is read as a relative name inside the directory. In this repository, copying a session-diagnosis report to a folder
   the user names needs an approval, and so does editing global config through the shell (`~/.claude/settings.json`,
   `~/.claude/CLAUDE.md`), which the file tools already refuse.
 - **The XP12 profile needs `write_roots` before that project upgrades.** Its workers write `C:/Users/darby/vab/`
