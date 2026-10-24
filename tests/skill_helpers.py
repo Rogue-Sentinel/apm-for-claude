@@ -148,6 +148,16 @@ def section(body: str, heading: str) -> str:
     return "\n".join(kept)
 
 
+def flat_section(body: str, heading: str) -> str:
+    """A section's text on one line, so a phrase wrapped across lines is still found."""
+    return " ".join(section(body, heading).split())
+
+
+def skill_text(name: str, *path: str) -> str:
+    """The text of a file under skills/<name>/."""
+    return (SKILLS_DIR / name).joinpath(*path).read_text(encoding="utf-8")
+
+
 def assert_sections(name: str, required: Sequence[str]) -> None:
     _, body = parse_skill(name)
     found = sections(body)
@@ -172,3 +182,24 @@ def local_links(text: str) -> list[str]:
                 continue
             targets.append(target.split("#", 1)[0])
     return targets
+
+
+def term_pattern(term: str) -> re.Pattern[str]:
+    """A pattern for `term` that does not match inside a longer word."""
+    before = r"(?<!\w)" if re.match(r"\w", term[0]) else ""
+    after = r"(?!\w)" if re.match(r"\w", term[-1]) else ""
+    return re.compile(before + re.escape(term) + after)
+
+
+def names_term(text: str, term: str) -> bool:
+    """Whether `text` names `term`, ignoring case and not matching inside a longer word."""
+    return bool(re.search(term_pattern(term).pattern, text, re.IGNORECASE))
+
+
+def trigger_cases(triggers: dict[str, Sequence[str]]) -> list[tuple[str, str]]:
+    """One (skill, phrase) pair for every trigger phrase, sorted by skill."""
+    return [(name, term) for name, terms in sorted(triggers.items()) for term in terms]
+
+
+def assert_description_names(name: str, term: str) -> None:
+    assert names_term(parse_skill(name)[0]["description"], term), f"{name}: {term}"

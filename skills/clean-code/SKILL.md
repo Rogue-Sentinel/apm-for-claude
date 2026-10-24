@@ -1,6 +1,6 @@
 ---
 name: clean-code
-description: "Use when you open a file to change it, when you need the function, file or public-method limits and how lines of logic are counted, or when you are about to add code to something already over a limit."
+description: "Use when you open a file to change it, when you need the function, file or public-method limits and how lines of logic are counted, or when you are about to add code to something already over a limit. Also use when the request mentions the boy scout rule, leaving code cleaner, continuous improvement, incremental quality improvements, improving naming, meaningful names, naming conventions, or unclear or misleading identifiers."
 ---
 
 # Clean code

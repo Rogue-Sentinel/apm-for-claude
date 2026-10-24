@@ -12,7 +12,8 @@ defaults; a project's `standard.limits` replaces them.
 
 ### Large class
 **What:** a type that does too much: many fields, many methods, many lines (over the file limit, or
-7 or more public methods without a stated reason).
+7 or more public methods without a stated reason); or a single type of about 200 lines, even in a
+file under the file limit (judged by the reviewer, not measured).
 **Why it hurts:** hard to understand, breaks single responsibility, and attracts still more
 responsibility.
 **Fix:** extract class: split it by responsibility.

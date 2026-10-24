@@ -63,6 +63,8 @@ Implement the domain's ports with a specific technology.
 | `SmtpEmailSender` | a mail-sending library | `EmailSender` |
 | `SystemClock` / `FixedClock` | the operating system's clock / a value set by the test | `Clock` |
 
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
+
 ## A directory layout
 
 ```

@@ -10,6 +10,7 @@ You never type the commands yourself. They are shown so you know what is happeni
 In this tutorial `<CLI>` stands for the command line the manager runs. Everything you type is a plain
 request in the chat, plus the two install lines and `/apm:setup` in section 1 (and one remove line if you
 installed APM from a local folder before).
+Optionally, `/apm:branch-review [branch]` has a reviewer score a branch against its base.
 
 A note on the examples. The output of `audit`, `metrics`, `coverage` and `brief` was captured from the real
 commands and then shortened. The output of `github file`, `github close`, `init`, `gate` and the guard's

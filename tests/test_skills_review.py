@@ -4,7 +4,7 @@ import re
 import pytest
 
 from skill_helpers import (
-    SKILLS_DIR, assert_sections, parse_skill, prose_lines, section, sections,
+    SKILLS_DIR, assert_sections, flat_section, parse_skill, prose_lines, section, sections,
 )
 
 DIMENSIONS = (
@@ -61,6 +61,20 @@ def test_skill_has_its_required_headings(name):
     assert_sections(name, REQUIRED[name])
 
 
+def test_branch_review_description_names_the_original_triggers():
+    fields, _ = parse_skill("branch-review")
+    description = fields["description"].lower()
+    for phrase in ("branch review", "code quality scorecard", "compare code quality"):
+        assert phrase in description, phrase
+
+
+def test_module_architecture_has_a_reviewer_judged_class_size_signal():
+    _, body = parse_skill("branch-review")
+    architecture = flat_section(body, "### Module architecture")
+    assert "about 200 lines" in architecture
+    assert "judged by the reviewer, not measured" in architecture
+
+
 def test_branch_review_has_its_named_references():
     for file_name in ("scoring-evidence-guide.md", "evidence-by-language.md"):
         assert (SKILLS_DIR / "branch-review" / "references" / file_name).is_file(), file_name
@@ -74,7 +88,7 @@ def test_the_scorecard_holds_the_eleven_dimensions_in_order():
 @pytest.mark.parametrize("dimension", DIMENSIONS)
 def test_every_dimension_keeps_every_rubric_band(dimension):
     _, body = parse_skill("branch-review")
-    text = section(body, f"### {dimension}")
+    text = flat_section(body, f"### {dimension}")
     missing = [band for band in BANDS if f"| {band} |" not in text]
     assert not missing, f"{dimension} lacks bands {missing}"
 
@@ -96,35 +110,35 @@ def _bad_bracket_expressions(text: str) -> list[str]:
 @pytest.mark.parametrize("dimension", UI_SCOPED)
 def test_ui_scoped_dimensions_give_na_with_its_reason_without_a_ui(dimension):
     _, body = parse_skill("branch-review")
-    assert NO_UI_REASON in section(body, f"### {dimension}"), dimension
+    assert NO_UI_REASON in flat_section(body, f"### {dimension}"), dimension
 
 
 def test_entry_points_are_still_scored_without_a_ui():
     _, body = parse_skill("branch-review")
-    assert "entry points are still scored" in section(body, "### Entry points and routing")
+    assert "entry points are still scored" in flat_section(body, "### Entry points and routing")
 
 
 def test_the_profile_ui_key_decides_the_ui_scoped_dimensions():
     _, review = parse_skill("branch-review")
     _, audit = parse_skill("clean-code-audit")
-    assert "`standard.ui`" in section(review, "## Gather evidence")
-    assert "`standard.ui`" in section(audit, "## Scan")
+    assert "`standard.ui`" in flat_section(review, "## Gather evidence")
+    assert "`standard.ui`" in flat_section(audit, "## Scan")
 
 
 def test_testing_can_reach_the_top_band_without_a_ui():
     _, body = parse_skill("branch-review")
     assert UI_WHERE in _band(section(body, "### Testing"), "9-10")
-    assert UI_WHERE in section(_reference("scoring-evidence-guide.md"), "## Testing")
+    assert UI_WHERE in flat_section(_reference("scoring-evidence-guide.md"), "## Testing")
 
 
 def test_duplication_counts_shared_modules_as_well_as_components():
     _, body = parse_skill("branch-review")
-    assert "shared components or shared modules" in section(body, "### Code duplication")
+    assert "shared components or shared modules" in flat_section(body, "### Code duplication")
 
 
 def test_branch_review_gathers_measured_and_project_evidence():
     _, body = parse_skill("branch-review")
-    evidence = section(body, "## Gather evidence")
+    evidence = flat_section(body, "## Gather evidence")
     needles = ("`<CLI> metrics`", "`<CLI> debt check", "`standard.review_patterns`", "`standard.limits`")
     for needle in needles:
         assert needle in evidence, needle
@@ -135,12 +149,12 @@ def test_report_keeps_the_old_new_and_previous_review_formats():
     _, body = parse_skill("branch-review")
     for line in SCORECARD_FORMATS:
         assert line in body, line
-    assert "`BRANCH_REVIEW.md`" in section(body, "## Previous reviews")
+    assert "`BRANCH_REVIEW.md`" in flat_section(body, "## Previous reviews")
 
 
 def test_scoring_honestly_keeps_greenfield_and_the_weighting_rule():
     _, body = parse_skill("branch-review")
-    honesty = section(body, "## Scoring honestly")
+    honesty = flat_section(body, "## Scoring honestly")
     assert "greenfield" in honesty and "N/A" in honesty
     assert "not an average" in body
 
@@ -181,13 +195,13 @@ def test_credits_name_both_review_skills():
 
 def test_audit_measures_against_the_profile_limits():
     _, body = parse_skill("clean-code-audit")
-    measure = section(body, "## Measure")
+    measure = flat_section(body, "## Measure")
     assert "`<CLI> metrics`" in measure and "`standard.limits`" in measure
     assert "20 lines" not in body
 
 
 def test_audit_report_keeps_the_summary_scores_and_top_five():
     _, body = parse_skill("clean-code-audit")
-    report = section(body, "## Report format")
+    report = flat_section(body, "## Report format")
     for needle in ("Overall health", "Files scanned", "Issues found", "(score: X/10)", "Top 5"):
         assert needle in report, needle
