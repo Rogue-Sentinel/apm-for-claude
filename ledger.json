@@ -1147,6 +1147,14 @@
           "status": "done",
           "title": "Bump the version to 0.3.4",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "review",
+          "model": "opus",
+          "status": "running",
+          "title": "Final whole-branch review",
+          "worker": "reviewer"
         }
       ],
       "title": "Release apm 0.3.4 with the #34 changes",
@@ -3373,6 +3381,11 @@
     {
       "at": "2026-10-24T20:53:55.211291+00:00",
       "event": "task 36/1 done",
+      "issue": 36
+    },
+    {
+      "at": "2026-10-24T20:53:57.688407+00:00",
+      "event": "task 36/review running",
       "issue": 36
     }
   ]
