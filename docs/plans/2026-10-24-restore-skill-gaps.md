@@ -530,7 +530,7 @@ is a test edit, not a protected path, and is approved by that ruling.)
   the one `Also use when` sentence this plan gives, and is at most 1024 characters
   (`tests/test_skills.py`).
 - `skills/refactoring/`, `skills/solid/`, `skills/object-design/`, `skills/clean-architecture/` and
-  `skills/functional-core/` each have a `references/examples-by-language.md`
+  `skills/functional-core/` each have a references/examples-by-language.md
   (`skills/refactoring/references/examples-by-language.md`,
   `skills/solid/references/examples-by-language.md`,
   `skills/object-design/references/examples-by-language.md`,
@@ -555,7 +555,7 @@ is a test edit, not a protected path, and is approved by that ruling.)
 
 *Ruling at the merge gate, 2026-10-24: the gate reads every backticked path in these criteria as a
 document that must exist, from the repository root. The criteria named skill files relative to
-`skills/` (`code-smells/SKILL.md` and the like), and named the B2 ADR in backticks although the user
+`skills/` (code-smells/SKILL.md and the like), and named the B2 ADR in backticks although the user
 ruled B1, so `<CLI> gate 34` failed criterion 4 on paths, not on missing work. The skill paths above
 now carry their `skills/` prefix and the five by-language files are listed one by one; the B2 ADR path
 lost its backticks (the criterion is unchanged and does not apply under ruling B1). Every criterion
