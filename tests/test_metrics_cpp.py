@@ -138,11 +138,11 @@ private:
 """
 
 
-def test_the_xp12_database_header_has_seven_public_methods() -> None:
+def test_the_database_header_has_seven_public_methods() -> None:
     assert _classes(DATABASE) == [("Database", 1, 7)]
 
 
-def test_the_xp12_map_screen_header_has_eight_public_methods() -> None:
+def test_the_map_screen_header_has_eight_public_methods() -> None:
     assert _classes(MAP_SCREEN) == [("MapScreen", 2, 8), ("MapScreen::Canvas", 14, 0)]
 
 
