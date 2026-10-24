@@ -1141,9 +1141,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Worktree and branch after merge: pytest test_setup+test_docs+test_cli 75 passed before and after; git grep shows 0.3.4 in the 4 places; debt check nothing worse; commit 43d28c4, profile commit e06bce0",
           "id": "1",
           "model": "haiku",
-          "status": "running",
+          "status": "done",
           "title": "Bump the version to 0.3.4",
           "worker": "implementer"
         }
@@ -3367,6 +3368,11 @@
     {
       "at": "2026-10-24T20:51:14.112857+00:00",
       "event": "task 36/1 running",
+      "issue": 36
+    },
+    {
+      "at": "2026-10-24T20:53:55.211291+00:00",
+      "event": "task 36/1 done",
       "issue": 36
     }
   ]
