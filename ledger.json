@@ -783,9 +783,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Worker 6cf2976 merged: targeted tests 302 passed in worktree and on branch (302 before); grep for xp12/x-plane/virtualairline over the scope prints nothing; debt check clean.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Generic names in tests, ADRs, comment",
           "worker": "implementer"
         },
@@ -2554,6 +2555,11 @@
     {
       "at": "2026-10-24T18:25:11.335238+00:00",
       "event": "task 27/3 pending",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:27:41.487641+00:00",
+      "event": "task 27/1 done",
       "issue": 27
     }
   ]
