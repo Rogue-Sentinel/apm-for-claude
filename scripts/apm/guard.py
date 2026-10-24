@@ -8,6 +8,7 @@ from typing import Any, Literal
 
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
+from .guard_outside import SHELL_TEMP_ROOTS, Reach, outside_write
 from .guard_paths import is_under, roots_for, same_path, write_denial
 from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
@@ -87,15 +88,17 @@ def _cwd(event: Mapping[str, Any], project: Project, windows: bool) -> Path:
 
 
 def _command_violation(
-    command: str, event: Mapping[str, Any], project: Project, profile: Profile,
-    prefixes: Sequence[str], windows: bool,
+    command: str, event: Mapping[str, Any], profile: Profile, prefixes: Sequence[str], reach: Reach
 ) -> tuple[str, str] | None:
-    cwd = _cwd(event, project, windows)
+    """The worker rules, the state directory and `check_command` first, so their reasons stay; then outside writes."""
+    project = reach.project
+    cwd = _cwd(event, project, reach.windows)
     if reason := worker_command_violation(command, event, cwd, project.worktree_root):
         return f"{reason}: {command.strip()}", _REMEDIES["command"]
     if reason := _state_dir_write(command, cwd, project):
         return f"{reason}: {command.strip()}", _REMEDIES["state"]
     reason = check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
+    reason = reason or outside_write(command, cwd, prefixes, reach)
     return (f"{reason}: {command.strip()}", _REMEDIES["command"]) if reason else None
 
 
@@ -107,12 +110,20 @@ def _violation(
     temp_roots: Sequence[Path],
     windows: bool,
     config_dir: Path | None,
+    *,
+    home: Path | None,
+    shell_temp: Sequence[Path],
 ) -> tuple[str, str] | None:
-    """Return (reason, remedy) for a denied call, or None. The remedy offers only an approval that works."""
+    """Return (reason, remedy) for a denied call, or None. The remedy offers only an approval that works.
+    The shell temp roots (`/tmp`) and the home folder reach only the command check, never the file tools, and the
+    shell temp roots only a Bash command: to PowerShell, `/tmp` is a real folder (`C:\\tmp`)."""
     globs, prefixes = _split_allowlist(allowlist)
     command = (event.get("tool_input") or {}).get("command")
     if event.get("tool_name") in _COMMAND_TOOLS and isinstance(command, str):
-        return _command_violation(command, event, project, profile, prefixes, windows)
+        powershell = event.get("tool_name") == "PowerShell"
+        roots = (*temp_roots, *(() if powershell else shell_temp))
+        reach = Reach(project, roots, config_dir, home, bool(event.get("agent_id")), windows, powershell)
+        return _command_violation(command, event, profile, prefixes, reach)
     return _file_violation(event, project, profile, globs, temp_roots, windows, config_dir)
 
 
@@ -150,9 +161,12 @@ def decide(
     windows: bool,
     approvals: Sequence[Any] = (),
     config_dir: Path | None = None,
+    home: Path | None = None,
+    shell_temp: Sequence[Path] = SHELL_TEMP_ROOTS,
 ) -> Decision:
     """Return none or deny for a tool call. Live one-off `approvals` count only in the main session,
-    and so does the memory folder under `config_dir`."""
+    and so does the memory folder under `config_dir`. `home` and `shell_temp` serve shell commands only;
+    `shell_temp` defaults to the roots the hook passes, so a direct caller gets the hook's verdict."""
     if project is None or profile is None:
         return Decision("none")
     worker = bool(event.get("agent_id"))
@@ -160,7 +174,8 @@ def decide(
         return Decision("none")
     globs = [] if worker else _split_allowlist(approvals)[0]
     rules = [*allowlist, *({"path": glob} for glob in globs)]
-    violation = _violation(event, project, profile, rules, temp_roots, windows, config_dir)
+    violation = _violation(event, project, profile, rules, temp_roots, windows, config_dir,
+                           home=home, shell_temp=shell_temp)
     if violation is None:
         return Decision("none")
     reason, remedy = violation

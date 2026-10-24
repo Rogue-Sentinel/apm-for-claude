@@ -44,7 +44,7 @@ def home_only(tmp_path: Path, monkeypatch) -> None:
 @pytest.fixture
 def isolated(home_only: None, monkeypatch) -> None:
     """Also no shell temp root, so `/tmp` (which holds tmp_path on Linux) opens nothing."""
-    monkeypatch.setattr(hook_pretooluse, "SHELL_TEMP_ROOTS", (), raising=False)
+    monkeypatch.setattr(hook_pretooluse, "SHELL_TEMP_ROOTS", ())
 
 
 @pytest.fixture
