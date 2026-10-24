@@ -1035,9 +1035,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Baseline 8/9 (miss: request 5 went to clean-code-audit), 5 medium-confidence; see the plan, Retrieval check",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Retrieval baseline",
           "worker": "general-purpose"
         },
@@ -3152,6 +3153,11 @@
     {
       "at": "2026-10-24T20:13:20.766326+00:00",
       "event": "task 34/4 running",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:14:23.899056+00:00",
+      "event": "task 34/1 done",
       "issue": 34
     }
   ]
