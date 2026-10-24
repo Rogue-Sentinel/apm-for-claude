@@ -40,9 +40,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 385a318 merged: RED 11 failed; GREEN 336 passed in worktree; on branch (with ruling commit) targeted metrics/docs/skills 380+ pass; debt check clean; repo metrics shows 'Files not measured: 1 / apm: 1' as planned. Ruling: see the plan, Task 4 amendment.",
           "id": "4",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Report lists files not measured",
           "worker": "implementer"
         },
@@ -2800,6 +2801,11 @@
       "at": "2026-10-24T18:37:30.495070+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/31",
       "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:41:27.944330+00:00",
+      "event": "task 10/4 done",
+      "issue": 10
     }
   ]
 }
