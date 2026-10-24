@@ -23,14 +23,15 @@ report.**
 - Only files the profile's scope includes are listed. An excluded file, or one outside the `PATH` arguments,
   never appears. `metrics --ref` lists the same files as the working tree does.
 - The count stays **out of the debt snapshot**. It is not debt the code can pay down, and a new not-measured
-  file could only be "fixed" by narrowing the scope, which the ratchet already treats as a regression.
-- QML, Inno Setup and CMake files are now measured for size only. As in ADR-0003, a long file in a language
+  file could be "fixed" by narrowing the scope, which the ratchet already treats as a regression, or by the
+  tool gaining a language.
+- QML, Inno Setup and CMake files are now measured for size only. As in ADR-0010, a long file in a language
   the baseline did not measure is a neutral note, not new debt.
 
 ## Consequences
 
-- Unknown kinds (`.html`, `.css`, `.qrc`, a script with a shebang line) are listed. The user can add a
-  language or an exclude.
+- Unknown kinds (`.html`, `.css`, `.qrc`, a script with a shebang line) are listed. The user can add an
+  exclude under `standard.metrics`, or file an issue asking for the language.
 - Each candidate file is read once more.
 - The lists of names and extensions are fixed. A `.txt` file that holds source counts as not code.
 

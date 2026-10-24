@@ -67,7 +67,7 @@ def _is_brace(metric: FileMetric) -> bool:
     return language is not None and language.family == "brace"
 
 
-def not_measured_candidates(paths: Sequence[str], config: MetricsConfig) -> list[str]:
+def _not_measured_candidates(paths: Sequence[str], config: MetricsConfig) -> list[str]:
     """The in-scope paths with no language that their names do not already mark as docs, data or binaries."""
     return [p for p in paths if language_for(p) is None and _in_scope(p, config) and not named_as_not_code(p)]
 
@@ -104,10 +104,11 @@ class Report:
         return {name: names.count(name) for name in sorted(set(names))}
 
 
-def not_measured_kinds(report: Report) -> dict[str, int]:
+def _not_measured_kinds(report: Report) -> dict[str, int]:
     """The files not measured, counted by kind: most files first, then by kind.
 
-    A function, not a `Report` method, so `Report` stays under the public-method review flag.
+    A rendering helper for the text report, so it is a private function beside the section that prints it,
+    not part of what a `Report` offers its callers.
     """
     counts = Counter(file_kind(path) for path in report.not_measured)
     return dict(sorted(counts.items(), key=lambda item: (-item[1], item[0])))
@@ -139,15 +140,15 @@ def choose_files(
 ) -> tuple[list[str], list[str]]:
     """The files to measure and the not-measured candidates, both in scope and under `paths`."""
     return (under_paths(select_files(files, config), paths),
-            under_paths(not_measured_candidates(files, config), paths))
+            under_paths(_not_measured_candidates(files, config), paths))
 
 
 def measure_files(names: Sequence[str], read: Read, candidates: Sequence[str] = ()) -> Report:
     """Measure the readable names; the candidates that hold text are the files not measured."""
     datas = ((name, read(name)) for name in names)
     measured = (measure_text(name, decode_text(data)) for name, data in datas if data is not None)
-    unmeasured = tuple(name for name in candidates if holds_text(read(name)))
-    return Report(tuple(metric for metric in measured if metric is not None), unmeasured)
+    not_measured = tuple(name for name in candidates if holds_text(read(name)))
+    return Report(tuple(metric for metric in measured if metric is not None), not_measured)
 
 
 def measure_tree(root: Path, config: MetricsConfig, paths: Sequence[str] | None = None) -> Report:
@@ -211,7 +212,7 @@ def _plain_section(report: Report) -> list[str]:
 
 def _not_measured_section(report: Report) -> list[str]:
     return _section(f"Files not measured: {len(report.not_measured)}",
-                    [f"{kind}: {count}" for kind, count in not_measured_kinds(report).items()])
+                    [f"{kind}: {count}" for kind, count in _not_measured_kinds(report).items()])
 
 
 def render_text(report: Report, limits: Limits) -> str:
