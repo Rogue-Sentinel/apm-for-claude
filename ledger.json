@@ -796,6 +796,12 @@
           "status": "running",
           "title": "ADR 0008: the guard is frozen",
           "worker": "implementer"
+        },
+        {
+          "attempts": 0,
+          "id": "3",
+          "status": "pending",
+          "title": "Merge gate"
         }
       ],
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
@@ -2543,6 +2549,11 @@
     {
       "at": "2026-10-24T18:25:09.013223+00:00",
       "event": "task 27/2 running",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:25:11.335238+00:00",
+      "event": "task 27/3 pending",
       "issue": 27
     }
   ]
