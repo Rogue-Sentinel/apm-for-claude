@@ -654,9 +654,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker c59c272, merged 56a9128: git grep for vab/vaR/X-Plane/XP12/.xpl/VirtualAirline/career.db/darby over guard modules, profile.py, agents, tutorial, ADR 0007 and the branch's new tests prints nothing. Targeted 2118 passed on feature branch; debt check --base origin/main nothing worse.",
           "id": "neutral",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Strip X-Plane examples from the branch",
           "worker": "implementer"
         }
@@ -2315,6 +2316,11 @@
     {
       "at": "2026-10-24T16:57:29.795181+00:00",
       "event": "question 20 #1",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:08:52.045221+00:00",
+      "event": "task 20/neutral done",
       "issue": 20
     }
   ]
