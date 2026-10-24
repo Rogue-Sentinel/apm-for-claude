@@ -1080,9 +1080,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Retrieval 9/9 expected skills, 8 high confidence (baseline 8/9, 3 high); see the plan, Retrieval check",
           "id": "5",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Retrieval check after",
           "worker": "general-purpose"
         }
@@ -3221,6 +3222,11 @@
     {
       "at": "2026-10-24T20:21:34.635818+00:00",
       "event": "task 34/5 running",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:21:59.363624+00:00",
+      "event": "task 34/5 done",
       "issue": 34
     }
   ]
