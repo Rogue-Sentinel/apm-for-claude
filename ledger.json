@@ -730,6 +730,17 @@
       "title": "Release apm 0.3.2 with the #14 and #19 fixes",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/25"
     },
+    "27": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/27"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -2332,6 +2343,11 @@
       "at": "2026-10-24T17:13:36.126247+00:00",
       "event": "resolve 20 #1",
       "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:13:49.566139+00:00",
+      "event": "filed 27 https://github.com/Rogue-Sentinel/apm-for-claude/issues/27",
+      "issue": 27
     }
   ]
 }
