@@ -57,6 +57,7 @@ denied, like a file-tool write outside the project.**
   project's memory folder, the rest of the config dir and the folder path itself stay denied. The hook adds `/tmp`
   as a shell temp root (`SHELL_TEMP_ROOTS`) because Git Bash mounts it on the Windows temp folder and macOS keeps it
   apart from `tempfile.gettempdir()`. `/tmp` and the home folder reach only the command check, never the file tools.
+  `/tmp` counts as temp for a Bash command only: to PowerShell, `/tmp` is a real `C:\tmp` folder, which is outside.
 - **What counts as a write target** (`guard_targets.write_targets`): a redirect's file; every word of `tee`,
   `touch`, `mkdir`, `rm`, `rmdir`, `unlink` and the PowerShell `Set-Content`, `Add-Content`, `Out-File`,
   `Tee-Object`, `New-Item` and `Remove-Item` with their aliases; the destination of `cp`, `mv`, `Copy-Item` and
@@ -65,12 +66,15 @@ denied, like a file-tool write outside the project.**
   is outside the model, except that a `git` command writes its working directory.
 - **How a command is read for this check.** Message arguments are masked as `check_command` masks them. The body of a
   heredoc no shell runs is set aside (`strip_heredoc_bodies`): it is data to its program, a script or a message.
-  The text is cut into segments only where an operator stands outside quotes (`command_readings`); when it holds
-  `\"`, a PowerShell reading, where `\` escapes nothing, is cut and judged as well, and any reading that names an
-  outside target denies. Each reading starts from the command's working directory, and a `cd` moves it for the
-  segments after it in that reading. A device (`/dev/null`, `NUL`, `$null`) and a descriptor (`2>&1`) are no file.
-  A leading `~`, `$HOME`, `${HOME}`, `$env:HOME` or `$env:USERPROFILE` names the home folder. A word that ends in a
-  separator (`cp notes.md <memory>/`) names a folder written into, and is judged as a path inside it.
+  The text is cut into segments only where an operator stands outside quotes (`command_readings`). For a PowerShell
+  command that holds `\"`, a PowerShell reading, where `\` escapes nothing, is cut and judged as well, and any
+  reading that names an outside target denies. The PowerShell reading applies to PowerShell commands only: bash reads
+  `\"` as an escaped quote, so a Bash command is judged on the bash reading alone. Each reading starts from the
+  command's working directory, and a `cd` moves it for the segments after it in that reading. A device (`/dev/null`,
+  `NUL`, `$null`) and a descriptor (`2>&1`) are no file. A leading `~`, `$HOME`, `${HOME}`, `$USERPROFILE`,
+  `${USERPROFILE}`, `$env:HOME`, `$env:USERPROFILE` or `${env:USERPROFILE}` names the home folder; the spellings
+  match in any case, which only adds denials. A word that ends in a separator (`cp notes.md <memory>/`) names a
+  folder written into, and is judged as a path inside it.
 - **Order.** `outside_write` runs after the worker rules, the state-directory check and `check_command`, so every
   reason given before this change is given unchanged. A plan allowlist prefix covers a segment for this check as for
   `check_command`.
@@ -104,13 +108,15 @@ verdict given before this change, for the folders it names.
 - **Known limits**, recorded in the docstrings of `guard_targets.py`, `guard_outside.py`, `guard_redirects.py` and
   `guard_data.py`: writes a program makes itself; PowerShell script blocks and the cmdlets the reader does not know;
   `bash -c '...'`, `eval` and `$(...)`; a target built from another variable, read as a relative name; `git
-  --git-dir`, `--work-tree` and `git config --global`; and a session whose shell already sits outside the project,
-  which is not guarded at all, because the project comes from the event's `cwd`.
+  --git-dir`, `--work-tree` and `git config --global`; a PowerShell drive switch (a segment `D:` followed by a
+  write), which is not tracked; and a session whose shell already sits outside the project, which is not guarded at
+  all, because the project comes from the event's `cwd`.
 - **`git` in another checkout is read by subcommand.** A read the list misses (`git -C ../o config --get x`) is a
   false denial there; inside the project every `git` command is allowed.
 - The main session's `mkdir -p <memory>` is denied, as the file tools deny the folder path. The folder normally
   exists, because Claude Code makes it. With a trailing separator (`mkdir -p <memory>/`) the word is read as a
-  write into the folder and is allowed; a recursive delete of the folder is still denied as destructive.
+  write into the folder and is allowed, and so are the main session's `touch "<memory>/"` and `rmdir "<memory>/"`;
+  a recursive delete of the folder is still denied as destructive.
 
 ## Alternatives considered
 

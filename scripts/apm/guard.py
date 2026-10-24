@@ -115,12 +115,14 @@ def _violation(
     shell_temp: Sequence[Path],
 ) -> tuple[str, str] | None:
     """Return (reason, remedy) for a denied call, or None. The remedy offers only an approval that works.
-    The shell temp roots (`/tmp`) and the home folder reach only the command check, never the file tools."""
+    The shell temp roots (`/tmp`) and the home folder reach only the command check, never the file tools, and the
+    shell temp roots only a Bash command: to PowerShell, `/tmp` is a real folder (`C:\\tmp`)."""
     globs, prefixes = _split_allowlist(allowlist)
     command = (event.get("tool_input") or {}).get("command")
     if event.get("tool_name") in _COMMAND_TOOLS and isinstance(command, str):
-        worker = bool(event.get("agent_id"))
-        reach = Reach(project, (*temp_roots, *shell_temp), config_dir, home, worker, windows)
+        powershell = event.get("tool_name") == "PowerShell"
+        roots = (*temp_roots, *(() if powershell else shell_temp))
+        reach = Reach(project, roots, config_dir, home, bool(event.get("agent_id")), windows, powershell)
         return _command_violation(command, event, profile, prefixes, reach)
     return _file_violation(event, project, profile, globs, temp_roots, windows, config_dir)
 
