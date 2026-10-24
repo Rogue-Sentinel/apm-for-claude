@@ -248,7 +248,7 @@ assert isTrialOver(account(startedAt: day 0), now: day 30) == false
   boundary; they do not disappear.
 - **Deep-copying nested values needlessly.** Share the unchanged parts (structural sharing), or use
   an immutable collection.
-- **Making a measured hot path immutable without measuring** the cost first.
+- **Making a performance-critical hot path immutable without measuring** the cost first.
 - **Forgetting which operations mutate in place**: many languages' sort and splice change the list
   they are called on.
 - **Confusing a binding that cannot be reassigned with a value that cannot change.** The binding is
