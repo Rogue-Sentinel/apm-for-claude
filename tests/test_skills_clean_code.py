@@ -1,7 +1,10 @@
 """The code-level Clean Code skills carry every heading the coverage inventory anchors to."""
 import pytest
 
-from skill_helpers import SKILLS_DIR, assert_sections, names_term, parse_skill, section as _section, sections
+from skill_helpers import (
+    SKILLS_DIR, assert_description_names, assert_sections, flat_section, parse_skill, sections,
+    skill_text, trigger_cases,
+)
 
 REQUIRED = {
     "clean-code": (
@@ -116,35 +119,22 @@ def test_adr_directory_comes_from_the_profile():
     assert "`docs/adr/`" in body
 
 
-def section(body: str, heading: str) -> str:
-    """A section's text on one line, so a phrase wrapped across lines is still found."""
-    return " ".join(_section(body, heading).split())
-
-
-def _skill_text(name: str, *path: str) -> str:
-    return (SKILLS_DIR / name).joinpath(*path).read_text(encoding="utf-8")
-
-
-def _cases():
-    return [(name, term) for name, terms in sorted(TRIGGERS.items()) for term in terms]
-
-
-@pytest.mark.parametrize(("name", "term"), _cases())
+@pytest.mark.parametrize(("name", "term"), trigger_cases(TRIGGERS))
 def test_description_names_the_original_triggers(name, term):
-    assert names_term(parse_skill(name)[0]["description"], term), f"{name}: {term}"
+    assert_description_names(name, term)
 
 
 def test_extract_method_keeps_the_original_trigger_threshold_and_aim():
     _, body = parse_skill("refactoring")
-    assert "simplify or decompose a function" in section(body, "## When this applies")
-    assert "about 10 lines of logic" in section(body, "## When this applies")
-    assert "read like prose" in section(body, "## Extract method")
+    assert "simplify or decompose a function" in flat_section(body, "## When this applies")
+    assert "about 10 lines of logic" in flat_section(body, "## When this applies")
+    assert "read like prose" in flat_section(body, "## Extract method")
 
 
 def test_type_checks_point_at_their_examples_by_language():
     _, body = parse_skill("refactoring")
-    assert "`instanceof`" in _skill_text("refactoring", "references", "examples-by-language.md")
-    assert "references/examples-by-language.md" in section(
+    assert "`instanceof`" in skill_text("refactoring", "references", "examples-by-language.md")
+    assert "references/examples-by-language.md" in flat_section(
         body, "## Replace conditional with polymorphism")
     others = [p for p in (SKILLS_DIR / "refactoring").rglob("*.md")
               if p.name != "examples-by-language.md"]
@@ -153,16 +143,29 @@ def test_type_checks_point_at_their_examples_by_language():
 
 def test_a_test_that_passes_at_once_is_deleted_as_redundant():
     _, body = parse_skill("test-first")
-    cycle = section(body, "## Red, green, refactor")
+    cycle = flat_section(body, "## Red, green, refactor")
     assert "redundant" in cycle and "delete it and pick a different behavior" in cycle
     assert "fix or delete" not in cycle
     assert "delete it and pick a different behavior" in " ".join(
-        _skill_text("test-first", "references", "cycle-steps.md").split())
+        skill_text("test-first", "references", "cycle-steps.md").split())
 
 
 def test_large_class_has_a_reviewer_judged_class_size_signal():
     _, body = parse_skill("code-smells")
-    catalog = _skill_text("code-smells", "references", "smell-catalog.md")
-    for text in (section(body, "## Finding smells"), section(catalog, "### Large class")):
+    catalog = skill_text("code-smells", "references", "smell-catalog.md")
+    for text in (flat_section(body, "## Finding smells"), flat_section(catalog, "### Large class")):
         for phrase in CLASS_SIZE_SIGNAL:
             assert phrase in text
+
+
+def test_a_regression_test_that_passes_on_the_current_code_has_not_reproduced_the_bug():
+    _, body = parse_skill("test-first")
+    fix = flat_section(body, "## A bug fix starts with a failing test")
+    assert "has not reproduced the bug" in fix
+
+
+def test_finding_smells_does_not_claim_the_class_size_is_the_only_unmeasured_signal():
+    _, body = parse_skill("code-smells")
+    finding = flat_section(body, "## Finding smells")
+    assert "One size signal it does not give" in finding
+    assert "The one size signal" not in finding

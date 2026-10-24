@@ -66,9 +66,10 @@ Scan in four passes. The full catalog, with what each smell is, why it hurts and
    | Unnecessary comments | comments that restate the code, or no longer match it |
 
 Use the numbers, not impressions, for the bloaters: `<CLI> metrics` lists every over-limit function
-and file and every wide type. The one size signal it does not give is a single type of about 200
-lines in a file under the limit: that is judged by the reviewer, not measured. The judgment smells (couplers, change preventers, most dispensables)
-come from reading the code. `<CLI>` is the framework's command line, as the manager's prompt defines it.
+and file and every wide type. One size signal it does not give is a single type of about 200 lines
+in a file under the limit: that is judged by the reviewer, not measured. The judgment smells
+(couplers, change preventers, most dispensables) come from reading the code. `<CLI>` is the
+framework's command line, as the manager's prompt defines it.
 
 ## Severity
 
