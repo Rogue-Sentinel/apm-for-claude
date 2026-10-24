@@ -782,6 +782,17 @@
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/27"
     },
+    "29": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "bug",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "metrics reads Qt .ts translation files (XML) as TypeScript",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/29"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -2484,6 +2495,11 @@
       "at": "2026-10-24T17:50:39.592423+00:00",
       "event": "issue 27 updated",
       "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:00:18.913299+00:00",
+      "event": "filed 29 https://github.com/Rogue-Sentinel/apm-for-claude/issues/29",
+      "issue": 29
     }
   ]
 }
