@@ -702,7 +702,12 @@
     "21": {
       "allowlist": [],
       "concerns": [],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-24T17:49:15.518212+00:00",
+          "text": "Closed on GitHub as not planned (2026-10-24): user froze the guard after #20. Reopen only if it blocks real work with no workaround. Ledger has no closed status, so it is recorded as blocked."
+        }
+      ],
       "kind": "bug",
       "questions": [],
       "status": "blocked",
@@ -2456,6 +2461,11 @@
     {
       "at": "2026-10-24T17:49:13.099510+00:00",
       "event": "issue 21 status blocked",
+      "issue": 21
+    },
+    {
+      "at": "2026-10-24T17:49:15.518242+00:00",
+      "event": "decision 21 Closed on GitHub as not planned (2026-10-24): user froze the guard after #20. Reopen only if it blocks real work with no workaround. Ledger has no closed status, so it is recorded as blocked.",
       "issue": 21
     }
   ]
