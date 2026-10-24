@@ -535,11 +535,11 @@
           "worker": "implementer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Task 5 review must-fix M1: the PowerShell reading must apply to PowerShell-tool events only. See the plan's Task 5 review ruling.",
           "id": "5",
           "model": "opus",
-          "status": "failed",
+          "status": "running",
           "title": "Deny shell writes outside; ADR 0007",
           "worker": "implementer"
         },
@@ -2137,6 +2137,11 @@
     {
       "at": "2026-10-24T14:37:16.145062+00:00",
       "event": "task 20/5 failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T14:37:18.503868+00:00",
+      "event": "task 20/5 running",
       "issue": 20
     }
   ]
