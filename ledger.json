@@ -545,10 +545,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Ruling pin fails: path_words reads a PowerShell backslash-blank as a bash escape (false deny); plus write_roots must reject root/home/empty entries. See the plan's Task 6 ruling.",
+          "evidence": "Task 6 review must-fix: M1 backslash/%USERPROFILE% entries open nothing; S1 '..' and ancestors; S2 /c/ drive forms; PowerShell \\ continuation join. See the plan.",
           "id": "6",
           "model": "sonnet",
-          "status": "running",
+          "status": "failed",
           "title": "write_roots profile key and remedy",
           "worker": "implementer"
         },
@@ -2195,6 +2195,11 @@
     {
       "at": "2026-10-24T15:58:37.968769+00:00",
       "event": "task 20/6r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:58:40.244749+00:00",
+      "event": "task 20/6 failed",
       "issue": 20
     }
   ]
