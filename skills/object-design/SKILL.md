@@ -1,6 +1,6 @@
 ---
 name: object-design
-description: "Use when you design or change a type's public surface, when callers read an object's fields to decide what to do with it, when a hierarchy is getting deep or a subtype uses little of what it inherits, or when a type has reached the public-method limit and needs a stated reason."
+description: "Use when you design or change a type's public surface, when callers read an object's fields to decide what to do with it, when a hierarchy is getting deep or a subtype uses little of what it inherits, or when a type has reached the public-method limit and needs a stated reason. Also use when the request mentions encapsulation, information hiding, exposing internal state, public fields, getter/setter abuse, protecting invariants, composition over inheritance, the fragile base class, or combining behaviors."
 ---
 
 # Object design

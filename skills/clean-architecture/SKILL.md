@@ -1,6 +1,6 @@
 ---
 name: clean-architecture
-description: "Use when a change crosses a layer, adds a dependency or an import between modules, puts business logic near a framework, a database, the network or the user interface, or connects the code to an outside system, so the core stays independent and is tested without them."
+description: "Use when a change crosses a layer, adds a dependency or an import between modules, puts business logic near a framework, a database, the network or the user interface, or connects the code to an outside system, so the core stays independent and is tested without them. Also use when the request mentions ports and adapters, hexagonal architecture, clean architecture boundaries, separating infrastructure from the domain, domain isolation, an anti-corruption layer, keeping the domain pure, or infrastructure leakage."
 ---
 
 # Clean architecture

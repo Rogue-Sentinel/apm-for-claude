@@ -1,6 +1,6 @@
 ---
 name: functional-core
-description: "Use when code holds state, has side effects, reads the clock, randomness or the environment, signals absence or failure, or repeats a loop that differs in one operation, so the decisions become pure functions over values and the effects move to the edges."
+description: "Use when code holds state, has side effects, reads the clock, randomness or the environment, signals absence or failure, or repeats a loop that differs in one operation, so the decisions become pure functions over values and the effects move to the edges. Also use when the request mentions pure functions, immutability, referential transparency, higher-order functions (HOFs), map, filter and reduce, callbacks, functional error handling, Result, Either or Option types, the Maybe monad, replacing try-catch with types, or handling errors without exceptions."
 ---
 
 # A functional core

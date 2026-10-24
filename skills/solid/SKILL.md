@@ -1,6 +1,6 @@
 ---
 name: solid
-description: "Use when you add or change a type, a module or an interface, when a type does too much or a new case means editing a growing conditional, when a subtype or a fake behaves differently from what its callers expect, or when business logic reaches for a concrete database, network or file system."
+description: "Use when you add or change a type, a module or an interface, when a type does too much or a new case means editing a growing conditional, when a subtype or a fake behaves differently from what its callers expect, or when business logic reaches for a concrete database, network or file system. Also use when the request mentions SRP, OCP, LSP, ISP or DIP, single responsibility, open-closed, Liskov substitution, interface segregation, dependency inversion, separation of concerns, multiple reasons to change, fat interfaces, depending on abstractions, decoupling, or inheritance hierarchies."
 ---
 
 # SOLID
