@@ -544,11 +544,11 @@
           "worker": "implementer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Ruling pin fails: path_words reads a PowerShell backslash-blank as a bash escape (false deny); plus write_roots must reject root/home/empty entries. See the plan's Task 6 ruling.",
           "id": "6",
           "model": "sonnet",
-          "status": "failed",
+          "status": "running",
           "title": "write_roots profile key and remedy",
           "worker": "implementer"
         },
@@ -2171,6 +2171,11 @@
     {
       "at": "2026-10-24T15:18:06.119979+00:00",
       "event": "task 20/6 failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:18:08.612122+00:00",
+      "event": "task 20/6 running",
       "issue": 20
     }
   ]
