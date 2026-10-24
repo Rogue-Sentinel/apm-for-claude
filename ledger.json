@@ -807,10 +807,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Final review (opus) at 42601ca: 0 must-fix, 1 should-fix (S1: ADR 0008 Decision implies state and outside file-tool writes are approvable), 2 suggestions (G1, G2). Ruling: see the plan, final-review amendment.",
+          "evidence": "Final review (opus) plus scoped re-review a5c0507..cfdf381: S1, G1, G2 addressed; 0 must-fix, 0 should-fix; 2 suggestions deferred in the plan; all 4 structural criteria met.",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -2630,6 +2630,11 @@
     {
       "at": "2026-10-24T18:31:51.648395+00:00",
       "event": "task 27/review running",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:32:43.527695+00:00",
+      "event": "task 27/review done",
       "issue": 27
     }
   ]
