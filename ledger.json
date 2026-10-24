@@ -1138,7 +1138,16 @@
       "plan": "docs/plans/2026-10-24-issue-36-release-0.3.4.md",
       "questions": [],
       "status": "building",
-      "tasks": [],
+      "tasks": [
+        {
+          "attempts": 1,
+          "id": "1",
+          "model": "haiku",
+          "status": "running",
+          "title": "Bump the version to 0.3.4",
+          "worker": "implementer"
+        }
+      ],
       "title": "Release apm 0.3.4 with the #34 changes",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/36"
     },
@@ -3353,6 +3362,11 @@
     {
       "at": "2026-10-24T20:51:11.870988+00:00",
       "event": "decision 36 The user's chat request to file and run the 0.3.4 release was taken as approval of a version-bump-only plan, as for #30.",
+      "issue": 36
+    },
+    {
+      "at": "2026-10-24T20:51:14.112857+00:00",
+      "event": "task 36/1 running",
       "issue": 36
     }
   ]
