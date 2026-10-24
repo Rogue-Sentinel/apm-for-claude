@@ -1061,9 +1061,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worktree and branch after merge: pytest test_docs+test_skills 184 passed; debt check nothing worse; RED 3 failed seen by worker; commit 44115b1",
           "id": "11",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "branch-review slash command",
           "worker": "implementer"
         }
@@ -3177,6 +3178,11 @@
     {
       "at": "2026-10-24T20:15:20.979772+00:00",
       "event": "task 34/4 done",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:15:53.725885+00:00",
+      "event": "task 34/11 done",
       "issue": 34
     }
   ]
