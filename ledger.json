@@ -167,6 +167,7 @@
     },
     "13": {
       "allowlist": [],
+      "branch": "issue-13-devnull-readonly",
       "concerns": [
         {
           "at": "2026-10-18T20:36:26.815545+00:00",
@@ -185,7 +186,7 @@
       ],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "The guard denies a worker's read-only command that redirects stderr to /dev/null",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/13"
@@ -2417,6 +2418,11 @@
       "at": "2026-10-24T17:44:11.408730+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/28",
       "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:44:24.970539+00:00",
+      "event": "issue 13 status planning",
+      "issue": 13
     }
   ]
 }
