@@ -73,9 +73,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 1e89b30 merged: SF1-3 and suggestions 1-4 per ruling; RED 8 failed, GREEN 716 passed in worktree; on branch metrics/audit/debt/docs/skills tests pass; debt check clean; holds_text probe: BOM-only False, blank UTF-16 False, UTF-16 text True. Ruling: see the plan, fix-round amendment.",
           "id": "fix",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fixes",
           "worker": "implementer"
         }
@@ -2855,6 +2856,11 @@
     {
       "at": "2026-10-24T18:52:32.789221+00:00",
       "event": "task 10/fix running",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:58:09.515608+00:00",
+      "event": "task 10/fix done",
       "issue": 10
     }
   ]
