@@ -809,3 +809,7 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 - Task 5 review (S6): more git reads seen as writes in another checkout: `git branch -a --no-merged origin/main`, `git ls-remote` (extends Task 4 S4).
 - Task 5 review (S8): `worker` is computed twice; `_violation` takes 9 parameters (for Task 6).
 - Task 5 review (found elsewhere): a worker's PowerShell `Get-Content ~\.claude\settings.json` is denied as a write, while Bash `cat` is allowed (existing, outside this diff).
+- Task 5 re-review (nit): on macOS, PowerShell `/tmp` is a real temp folder that `gettempdir()` does not return, so pwsh `/tmp/x` is now denied there; limit the exclusion to Windows if it ever matters.
+- Task 5 re-review (nit): the `_HOME` line in `guard_outside.py` is about 120 characters.
+
+*Task 5 re-review: M1, S2 and S3 addressed; replays on base, a51e3fc and de3c7c4 (3,065 calls in this repo, 2,528 from XP12): 0 loosened, 0 reason changes; new denials are only the cross-repo incident and the expected X-Plane deploy and backup writes; open 0.*
