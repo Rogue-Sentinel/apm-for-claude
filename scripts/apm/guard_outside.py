@@ -86,7 +86,7 @@ def _lands_outside(word: str, cwd: Path, reach: Reach) -> Path | None:
 
 
 def _first_outside(segment: str, cwd: Path, reach: Reach) -> Path | None:
-    targets = (_lands_outside(word, cwd, reach) for word in write_targets(segment) if not is_device(word))
+    targets = (_lands_outside(word, cwd, reach) for word in write_targets(segment, reach.powershell) if not is_device(word))
     return next((target for target in targets if target is not None), None)
 
 
@@ -96,7 +96,7 @@ def _outside_in(reading: Sequence[str], cwd: Path, allowed_prefixes: Sequence[st
         target = None if is_exempt(segment, allowed_prefixes) else _first_outside(segment, cwd, reach)
         if target is not None:
             return target
-        place = cd_target(segment)
+        place = cd_target(segment, reach.powershell)
         cwd = cwd if place is None else reach.resolve(place, cwd)
     return None
 

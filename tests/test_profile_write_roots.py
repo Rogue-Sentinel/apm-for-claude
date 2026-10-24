@@ -39,6 +39,31 @@ def test_write_roots_must_be_strings(tmp_path: Path, roots: object) -> None:
         load_profile(path)
 
 
+TOO_BROAD = [
+    "", "  ", "/", "//", "C:", "C:/", "C:\\", "c:\\\\", "\\\\server\\share", "//server/share", "//server/share/",
+    "~", "~/", "~\\", "$HOME", "$HOME/", "${HOME}", "${HOME}/", "$USERPROFILE", "${USERPROFILE}", "%USERPROFILE%",
+    "%USERPROFILE%\\", "$env:USERPROFILE", "$home",
+]
+
+
+@pytest.mark.parametrize("entry", TOO_BROAD)
+def test_an_entry_that_opens_a_root_or_the_home_folder_is_rejected(tmp_path: Path, entry: str) -> None:
+    path = _profile_with(tmp_path, ["~/vab", entry])
+
+    with pytest.raises(ProfileError, match="write_roots") as caught:
+        load_profile(path)
+
+    assert f'"{entry}"' in str(caught.value)
+
+
+@pytest.mark.parametrize("entry", [
+    "~/vab", "$HOME/vab", "C:/vab", "C:\\vab", "../vab", "vab", "/opt/build", "//server/share/vab",
+    "\\\\server\\share\\vab", "%USERPROFILE%\\vab", "~user", "D:/X-Plane 12/Output",
+])
+def test_a_named_folder_is_accepted(tmp_path: Path, entry: str) -> None:
+    assert load_profile(_profile_with(tmp_path, [entry])).write_roots == (entry,)
+
+
 def test_a_profile_without_write_roots_is_written_unchanged(tmp_path: Path) -> None:
     path = tmp_path / "profile.json"
 

@@ -113,7 +113,8 @@ def test_a_worker_denial_names_no_remedy(tmp_path: Path) -> None:
 @pytest.mark.parametrize("command", [
     "Copy-Item -Path a -Destination {V}\\",
     'Copy-Item -Destination "{V}\\" -Path a',
-], ids=["last-word", "quoted"])
+    "Copy-Item -Destination {V}\\ -Path a",
+], ids=["last-word", "quoted", "before-a-blank"])
 def test_a_powershell_destination_ending_in_a_backslash_is_the_named_folder(
     tmp_path: Path, extra: dict, command: str
 ) -> None:
@@ -122,3 +123,13 @@ def test_a_powershell_destination_ending_in_a_backslash_is_the_named_folder(
     decision = _decide(tmp_path, command.format(V=vab), extra, [vab.as_posix()], tool="PowerShell")
 
     assert decision.kind == "none"
+
+
+@BOTH
+def test_bash_still_reads_a_backslash_before_a_blank_as_an_escape(tmp_path: Path, extra: dict) -> None:
+    """In bash `vab\\ b` is one name, the folder `vab b`, which is not the named folder."""
+    vab = tmp_path / "vab"
+
+    decision = _decide(tmp_path, f"cp a {vab.as_posix()}\\ b", extra, [vab.as_posix()])
+
+    assert decision.kind == "deny"

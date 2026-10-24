@@ -400,7 +400,7 @@ explains each key. Every key shown exists. Leave out anything you do not need.
 - `write_roots`: folders outside the project that shell commands may write, such as an out-of-tree build folder
   or a deploy target. `~` is your home folder; a relative path is relative to the checkout. File tools still write
   only inside the project. Add one only when you mean it: the guard then lets the manager and every worker write
-  there.
+  there. The profile refuses an empty entry, a drive or share root and your bare home folder; name one folder.
 - `standard.limits`: the size limits the ratchet uses.
 - `standard.metrics`: what to measure. `extra_exclude` adds folders to skip.
 - `standard.debt_sources`: your own numbers to hold the line on. Each has a `command`, a regular expression

@@ -220,21 +220,21 @@ _FAMILIES: dict[str, Callable[[list[str]], list[str]]] = {
 }
 
 
-def write_targets(segment: str) -> list[str]:
+def write_targets(segment: str, powershell: bool = False) -> list[str]:
     """The words one segment writes, as written: its redirect targets, then its program's targets.
 
     Redirect targets are returned as they stand, devices included (`is_device` decides); the program is read with
     `path_words`, so quotes are gone and `\\` is a separator or an escape."""
     rest, redirects = split_redirects(segment)
-    name, args = _program(path_words(rest))
+    name, args = _program(path_words(rest, powershell))
     return redirects + _FAMILIES.get(name, lambda _: [])(args)
 
 
-def cd_target(segment: str) -> str | None:
+def cd_target(segment: str, powershell: bool = False) -> str | None:
     """Where a `cd` (`chdir`, `pushd`, `Set-Location` and their aliases) goes: its first non-option word, `~` when
     it has none, None for `cd -` and for any other program."""
     rest, _ = split_redirects(segment)
-    name, args = _program(path_words(rest))
+    name, args = _program(path_words(rest, powershell))
     if name not in _CD or args[:1] == ["-"]:
         return None
     return next(iter(_non_options(args)), "~")
