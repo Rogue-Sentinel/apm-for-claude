@@ -172,3 +172,10 @@ def local_links(text: str) -> list[str]:
                 continue
             targets.append(target.split("#", 1)[0])
     return targets
+
+
+def term_pattern(term: str) -> re.Pattern[str]:
+    """A pattern for `term` that does not match inside a longer word."""
+    before = r"(?<!\w)" if re.match(r"\w", term[0]) else ""
+    after = r"(?!\w)" if re.match(r"\w", term[-1]) else ""
+    return re.compile(before + re.escape(term) + after)
