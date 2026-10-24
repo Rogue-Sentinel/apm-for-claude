@@ -635,11 +635,11 @@
           "worker": "reviewer"
         },
         {
-          "attempts": 2,
+          "attempts": 3,
           "evidence": "Scoped re-review 598c1fe..56a9128: replays 0 loosened/0 new denials/0 reason changes (5,997 + 3,090 calls); open MF1 (test_guard_write_roots.py:67 sibling-prefix lost its meaning after rename) and SF1 (PowerShell reading drops bash clusters for cp/mv/rm/mkdir/touch/tee, a miss where those run native tools).",
           "id": "review",
           "model": "opus",
-          "status": "failed",
+          "status": "running",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -2371,6 +2371,11 @@
     {
       "at": "2026-10-24T17:33:23.924541+00:00",
       "event": "task 20/fix2 done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:33:26.324199+00:00",
+      "event": "task 20/review running",
       "issue": 20
     }
   ]
