@@ -51,6 +51,11 @@ def test_an_empty_blank_or_unreadable_file_holds_no_text(data: bytes | None) -> 
     assert not holds_text(data)
 
 
+@pytest.mark.parametrize("data", [b"\xff\xfe", b"\xfe\xff", " \n".encode("utf-16")])
+def test_a_byte_order_mark_alone_or_blank_utf16_holds_no_text(data: bytes) -> None:
+    assert not holds_text(data)
+
+
 @pytest.mark.parametrize("path, kind", [
     ("ui/Panel.QRC", ".qrc"), ("build/Makefile", "Makefile"), ("config.h.in", ".in"),
 ])

@@ -39,7 +39,7 @@ def test_cli_audit_json_and_not_a_repo(repo: Path, capsys, tmp_path: Path, monke
     assert code == 0
     assert (data["mode"], data["base"], data["debt_issues"]) == ("existing", "main", [4])
     assert [item["id"] for item in data["in_flight"]] == ["issue:7"]
-    assert set(data) == {"mode", "base", "notes", "in_flight", "debt_issues", "totals"}
+    assert set(data) == {"mode", "base", "notes", "in_flight", "debt_issues", "files_not_measured", "totals"}
     monkeypatch.chdir(tmp_path)
     assert apm_cli.main(["audit"]) == 2
 

@@ -21,6 +21,7 @@ def audit_json(audit: Audit, report: Report, limits: Limits) -> dict:
         "mode": audit.mode, "base": audit.base, "notes": list(audit.notes),
         "in_flight": [asdict(item) for item in audit.in_flight],
         "debt_issues": list(audit.debt_issues),
+        "files_not_measured": len(report.not_measured),
         "totals": snapshot(report, limits)["totals"],
     }
 
@@ -52,7 +53,7 @@ def render_audit(audit: Audit, report: Report, limits: Limits, coverage: dict | 
     debt = ", ".join(f"#{number}" for number in audit.debt_issues) or "None."
     sections = [
         ["# Audit"],
-        ["## Mode", "", _MODE_TEXT[audit.mode]],
+        ["## Mode", "", _MODE_TEXT[audit.mode], "", f"Files not measured: {len(report.not_measured)}"],
         [f"## Measured at {audit.base or '(no commits yet)'}", "", *_totals(audit_json(audit, report, limits)["totals"])],
         ["## In-flight work", "", *_table(audit)],
         ["## Debt issues", "", debt],

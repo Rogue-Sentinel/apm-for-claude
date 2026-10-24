@@ -8,9 +8,10 @@ Rules:
 - `named_as_not_code` is called only for a path that has no language; it does not look the
   language up itself. It is True for a dotfile, for a well-known license or readme name, and for a
   documentation, data, configuration or binary extension.
-- `holds_text` reads the bytes of such a file. A file with no non-whitespace byte, or one that
-  could not be read, holds no text. Otherwise it holds text when it starts with a UTF-16 byte
-  order mark, or has no NUL byte in its first 8000 bytes (git's own binary heuristic).
+- `holds_text` reads the bytes of such a file. A file that could not be read holds no text. One
+  that starts with a UTF-16 byte order mark is decoded without it and holds text when something
+  other than whitespace is left. Any other file holds text when it has a non-whitespace byte and
+  no NUL byte in its first 8000 bytes (git's own binary heuristic).
 - `file_kind` names a file for the report: its lowercased extension with the dot, or its file name
   when it has no extension.
 
@@ -37,7 +38,7 @@ BINARY_EXTENSIONS: frozenset[str] = frozenset(
 NOT_CODE_NAMES: frozenset[str] = frozenset(
     "license copying notice authors contributors changelog changes readme owners codeowners".split()
 )
-_UTF16_MARKS = (b"\xff\xfe", b"\xfe\xff")
+_UTF16_MARKS = {b"\xff\xfe": "utf-16-le", b"\xfe\xff": "utf-16-be"}
 _BINARY_SNIFF_BYTES = 8000
 
 
@@ -71,8 +72,19 @@ def named_as_not_code(path: str) -> bool:
     )
 
 
+def _utf16_text(data: bytes) -> str | None:
+    """The text after a UTF-16 byte order mark, or None when `data` does not start with one."""
+    for mark, codec in _UTF16_MARKS.items():
+        if data.startswith(mark):
+            return data[len(mark):].decode(codec, errors="replace")
+    return None
+
+
 def holds_text(data: bytes | None) -> bool:
     """True when `data` reads as text: not empty or blank, and not binary."""
-    if data is None or not data.strip():
+    if data is None:
         return False
-    return data.startswith(_UTF16_MARKS) or b"\x00" not in data[:_BINARY_SNIFF_BYTES]
+    utf16 = _utf16_text(data)
+    if utf16 is not None:
+        return bool(utf16.strip())
+    return bool(data.strip()) and b"\x00" not in data[:_BINARY_SNIFF_BYTES]

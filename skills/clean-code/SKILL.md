@@ -62,7 +62,8 @@ language with classes the review-flag line says "not measured" and names the lan
 Some languages (QML, Inno Setup, CMake) are measured for size only: their files count toward the file limit,
 and their functions are not scanned. The last line, `Files not measured: N`, counts the in-scope text files that
 have no language at all, with one row per kind; docs, data, config and binaries are not counted. A non-zero count
-means the report did not look at those files: add a language or an exclude, and never read it as clean.
+means the report did not look at those files: add an exclude under `standard.metrics`, or file an issue asking
+for the language, and never read it as clean.
 
 ## Counting lines of logic
 
