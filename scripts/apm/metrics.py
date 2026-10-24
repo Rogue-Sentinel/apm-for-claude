@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import posixpath
 import subprocess
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -16,6 +16,8 @@ from apm.metrics_model import (
 )
 from apm.metrics_python import measure_python
 from apm.standard_config import Limits, MetricsConfig
+
+Read = Callable[[str], bytes | None]
 
 
 def measure_text(path: str, text: str) -> FileMetric | None:
@@ -40,17 +42,17 @@ def tracked_files(root: Path) -> list[str]:
     return sorted({name for name in names if name})
 
 
+def _in_scope(path: str, config: MetricsConfig) -> bool:
+    """Whether the config includes the path and does not exclude it."""
+    return (not config.include or matches_any(config.include, path)) and not matches_any(config.exclude, path)
+
+
 def select_files(paths: Sequence[str], config: MetricsConfig) -> list[str]:
     """The paths in a known language that the config includes and does not exclude.
 
     Globs match case-insensitively, because they reuse the guard's glob compiler.
     """
-    return [
-        path for path in paths
-        if language_for(path) is not None
-        and (not config.include or matches_any(config.include, path))
-        and not matches_any(config.exclude, path)
-    ]
+    return [path for path in paths if language_for(path) is not None and _in_scope(path, config)]
 
 
 def _is_plain(metric: FileMetric) -> bool:
@@ -108,19 +110,24 @@ def decode_text(data: bytes) -> str:
     return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
-def _read(path: Path) -> str | None:
+def _read(path: Path) -> bytes | None:
     try:
-        return decode_text(path.read_bytes())
+        return path.read_bytes()
     except OSError:
         return None
+
+
+def measure_files(names: Sequence[str], read: Read) -> Report:
+    """Read each name's bytes, skip the unreadable, then decode and measure the rest."""
+    datas = ((name, read(name)) for name in names)
+    measured = (measure_text(name, decode_text(data)) for name, data in datas if data is not None)
+    return Report(tuple(metric for metric in measured if metric is not None))
 
 
 def measure_tree(root: Path, config: MetricsConfig, paths: Sequence[str] | None = None) -> Report:
     """Measure the selected files of the git tree at `root`, optionally only under `paths`."""
     names = under_paths(select_files(tracked_files(root), config), paths)
-    texts = ((name, _read(root / name)) for name in names)
-    measured = (measure_text(name, text) for name, text in texts if text is not None)
-    return Report(tuple(metric for metric in measured if metric is not None))
+    return measure_files(names, lambda name: _read(root / name))
 
 
 def _section(title: str, rows: list[str]) -> list[str]:
