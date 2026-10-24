@@ -789,3 +789,23 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 
 - Task 5 (concern): `_violation` takes 9 parameters; consider a small context object when Task 6 adds `write_roots`.
 - Task 5 (concern): no test pins the fresh cwd per reading; the worker could not build a realistic command where it changes the verdict.
+
+*Ruling after the Task 5 review (2026-10-24).*
+
+*The review replayed 3,029 calls from this repo's transcripts and a capped sample of 2,528 from XP12's, and ran 196 hook events. No verdict loosened and no existing reason changed. All new denials are the expected cross-repo and X-Plane deploy writes, except one.*
+
+*M1, upheld as must-fix: the PowerShell reading (`command_readings` reading 1) was judged for Bash-tool events too. It invented a target in a read-only `cd "/d/X-Plane 12" && python -c "...\"...\"..."`, so a real read was denied. The fix: `Reach` gains a `powershell: bool` set from the event's `tool_name`, and a Bash-tool event is judged on reading 0 only. Bash reads `\"` as an escaped quote, so dropping the PowerShell reading there removes only denials of writes bash never makes.*
+
+*Two more fixes ride along, because the same flag makes them one-liners and each closes a missed write a cooperative worker types:*
+- *S2: Git Bash's `$USERPROFILE`/`${USERPROFILE}` and PowerShell's `${env:USERPROFILE}` are home spellings.*
+- *S3: `SHELL_TEMP_ROOTS` (`/tmp`) applies to Bash-tool events only. In PowerShell, `/tmp` is a real `C:\tmp` folder, which is outside.*
+
+*S5 and S7 become docstring lines: the trailing-`/` deviation also lets the main session `touch`/`rmdir "<memory>/"`, and a PowerShell drive switch (`D:` then a write) is not tracked.*
+
+*Cost if wrong: Bash commands that hold `\"` lose PowerShell-reading denials that bash never acts on, and some PowerShell `/tmp` writes are newly denied.*
+
+- Task 5 review (S1): when `Path.home()` raises and `CLAUDE_CONFIG_DIR` is set, `~` is read as a name, so `echo x > ~/notes.md` is allowed (fails open in an implausible environment). Fix: treat any home-spelled word as outside when home is unknown, or record it as a known limit.
+- Task 5 review (S4): ADR 0007 does not say the home spellings match in any case; `manager.md` says "the project and its worktrees" where the code allows the main checkout and the current worktree.
+- Task 5 review (S6): more git reads seen as writes in another checkout: `git branch -a --no-merged origin/main`, `git ls-remote` (extends Task 4 S4).
+- Task 5 review (S8): `worker` is computed twice; `_violation` takes 9 parameters (for Task 6).
+- Task 5 review (found elsewhere): a worker's PowerShell `Get-Content ~\.claude\settings.json` is denied as a write, while Bash `cat` is allowed (existing, outside this diff).
