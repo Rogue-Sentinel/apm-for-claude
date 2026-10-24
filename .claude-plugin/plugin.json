@@ -1,6 +1,6 @@
 {
   "name": "apm",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Agentic project management for Claude Code: issues, workers, and guarded tool use.",
   "author": {
     "name": "Rogue-Sentinel"
