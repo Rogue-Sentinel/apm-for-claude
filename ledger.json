@@ -22,9 +22,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 9023106 merged: pure move, no test edited; 85 passed before and after in worktree; on branch combined metrics tests pass; debt clean.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "One measuring function for tree and ref",
           "worker": "implementer"
         },
@@ -2764,6 +2765,11 @@
     {
       "at": "2026-10-24T18:36:12.517447+00:00",
       "event": "task 10/1 done",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:36:14.832536+00:00",
+      "event": "task 10/2 done",
       "issue": 10
     }
   ]
