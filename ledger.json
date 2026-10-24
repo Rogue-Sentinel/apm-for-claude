@@ -1032,6 +1032,14 @@
           "id": "10",
           "status": "blocked",
           "title": "Dropped by ruling"
+        },
+        {
+          "attempts": 1,
+          "id": "1",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Retrieval baseline",
+          "worker": "general-purpose"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3113,6 +3121,11 @@
     {
       "at": "2026-10-24T20:13:14.225805+00:00",
       "event": "task 34/10 blocked",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:13:16.376587+00:00",
+      "event": "task 34/1 running",
       "issue": 34
     }
   ]
