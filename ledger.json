@@ -636,10 +636,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Final review (opus): replays of 9,087 calls: 0 loosened, 0 reason changes, no routine false denial; 1 must-fix (PowerShell positional destination followed by a value option, e.g. -ErrorAction Stop); docs to correct (variable-path deploys).",
+          "evidence": "Scoped re-review 598c1fe..56a9128: replays 0 loosened/0 new denials/0 reason changes (5,997 + 3,090 calls); open MF1 (test_guard_write_roots.py:67 sibling-prefix lost its meaning after rename) and SF1 (PowerShell reading drops bash clusters for cp/mv/rm/mkdir/touch/tee, a miss where those run native tools).",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -2348,6 +2348,11 @@
       "at": "2026-10-24T17:13:49.566139+00:00",
       "event": "filed 27 https://github.com/Rogue-Sentinel/apm-for-claude/issues/27",
       "issue": 27
+    },
+    {
+      "at": "2026-10-24T17:18:36.289018+00:00",
+      "event": "task 20/review failed",
+      "issue": 20
     }
   ]
 }
