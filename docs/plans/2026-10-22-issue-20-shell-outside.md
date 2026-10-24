@@ -821,3 +821,16 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 *(2) The `write_roots` loader rejects entries that would open far more than one folder: an empty string, a filesystem root (`/`, `C:/`, `C:\`, `\\server\share`) and the bare home folder (`~`, `$HOME`, `%USERPROFILE%`). It raises `ProfileError` naming the entry. This tightens; manager.md still requires the user's yes for each folder.*
 
 *Cost if wrong: one more parameter, and a profile that tried to open a whole drive or home must name narrower folders.*
+
+*Ruling after the Task 6 review (2026-10-24). The review replayed 5,997 transcript calls. With no `write_roots`, 0 verdicts changed; the only text change is the new remedy. With XP12's folders listed, 37 outside-write denials lift and nothing else does. All of the following go to a Task 6 fix round:*
+
+- *M1 (must-fix): a home folder written with backslashes or as `%USERPROFILE%` is accepted but opens nothing, so routine writes stay denied. Fix: change `\` to `/` in each entry before it is resolved. `$env:USERPROFILE\vab` and `$HOME\vab` then resolve as home. Reject `%...%` entries at load, with a message pointing to `~`. Task 6's own accepted-form pin for `%USERPROFILE%\vab` changes to a rejection.*
+- *S1 (upgraded to must-fix): `..` opens the parent folder, here `source\repos` with every other repository in it. That is the incident #20 exists to stop, and it breaks the ruling's "name one folder". Fix: the loader rejects a relative entry made only of `.` and `..` segments, and `Reach` ignores any entry that resolves to the main checkout itself or one of its ancestors (`~/source/repos`, for example). Ignoring fails closed.*
+- *S2 (upgraded to must-fix): Git Bash drive forms (`/c`, `/c/`, `/d`) and dot forms (`C:/.`, `C:/..`, `~/.`, `~/..`) get past the root check and open a whole drive. Fix: normalize the entry (`\` to `/`, then normpath, then `/x/` read as `x:/`) before the textual check.*
+- *Found elsewhere, upgraded to must-fix: for PowerShell text, `join_continuations` joins a bash `\` at the end of a line, so `Copy-Item a C:\vab\` followed by `Set-Content ..\o\f x` on the next line reads as one segment and the outside write is missed. Fix: for a PowerShell command, join only backtick continuations (`command_readings(text, powershell=...)`, passed from `Reach`).*
+- *Docs: S3 (the redirect `\`-before-a-blank limit named in the `guard_redirects` and `guard_targets` docstrings), S4 (a refused entry blocks every guarded call until the user fixes the profile; say so in the tutorial and manager.md) and S6 (ADR 0007 and the `guard_outside` docstring describe the loader's refusals, how entries resolve against the main checkout, and the PowerShell `\` rule; the tutorial says "main checkout").*
+
+*Cost if wrong: a profile whose author meant a broad folder must name narrower ones.*
+
+- Task 6 review (S5): pins for behavior that probes show is already correct: unit tests for `write_targets(..., True)` and `cd_target(..., True)`, a decide-level `Set-Location V\ ; Set-Content a b`, a worktree under a different parent, `~/vab` with `home=None`, and the `V/../other/x` escape.
+- Task 6 review (nits): lines over 120 characters at `guard_outside.py:56`, `:89` and `guard_words.py:70`.
