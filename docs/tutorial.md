@@ -339,6 +339,9 @@ The last line counts the text files in scope that the tool has no language for, 
 `Makefile`, with one row per kind when it is not 0. Docs, data files and binaries are not counted. A count above
 0 means those files were not looked at, so the report is not the whole picture.
 
+After an upgrade measures a new language, its long files show under "newly measured, not new debt:" until
+`debt baseline` records them.
+
 The manager runs `<CLI> debt check` on every task and again on the feature branch. It exits 0 when nothing
 got worse. When it fails, it lists each regression, for example `new over-limit function: notes/web.py::render
 (16 lines)`. The manager sends the task back for a split and never loosens the baseline to get past it.
