@@ -807,10 +807,12 @@
           "worker": "implementer"
         },
         {
-          "attempts": 0,
+          "attempts": 1,
           "id": "3",
-          "status": "pending",
-          "title": "Merge gate"
+          "model": "opus",
+          "status": "running",
+          "title": "Merge gate",
+          "worker": "manager"
         },
         {
           "attempts": 2,
@@ -2652,6 +2654,11 @@
     {
       "at": "2026-10-24T18:32:48.196491+00:00",
       "event": "issue 27 status integrating",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:32:51.078496+00:00",
+      "event": "task 27/3 running",
       "issue": 27
     }
   ]
