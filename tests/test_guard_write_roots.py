@@ -64,7 +64,7 @@ def test_a_relative_entry_is_read_from_the_checkout(tmp_path: Path, extra: dict)
 
 
 @BOTH
-@pytest.mark.parametrize("place", ["vab2/x", "other/x"], ids=["sibling-prefix", "unnamed-folder"])
+@pytest.mark.parametrize("place", ["out2/x", "other/x"], ids=["sibling-prefix", "unnamed-folder"])
 def test_only_the_named_folder_opens(tmp_path: Path, extra: dict, place: str) -> None:
     out_dir = tmp_path / "out"
 
