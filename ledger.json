@@ -1089,9 +1089,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Final review 0 must-fix; manager re-graded S1 S2 S3 S4 S5 S7 to fix before merge; see the plan, Final review",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         }
@@ -3240,6 +3241,11 @@
     {
       "at": "2026-10-24T20:22:09.158939+00:00",
       "event": "task 34/review running",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:27:40.572205+00:00",
+      "event": "task 34/review failed",
       "issue": 34
     }
   ]
