@@ -645,6 +645,14 @@
           "status": "done",
           "title": "Final review fix",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "neutral",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Strip X-Plane examples from the branch",
+          "worker": "implementer"
         }
       ],
       "title": "Shell commands that write outside the project are never checked by the guard",
@@ -2291,6 +2299,11 @@
     {
       "at": "2026-10-24T16:56:57.090743+00:00",
       "event": "decision 20 User (2026-10-24): strip X-Plane/VirtualAirline references; APM is not an X-Plane plugin. The #20 branch's own code, tests and docs get generic examples before merge.",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:56:59.389675+00:00",
+      "event": "task 20/neutral running",
       "issue": 20
     }
   ]
