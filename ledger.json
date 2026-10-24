@@ -26,6 +26,14 @@
           "status": "running",
           "title": "One measuring function for tree and ref",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "3",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Which language-less files are not measured",
+          "worker": "implementer"
         }
       ],
       "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
@@ -2691,6 +2699,11 @@
     {
       "at": "2026-10-24T18:33:08.734490+00:00",
       "event": "task 10/2 running",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:33:10.891206+00:00",
+      "event": "task 10/3 running",
       "issue": 10
     }
   ]
