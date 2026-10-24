@@ -856,9 +856,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "gate 27 --base origin/main: clean tree, base merged, layers, test (full suite), debt, review, plan 4 criteria all PASS; merge gate: passed (exit 0).",
           "id": "3",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Merge gate",
           "worker": "manager"
         },
@@ -2788,6 +2789,11 @@
       "at": "2026-10-24T18:36:39.636766+00:00",
       "event": "task 10/4 running",
       "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:37:14.530273+00:00",
+      "event": "task 27/3 done",
+      "issue": 27
     }
   ]
 }
