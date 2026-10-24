@@ -12,7 +12,7 @@ from apm.paths import Project
 from apm.standard_config import Standard
 
 HINT = "Run `apm debt baseline` to record these improvements"
-TRACK_HINT = "Run `apm debt baseline` to start tracking the newly measured classes"
+TRACK_HINT = "Run `apm debt baseline` to start tracking the newly measured classes and files"
 
 
 def _section(title: str, lines: tuple[str, ...]) -> list[str]:
@@ -20,7 +20,7 @@ def _section(title: str, lines: tuple[str, ...]) -> list[str]:
 
 
 def render_comparison(result: Comparison) -> str:
-    """Regressions first, then neutral notes (moves, newly measured classes), then improvements, then hints."""
+    """Regressions first, then neutral notes (moves, newly measured), then improvements, then hints."""
     count = len(result.regressions)
     head = f"debt: {count} worse than the baseline" if count else "debt: nothing worse than the baseline"
     lines = [head, *(f"  {line}" for line in result.regressions),

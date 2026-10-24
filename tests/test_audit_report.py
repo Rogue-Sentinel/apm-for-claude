@@ -22,6 +22,7 @@ def test_json_has_exactly_the_consumed_keys() -> None:
         "notes": ["open issues not read: gh is not installed"],
         "in_flight": [{"id": "branch:feat/x", "kind": "branch", "title": "feat/x", "detail": "2 ahead, also on origin"}],
         "debt_issues": [5, 9],
+        "files_not_measured": 0,
         "totals": data["totals"],
     }
     assert data["totals"]["long_functions"] == 0

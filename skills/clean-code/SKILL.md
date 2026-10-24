@@ -59,6 +59,11 @@ does, and the guard denies it. Before you edit a function, know its number.
 Public methods are counted only for the languages that have a class scanner, listed in
 [references/class-scanners-by-language.md](references/class-scanners-by-language.md); for any other
 language with classes the review-flag line says "not measured" and names the language, never 0.
+Some languages (QML, Inno Setup, CMake) are measured for size only: their files count toward the file limit,
+and their functions are not scanned. The last line, `Files not measured: N`, counts the in-scope text files that
+have no language at all, with one row per kind; docs, data, config and binaries are not counted. A non-zero count
+means the report did not look at those files: add an exclude under `standard.metrics`, or file an issue asking
+for the language, and never read it as clean.
 
 ## Counting lines of logic
 
