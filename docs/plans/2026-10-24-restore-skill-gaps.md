@@ -569,6 +569,12 @@ One miss (5), five medium-confidence matches. Miss 5, verbatim: "A systematic as
 debt fits a whole-codebase audit that ranks findings, and its trigger names 'before planning a debt
 paydown'. code-smells is a possible alternative."
 
+**Task 5 check, 2026-10-24, descriptions as on the branch after Tasks 2, 3, 4 and 11 merged, one sonnet
+subagent:** 9 of 9 chose the expected skill; 8 high confidence. Request 5 now chose code-smells
+(medium: "clean-code-audit is a plausible rival because it audits a whole codebase and ranks findings,
+but it never mentions technical debt in the description"). Every medium in the baseline (2, 4, 6, 7)
+is now high. Pass.
+
 ## Pre-flight scan
 
 | Pair or task | Shared file or interface | Found |
