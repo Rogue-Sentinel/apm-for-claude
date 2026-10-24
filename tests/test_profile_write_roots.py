@@ -56,9 +56,36 @@ def test_an_entry_that_opens_a_root_or_the_home_folder_is_rejected(tmp_path: Pat
     assert f'"{entry}"' in str(caught.value)
 
 
+@pytest.mark.parametrize("entry", ["..", "../..", "./..", "..\\", ".", "./", "vab/../.."])
+def test_an_entry_made_only_of_dot_segments_is_rejected(tmp_path: Path, entry: str) -> None:
+    """`..` is the folder holding the main checkout, and with it every other repository there."""
+    with pytest.raises(ProfileError, match="write_roots") as caught:
+        load_profile(_profile_with(tmp_path, [entry]))
+
+    assert f'"{entry}"' in str(caught.value)
+
+
+@pytest.mark.parametrize("entry", ["/c", "/c/", "/d", "/C", "C:/.", "C:/..", "~/.", "~/..", "~/vab/..", "$HOME/vab/.."])
+def test_a_drive_or_dot_form_of_a_root_or_the_home_folder_is_rejected(tmp_path: Path, entry: str) -> None:
+    with pytest.raises(ProfileError, match="write_roots") as caught:
+        load_profile(_profile_with(tmp_path, [entry]))
+
+    assert f'"{entry}"' in str(caught.value)
+
+
+@pytest.mark.parametrize("entry", ["%USERPROFILE%\\vab", "%HOMEDRIVE%%HOMEPATH%/vab", "D:/%BUILD%/out"])
+def test_a_percent_variable_is_rejected_with_a_pointer_to_the_home_form(tmp_path: Path, entry: str) -> None:
+    """The guard expands no `%...%` variable, so such an entry would open nothing; `~` is the home spelling."""
+    with pytest.raises(ProfileError, match="write_roots") as caught:
+        load_profile(_profile_with(tmp_path, [entry]))
+
+    assert f'"{entry}"' in str(caught.value) and '"~/vab"' in str(caught.value)
+
+
 @pytest.mark.parametrize("entry", [
     "~/vab", "$HOME/vab", "C:/vab", "C:\\vab", "../vab", "vab", "/opt/build", "//server/share/vab",
-    "\\\\server\\share\\vab", "%USERPROFILE%\\vab", "~user", "D:/X-Plane 12/Output",
+    "\\\\server\\share\\vab", "~user", "D:/X-Plane 12/Output", "~\\vab", "$HOME\\vab", "$env:USERPROFILE\\vab",
+    "${env:USERPROFILE}\\vab", "/c/vab", "./vab", "C:/vab/./x",
 ])
 def test_a_named_folder_is_accepted(tmp_path: Path, entry: str) -> None:
     assert load_profile(_profile_with(tmp_path, [entry])).write_roots == (entry,)

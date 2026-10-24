@@ -14,8 +14,9 @@ PowerShell `\\>` is read as bash's escaped `>`.
 `split_redirects` reads the same redirects the other way round: it takes them out of the segment and returns
 the words they write, which is the reader that `_is_read_only` (issue #13) can use. Its known limits: a
 redirect inside a quoted string that another shell runs (`sh -c 'echo x > /y'`) is not read, a target built
-from a variable or a substitution (`> "$DIR/x"`, `> $(f)`) is returned as written or not at all, and a
-process substitution (`>(cmd)`) names no file.
+from a variable or a substitution (`> "$DIR/x"`, `> $(f)`) is returned as written or not at all, a
+process substitution (`>(cmd)`) names no file, and a redirect target is read the bash way for both tools, so a `\\`
+before a blank is an escape there: PowerShell's `> C:\\o\\ y` names `C:/o y`, not the folder `C:/o/`.
 """
 from __future__ import annotations
 

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import posixpath
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -20,12 +21,12 @@ DEFAULT_MODELS: dict[str, str] = {
 }
 MAX_WORKERS_CAP = 3
 _KNOWN_KEYS = frozenset({"framework_version", "protected_paths", "max_workers", "models", "write_roots"})
-# A write root that is empty, a filesystem root (`/`, `C:/`), a share root (`\\server\share`) or the bare home folder.
-_SEP = r"[\\/]"
-_HOME = r"(?:~|\$(?:env:)?(?:home|userprofile)|\$\{(?:env:)?(?:home|userprofile)\}|%userprofile%)"
-_TOO_BROAD = re.compile(
-    rf"\s*(?:(?:[a-z]:)?{_SEP}*|{_SEP}{{2}}[^\\/]+{_SEP}+[^\\/]+{_SEP}*|{_HOME}{_SEP}*)\s*", re.IGNORECASE
-)
+# A write root, in its normal form (`_normal`), that is a filesystem root (`/`, `C:`, Git Bash's `/c`), a share root
+# (`//server/share`), the bare home folder, or made only of `.` and `..` (the main checkout or a folder holding it).
+_HOME = r"(?:~|\$(?:env:)?(?:home|userprofile)|\$\{(?:env:)?(?:home|userprofile)\})"
+_TOO_BROAD = re.compile(rf"(?:[a-z]:)?/*|/[a-z]|//[^/]+/[^/]+|{_HOME}|\.\.?(?:/\.\.)*", re.IGNORECASE)
+# A cmd variable (`%USERPROFILE%`): the guard expands none, so the entry would open nothing.
+_PERCENT = re.compile(r"%[^%]+%")
 
 
 class ProfileError(Exception):
@@ -107,13 +108,23 @@ def _models(value: object) -> dict[str, str]:
     return dict(value)
 
 
+def _normal(entry: str) -> str:
+    """The entry as the root check reads it: blanks trimmed, `\\` read as `/`, `.` and `..` folded (`~/..` is `.`)."""
+    return posixpath.normpath(entry.strip().replace("\\", "/"))
+
+
 def _write_roots(value: object) -> tuple[str, ...]:
     """The folders shell commands may write outside the project. An entry that would open far more than one folder
-    (nothing, a filesystem root, a share root, the bare home folder) is refused. The check is textual: nothing is
-    resolved against the real home."""
+    (nothing, a filesystem root, a share root, the bare home folder, `..` and the like) is refused, and so is a
+    `%...%` variable, which would open nothing. The check is textual: nothing is resolved against the real home."""
     roots = _string_list(value, "write_roots")
     for entry in roots:
-        if _TOO_BROAD.fullmatch(entry):
+        if _PERCENT.search(entry):
+            raise ProfileError(
+                f'write_roots entry "{entry}" uses a %...% variable, which the guard does not expand: write the home '
+                'folder as ~, such as "~/vab" rather than "%USERPROFILE%\\vab"'
+            )
+        if _TOO_BROAD.fullmatch(_normal(entry)):
             raise ProfileError(f'write_roots entry "{entry}" opens too much: name one folder, such as "~/builds"')
     return roots
 

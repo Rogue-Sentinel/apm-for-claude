@@ -398,9 +398,13 @@ explains each key. Every key shown exists. Leave out anything you do not need.
 - `models`: which model each role uses (`auditor`, `planner`, `implementer`, `debugger`, `reviewer`). Roles you
   leave out keep their defaults.
 - `write_roots`: folders outside the project that shell commands may write, such as an out-of-tree build folder
-  or a deploy target. `~` is your home folder; a relative path is relative to the checkout. File tools still write
-  only inside the project. Add one only when you mean it: the guard then lets the manager and every worker write
-  there. The profile refuses an empty entry, a drive or share root and your bare home folder; name one folder.
+  or a deploy target. `~` is your home folder; a relative path is relative to the main checkout; `\` and `/` both
+  work. File tools still write only inside the project. Add one only when you mean it: the guard then lets the
+  manager and every worker write there. The profile refuses an entry that opens more than one folder (an empty
+  entry, a drive or share root such as `C:/`, `/c` or `\\server\share`, your bare home folder, a path made only of
+  `.` and `..`) and a `%...%` variable, which the guard does not expand (write `~/vab`, not `%USERPROFILE%\vab`).
+  An entry that is the main checkout or a folder holding it (`~/source/repos`) is ignored. A refused entry blocks
+  every guarded tool call, the manager's and every worker's, until you fix `.apm/profile.json` by hand.
 - `standard.limits`: the size limits the ratchet uses.
 - `standard.metrics`: what to measure. `extra_exclude` adds folders to skip.
 - `standard.debt_sources`: your own numbers to hold the line on. Each has a `command`, a regular expression

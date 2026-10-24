@@ -21,7 +21,9 @@ command string another shell runs (`bash -c '...'`), `$(...)` and `eval`; `git -
 PowerShell parameter abbreviations (`-Dest`), arrays (`-Path a,b`), `Join-Path` expressions and `''` quoting; a `\\;`
 before a PowerShell command (read as bash's escaped `;`, so no cut); a stray quote outside a comment, read as a plain
 character (the text is still cut, but a second stray quote can pair with it and hide the cuts between them); a
-positional PowerShell value read as a target (failing closed).
+positional PowerShell value read as a target (failing closed); a redirect target, which `split_redirects` reads the
+bash way for both tools, so in PowerShell's `> C:\\o\\ y` the `\\` before the blank is an escape and the target is
+`C:/o y`, not `C:/o/` (a program's words, by contrast, take the `powershell` reading).
 """
 from __future__ import annotations
 
@@ -40,6 +42,9 @@ _PIECES = (
 )
 _BASH = re.compile(_PIECES.format(double=r'"(?:\\.|[^"\\])*"'), re.DOTALL)
 _POWERSHELL = re.compile(_PIECES.format(double=r'"[^"]*"'), re.DOTALL)
+# An odd run of backticks before a newline, as `guard_commands.join_continuations` reads it; the last backtick stays.
+_BACKTICK_CONTINUATION = re.compile(r"(?<!`)((?:``)*)`\r?\n")
+_LINE_END_BACKSLASH = re.compile(r"\\(?=\r?\n)")
 
 _ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
 _VARIABLE = re.compile(r"\$[\w:]+=?")
@@ -81,14 +86,24 @@ def command_segments(text: str) -> list[str]:
     return _pieces(join_continuations(text), _BASH)
 
 
-def command_readings(text: str) -> list[list[str]]:
+def _joined(text: str, powershell: bool) -> str:
+    """`text` with its continued lines joined. PowerShell has no `\\` escape and no `\\` continuation: there a `\\`
+    at the end of a line is a path's last separator (`Copy-Item a C:\\vab\\`), so it is read as `/` and the newline
+    after it still cuts; only an odd run of backticks joins lines."""
+    if not powershell:
+        return join_continuations(text)
+    return _LINE_END_BACKSLASH.sub("/", _BACKTICK_CONTINUATION.sub(r"\1` ", text))
+
+
+def command_readings(text: str, powershell: bool = False) -> list[list[str]]:
     """Each reading of `text` as a list of segments: the bash reading, then, when the text holds `\\"`, the
     PowerShell reading.
 
     PowerShell does not escape a quote with `\\`, so `"C:\\x\\"` is a closed string there and the `;` after it cuts.
     The whole text is cut again with `\\` plain inside double quotes, and each `\\"` is rewritten to `/"` in the
-    segments so that `write_targets` reads the path (`C:/x/`). The caller judges each reading and acts on any."""
-    joined = join_continuations(text)
+    segments so that `write_targets` reads the path (`C:/x/`). The caller judges each reading and acts on any.
+    With `powershell` (a PowerShell command), only backtick continuations join lines: see `_joined`."""
+    joined = _joined(text, powershell)
     readings = [_pieces(joined, _BASH)]
     if '\\"' in joined:
         readings.append([piece.replace('\\"', '/"') for piece in _pieces(joined, _POWERSHELL)])
