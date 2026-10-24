@@ -834,3 +834,9 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 
 - Task 6 review (S5): pins for behavior that probes show is already correct: unit tests for `write_targets(..., True)` and `cd_target(..., True)`, a decide-level `Set-Location V\ ; Set-Content a b`, a worktree under a different parent, `~/vab` with `home=None`, and the `V/../other/x` escape.
 - Task 6 review (nits): lines over 120 characters at `guard_outside.py:56`, `:89` and `guard_words.py:70`.
+
+*Recorded after the Task 6 re-review (2026-10-24). Under the retry rule, Task 6's third round went to a fresh opus worker. M1, S1, S2 and the PowerShell continuation item are all addressed, and the docs (S3, S4, S6) match the code. The replay of 5,997 calls shows 0 verdict changes without `write_roots`, and the same 37 expected lifts with the XP12 roots. Open must-fix: 0.*
+- Task 6 re-review (note): the loader accepts `\\.\C:\` again. In this layout `named_roots` drops it, but for a project on another drive it would open all of C:. It is a device-namespace spelling, so it is a known limit.
+- Task 6 re-review (note): a `~/.claude` entry would open the config folder; it is user-named, and the tutorial could warn about it.
+- Task 6 re-review (nit): `_BACKTICK_CONTINUATION` in `guard_targets.py` copies the regex in `guard_commands`, so the two could drift; share one definition.
+- Task 6 re-review (note): the ancestor rule considers only the main checkout, so a worktree created outside it (`git worktree add ../wt`) is not covered. APM's worktrees live under `.claude/worktrees`.
