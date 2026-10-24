@@ -64,3 +64,13 @@ Test: `python -B -m pytest -q tests/test_docs.py`.
 - `docs/adr/0008-the-guard-is-frozen-at-issue-20.md` exists and is listed in `docs/adr/README.md`.
 - No file outside the Task 1 and Task 2 lists changes; no `guard*` module changes.
 - Every file stays within 200 lines of logic and every function within 15; `debt check` is clean.
+
+## Pre-flight scan
+| Check | Finding |
+|---|---|
+| Task 1 vs Task 2: shared files | None: Task 1 edits three tests, ADRs 0003 and 0006, and one comment; Task 2 adds ADR 0008 and a README row. |
+| Task 1 self-consistency | The renames keep the space in `SPACED` and the slug's shape; the grep criterion matches the file list. |
+| Task 2 self-consistency | ADR 0008 builds on 0002 and 0007 and edits neither. |
+| Rubric conflicts | None. |
+
+*Ruling before Task 1: the two tasks are small and of one kind (doc and example edits), so one worker builds both, as two commits. Cost if wrong: none.*
