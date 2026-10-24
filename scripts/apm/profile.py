@@ -18,7 +18,7 @@ DEFAULT_MODELS: dict[str, str] = {
     "reviewer": "opus",
 }
 MAX_WORKERS_CAP = 3
-_KNOWN_KEYS = frozenset({"framework_version", "protected_paths", "max_workers", "models"})
+_KNOWN_KEYS = frozenset({"framework_version", "protected_paths", "max_workers", "models", "write_roots"})
 
 
 class ProfileError(Exception):
@@ -32,6 +32,8 @@ class Profile:
     max_workers: int = MAX_WORKERS_CAP
     models: Mapping[str, str] = field(default_factory=lambda: dict(DEFAULT_MODELS))
     extra: Mapping[str, Any] = field(default_factory=dict)
+    # Folders outside the project that shell commands may write (never the file tools): ADR 0007.
+    write_roots: tuple[str, ...] = ()
 
     def protected_globs(self) -> tuple[str, ...]:
         return ALWAYS_PROTECTED + self.protected_paths
@@ -48,6 +50,7 @@ def load_profile(path: Path) -> Profile:
         max_workers=_max_workers(data.get("max_workers", MAX_WORKERS_CAP)),
         models={**DEFAULT_MODELS, **_models(data.get("models", {}))},
         extra={key: value for key, value in data.items() if key not in _KNOWN_KEYS},
+        write_roots=_string_list(data.get("write_roots", []), "write_roots"),
     )
 
 
@@ -58,6 +61,7 @@ def write_profile(path: Path, profile: Profile) -> None:
         "protected_paths": list(profile.protected_paths),
         "max_workers": profile.max_workers,
         "models": dict(profile.models),
+        **({"write_roots": list(profile.write_roots)} if profile.write_roots else {}),
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(data, indent=2, sort_keys=True) + "\n"

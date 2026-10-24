@@ -36,6 +36,9 @@ _REMEDIES = {
         "never by editing its files."
     ),
 }
+_REMEDIES["shell_outside"] = _REMEDIES["command"] + (
+    " If the project writes there routinely, the user can list the folder under write_roots in .apm/profile.json."
+)
 
 
 @dataclass(frozen=True)
@@ -97,9 +100,10 @@ def _command_violation(
         return f"{reason}: {command.strip()}", _REMEDIES["command"]
     if reason := _state_dir_write(command, cwd, project):
         return f"{reason}: {command.strip()}", _REMEDIES["state"]
-    reason = check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
-    reason = reason or outside_write(command, cwd, prefixes, reach)
-    return (f"{reason}: {command.strip()}", _REMEDIES["command"]) if reason else None
+    if reason := check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root):
+        return f"{reason}: {command.strip()}", _REMEDIES["command"]
+    reason = outside_write(command, cwd, prefixes, reach)
+    return (f"{reason}: {command.strip()}", _REMEDIES["shell_outside"]) if reason else None
 
 
 def _violation(
@@ -122,7 +126,8 @@ def _violation(
     if event.get("tool_name") in _COMMAND_TOOLS and isinstance(command, str):
         powershell = event.get("tool_name") == "PowerShell"
         roots = (*temp_roots, *(() if powershell else shell_temp))
-        reach = Reach(project, roots, config_dir, home, bool(event.get("agent_id")), windows, powershell)
+        worker = bool(event.get("agent_id"))
+        reach = Reach(project, roots, config_dir, home, worker, windows, powershell, profile.write_roots)
         return _command_violation(command, event, profile, prefixes, reach)
     return _file_violation(event, project, profile, globs, temp_roots, windows, config_dir)
 

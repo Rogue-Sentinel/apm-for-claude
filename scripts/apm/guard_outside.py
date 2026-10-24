@@ -52,7 +52,8 @@ _INSIDE = "file"
 
 @dataclass(frozen=True)
 class Reach:
-    """Where one session's shell may write, and which shell reads the command (`powershell` for the PowerShell tool)."""
+    """Where one session's shell may write, and which shell reads the command (`powershell` for the PowerShell tool).
+    `write_roots` are the profile's folders, read like any shell word: `~`, absolute, or relative to the main checkout."""
 
     project: Project
     temp_roots: tuple[Path, ...]
@@ -61,6 +62,7 @@ class Reach:
     worker: bool
     windows: bool
     powershell: bool
+    write_roots: tuple[str, ...] = ()
 
     def resolve(self, word: str, cwd: Path) -> Path:
         """The path a shell word names, read from `cwd`; a leading home spelling becomes `home` when it is known."""
@@ -71,7 +73,8 @@ class Reach:
 
     def writable(self, target: Path) -> bool:
         roots = roots_for(target, self.project, self.temp_roots, self.config_dir, self.worker)
-        return in_scope(target, self.project, roots)
+        named = [self.resolve(entry, self.project.main_root) for entry in self.write_roots]
+        return in_scope(target, self.project, [*roots, *named])
 
 
 def _lands_outside(word: str, cwd: Path, reach: Reach) -> Path | None:
