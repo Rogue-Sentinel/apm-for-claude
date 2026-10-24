@@ -1111,6 +1111,13 @@
           "status": "done",
           "title": "Final review fix round",
           "worker": "implementer"
+        },
+        {
+          "attempts": 0,
+          "evidence": "gate 34 at c888dcc: all PASS (clean tree, base merged, layers, test, debt, review, plan 8 criteria); merge gate: passed",
+          "id": "12",
+          "status": "done",
+          "title": "Merge gate"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3302,6 +3309,11 @@
     {
       "at": "2026-10-24T20:42:34.908451+00:00",
       "event": "review 34 0 open at c888dcc",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:48:48.533446+00:00",
+      "event": "task 34/12 done",
       "issue": 34
     }
   ]
