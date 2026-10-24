@@ -636,10 +636,10 @@
         },
         {
           "attempts": 3,
-          "evidence": "Scoped re-review 598c1fe..56a9128: replays 0 loosened/0 new denials/0 reason changes (5,997 + 3,090 calls); open MF1 (test_guard_write_roots.py:67 sibling-prefix lost its meaning after rename) and SF1 (PowerShell reading drops bash clusters for cp/mv/rm/mkdir/touch/tee, a miss where those run native tools).",
+          "evidence": "Final reviewer (opus) scoped re-review 56a9128..294a603: open must-fix 0, should-fix 0, all structural criteria met; replays vs 56a9128 0 loosened/0 new denials (5,997 + 3,090 calls); vs main 0 loosened, 44 + 6 new denials, all real outside writes. Its one nit (docstring line 130 chars) fixed by a docstring-only rewrap a5a08ba.",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -2376,6 +2376,11 @@
     {
       "at": "2026-10-24T17:33:26.324199+00:00",
       "event": "task 20/review running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:39:13.971917+00:00",
+      "event": "task 20/review done",
       "issue": 20
     }
   ]
