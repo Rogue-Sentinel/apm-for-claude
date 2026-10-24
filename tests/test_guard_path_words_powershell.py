@@ -5,15 +5,15 @@ import pytest
 
 from apm.guard_words import path_words
 
-TEXT = r"Copy-Item -Destination C:\vab\ -Path a"
+TEXT = r"Copy-Item -Destination C:\out\ -Path a"
 
 
 def test_a_backslash_before_a_blank_is_a_separator_for_powershell() -> None:
-    assert path_words(TEXT, powershell=True) == ["Copy-Item", "-Destination", "C:/vab/", "-Path", "a"]
+    assert path_words(TEXT, powershell=True) == ["Copy-Item", "-Destination", "C:/out/", "-Path", "a"]
 
 
 def test_the_bash_reading_of_a_backslash_before_a_blank_is_unchanged() -> None:
-    assert path_words(TEXT) == ["Copy-Item", "-Destination", "C:/vab -Path", "a"]
+    assert path_words(TEXT) == ["Copy-Item", "-Destination", "C:/out -Path", "a"]
 
 
 @pytest.mark.parametrize("text", [
@@ -27,4 +27,4 @@ def test_every_other_reading_is_the_same_in_powershell(text: str) -> None:
 
 
 def test_a_trailing_backslash_at_the_end_of_the_text_is_a_separator_for_powershell() -> None:
-    assert path_words("Copy-Item a C:\\vab\\", powershell=True) == ["Copy-Item", "a", "C:/vab/"]
+    assert path_words("Copy-Item a C:\\out\\", powershell=True) == ["Copy-Item", "a", "C:/out/"]

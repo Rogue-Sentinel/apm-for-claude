@@ -34,13 +34,13 @@ def _decide(
 
 @BOTH
 @TOOLS
-@pytest.mark.parametrize("entry", ["~\\vab", "$HOME\\vab", "$env:USERPROFILE\\vab", "${env:USERPROFILE}\\vab"])
+@pytest.mark.parametrize("entry", ["~\\out", "$HOME\\out", "$env:USERPROFILE\\out", "${env:USERPROFILE}\\out"])
 def test_a_home_entry_written_with_backslashes_opens_the_folder_under_home(
     tmp_path: Path, extra: dict, tool: str, entry: str
 ) -> None:
-    vab = tmp_path / "home" / "vab"
+    out_dir = tmp_path / "home" / "out"
 
-    decision = _decide(tmp_path, f"echo x > {vab.as_posix()}/build.log", extra, [entry], tool)
+    decision = _decide(tmp_path, f"echo x > {out_dir.as_posix()}/build.log", extra, [entry], tool)
 
     assert decision.kind == "none"
 
@@ -48,10 +48,10 @@ def test_a_home_entry_written_with_backslashes_opens_the_folder_under_home(
 @BOTH
 @TOOLS
 def test_an_absolute_entry_written_with_backslashes_still_opens(tmp_path: Path, extra: dict, tool: str) -> None:
-    vab = tmp_path / "vab"
-    entry = str(vab).replace("/", "\\")
+    out_dir = tmp_path / "out"
+    entry = str(out_dir).replace("/", "\\")
 
-    decision = _decide(tmp_path, f"echo x > {vab.as_posix()}/build.log", extra, [entry], tool)
+    decision = _decide(tmp_path, f"echo x > {out_dir.as_posix()}/build.log", extra, [entry], tool)
 
     assert decision.kind == "none"
 
@@ -59,9 +59,9 @@ def test_an_absolute_entry_written_with_backslashes_still_opens(tmp_path: Path, 
 def test_a_share_entry_written_with_backslashes_names_the_share_folder(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     project = Project(main_root=repo, worktree_root=repo)
-    reach = Reach(project, (), None, None, False, WINDOWS, True, ("\\\\server\\share\\vab",))
+    reach = Reach(project, (), None, None, False, WINDOWS, True, ("\\\\server\\share\\out",))
 
-    assert reach.named_roots() == [Path("//server/share/vab")]
+    assert reach.named_roots() == [Path("//server/share/out")]
 
 
 @BOTH
@@ -82,9 +82,9 @@ def test_an_entry_holding_the_main_checkout_opens_nothing(tmp_path: Path, extra:
 @TOOLS
 def test_a_folder_beside_the_main_checkout_still_opens(tmp_path: Path, extra: dict, tool: str) -> None:
     repos = tmp_path / "home" / "source" / "repos"
-    command = f"echo x > {(repos / 'vab').as_posix()}/f"
+    command = f"echo x > {(repos / 'out').as_posix()}/f"
 
-    decision = _decide(tmp_path, command, extra, ["~/source/repos/vab"], tool, repos / "apm")
+    decision = _decide(tmp_path, command, extra, ["~/source/repos/out"], tool, repos / "apm")
 
     assert decision.kind == "none"
 
@@ -92,10 +92,10 @@ def test_a_folder_beside_the_main_checkout_still_opens(tmp_path: Path, extra: di
 @BOTH
 def test_a_powershell_backslash_at_a_line_end_does_not_join_the_next_line(tmp_path: Path, extra: dict) -> None:
     """PowerShell has no `\\` continuation: the second line is its own command, and it writes outside."""
-    vab = tmp_path / "vab"
-    command = f"Copy-Item a {vab}\\\nSet-Content ..\\o\\f x"
+    out_dir = tmp_path / "out"
+    command = f"Copy-Item a {out_dir}\\\nSet-Content ..\\o\\f x"
 
-    decision = _decide(tmp_path, command, extra, [vab.as_posix()], "PowerShell")
+    decision = _decide(tmp_path, command, extra, [out_dir.as_posix()], "PowerShell")
 
     assert decision.kind == "deny"
     assert OUTSIDE_REASON in decision.reason
@@ -111,7 +111,7 @@ def test_a_bash_backslash_at_a_line_end_still_joins_the_next_line(tmp_path: Path
 
 def test_the_powershell_reading_joins_only_backtick_lines() -> None:
     """A PowerShell `\\` at a line end is a path's last separator, read as `/`; the newline after it cuts."""
-    assert command_readings("a C:\\vab\\\nb `\nc", powershell=True) == [["a C:\\vab/", "b ` c"]]
+    assert command_readings("a C:\\out\\\nb `\nc", powershell=True) == [["a C:\\out/", "b ` c"]]
 
 
 def test_the_bash_reading_joins_backslash_lines() -> None:

@@ -38,27 +38,27 @@ def _decide(
     "cp a {V}/",
 ], ids=["redirect", "build-log", "mkdir", "copy-into"])
 def test_a_named_folder_opens_for_shell_writes(tmp_path: Path, extra: dict, command: str) -> None:
-    vab = tmp_path / "vab"
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, command.format(V=vab.as_posix()), extra, [vab.as_posix()])
+    decision = _decide(tmp_path, command.format(V=out_dir.as_posix()), extra, [out_dir.as_posix()])
 
     assert decision.kind == "none"
 
 
 @BOTH
 def test_the_home_form_opens_a_folder_under_home(tmp_path: Path, extra: dict) -> None:
-    vab = tmp_path / "home" / "vab"
+    out_dir = tmp_path / "home" / "out"
 
-    decision = _decide(tmp_path, f"echo x > {vab.as_posix()}/build.log", extra, ["~/vab"])
+    decision = _decide(tmp_path, f"echo x > {out_dir.as_posix()}/build.log", extra, ["~/out"])
 
     assert decision.kind == "none"
 
 
 @BOTH
 def test_a_relative_entry_is_read_from_the_checkout(tmp_path: Path, extra: dict) -> None:
-    vab = tmp_path / "vab"
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, f"echo x > {vab.as_posix()}/build.log", extra, ["../vab"])
+    decision = _decide(tmp_path, f"echo x > {out_dir.as_posix()}/build.log", extra, ["../out"])
 
     assert decision.kind == "none"
 
@@ -66,18 +66,18 @@ def test_a_relative_entry_is_read_from_the_checkout(tmp_path: Path, extra: dict)
 @BOTH
 @pytest.mark.parametrize("place", ["vab2/x", "other/x"], ids=["sibling-prefix", "unnamed-folder"])
 def test_only_the_named_folder_opens(tmp_path: Path, extra: dict, place: str) -> None:
-    vab = tmp_path / "vab"
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, f"echo x > {(tmp_path / place).as_posix()}", extra, [vab.as_posix()])
+    decision = _decide(tmp_path, f"echo x > {(tmp_path / place).as_posix()}", extra, [out_dir.as_posix()])
 
     assert decision.kind == "deny"
 
 
 @BOTH
 def test_write_roots_do_not_open_the_file_tools(tmp_path: Path, extra: dict) -> None:
-    vab = tmp_path / "vab"
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, str(vab / "x.md"), extra, [vab.as_posix()], tool="Write")
+    decision = _decide(tmp_path, str(out_dir / "x.md"), extra, [out_dir.as_posix()], tool="Write")
 
     assert decision.kind == "deny"
     assert "is outside the project" in decision.reason
@@ -86,9 +86,9 @@ def test_write_roots_do_not_open_the_file_tools(tmp_path: Path, extra: dict) -> 
 
 @BOTH
 def test_write_roots_do_not_lift_another_denial(tmp_path: Path, extra: dict) -> None:
-    vab = tmp_path / "vab"
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, f"rm -rf {vab.as_posix()}/x", extra, [vab.as_posix()])
+    decision = _decide(tmp_path, f"rm -rf {out_dir.as_posix()}/x", extra, [out_dir.as_posix()])
 
     assert decision.kind == "deny"
     assert "destructive command (recursive rm)" in decision.reason
@@ -118,18 +118,18 @@ def test_a_worker_denial_names_no_remedy(tmp_path: Path) -> None:
 def test_a_powershell_destination_ending_in_a_backslash_is_the_named_folder(
     tmp_path: Path, extra: dict, command: str
 ) -> None:
-    vab = tmp_path / "vab"
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, command.format(V=vab), extra, [vab.as_posix()], tool="PowerShell")
+    decision = _decide(tmp_path, command.format(V=out_dir), extra, [out_dir.as_posix()], tool="PowerShell")
 
     assert decision.kind == "none"
 
 
 @BOTH
 def test_bash_still_reads_a_backslash_before_a_blank_as_an_escape(tmp_path: Path, extra: dict) -> None:
-    """In bash `vab\\ b` is one name, the folder `vab b`, which is not the named folder."""
-    vab = tmp_path / "vab"
+    """In bash `out\\ b` is one name, the folder `out b`, which is not the named folder."""
+    out_dir = tmp_path / "out"
 
-    decision = _decide(tmp_path, f"cp a {vab.as_posix()}\\ b", extra, [vab.as_posix()])
+    decision = _decide(tmp_path, f"cp a {out_dir.as_posix()}\\ b", extra, [out_dir.as_posix()])
 
     assert decision.kind == "deny"

@@ -33,14 +33,13 @@ it active, every existing guard and hook test still passed (1308), so no current
 below removed the false positives a naive reading gave (a `|` inside a quoted `sed` script, `>` inside a Python or
 C++ heredoc body, an escaped blank in a bash path), what remained were real outside writes:
 
-- **A cross-repository incident.** An APM-repo session ran `cd ".../VirtualAirline Plugin for XP12" && git fetch ...;
+- **A cross-repository incident.** An APM-repo session ran `cd` into another repository's checkout `&& git fetch ...;
   git worktree add -b apm-init ...` and `apm setup` there. That is the incident behind the user's "stay in this
   repo" rule. Eight main-session commands operated on another checkout.
-- **XP12 routines.** In the VirtualAirline XP12 project the manager deploys the built plugin to
-  `D:/X-Plane 12/Resources/plugins/VirtualAirline/` and backs up `D:/X-Plane 12/Output/VirtualAirline/career.db`
-  (50 distinct commands), and builds and logs out of tree in `C:/Users/darby/vab/` and `C:/vaR`, as workarounds for
-  the Windows path limit (56 distinct commands). Workers wrote build logs and diffs under `C:/Users/darby/vab/` in
-  110 distinct commands.
+- **Routines in another project the user runs.** There the manager deploys the built plugin to an app's plugin
+  folder on another drive and backs up a database (50 distinct commands), and builds and logs out of tree in a
+  home folder and a short drive path, as workarounds for the Windows path limit (56 distinct commands). Workers
+  wrote build logs and diffs under that home folder in 110 distinct commands.
 - **Worker typos and overshoots.** `> /tmp_full_report.txt` and `rm -f ../../../../../../../tmp_tb.cpp` wrote to
   the drive root, and a worker ran `mkdir -p ~/.claude/plans`.
 
@@ -94,8 +93,8 @@ denied, like a file-tool write outside the project.**
   checkout or to a folder holding it (`..`, `~/source/repos`) is ignored, since it would open every repository beside
   this one; ignoring fails closed.
 - **PowerShell's `\`.** PowerShell has no `\` escape and no `\` continuation. For a PowerShell command a `\` before a
-  blank or at the end of a line is a path's last separator (`Copy-Item -Destination C:\vab\ -Path a` names
-  `C:/vab/`), and only an odd run of backticks joins two lines. A Bash command keeps bash's reading: `\ ` is an
+  blank or at the end of a line is a path's last separator (`Copy-Item -Destination C:\out\ -Path a` names
+  `C:/out/`), and only an odd run of backticks joins two lines. A Bash command keeps bash's reading: `\ ` is an
   escaped blank and a `\` at the end of a line joins the next one.
 
 How ADR-0002 rule 2 is read: this change only adds denials, so it needs no reading of that rule. Every call allowed
@@ -108,14 +107,14 @@ verdict given before this change, for the folders it names.
   home folder, a copy into another repository, a `cd` into one and a commit, a `..` or `/` overshoot) is now denied
   in both sessions and both tools.
 - **Main-session routines that break**, each denied until that project lists the folder under `write_roots` or the
-  user approves the one command: the XP12 deploys to the X-Plane folders when they name the folder as a literal
-  path, the out-of-tree builds and logs in `~/vab` and `C:/vaR`, a clone into `~/tmp-ccs`. A deploy that builds the
-  path in a variable (`$dst = "D:\X-Plane 12\..."; Copy-Item $src $dst`) is a named limit and stays allowed: the
-  variable is read as a relative name inside the directory. In this repository, copying a session-diagnosis report to
-  a folder the user names needs an approval, and so does editing global config through the shell
-  (`~/.claude/settings.json`, `~/.claude/CLAUDE.md`), which the file tools already refuse.
-- **The XP12 profile needs `write_roots` before that project upgrades.** Its workers write `C:/Users/darby/vab/`
-  routinely, and a worker's denial has no approval.
+  user approves the one command: a deploy to an app's plugin folder on another drive when it names the folder as a
+  literal path, the out-of-tree builds and logs in `~/out` and `C:/build`, a clone into `~/tmp-ccs`. A deploy that
+  builds the path in a variable (`$dst = "D:\Shared Apps\..."; Copy-Item $src $dst`) is a named limit and stays
+  allowed: the variable is read as a relative name inside the directory. In this repository, copying a
+  session-diagnosis report to a folder the user names needs an approval, and so does editing global config
+  through the shell (`~/.claude/settings.json`, `~/.claude/CLAUDE.md`), which the file tools already refuse.
+- **A project with routine out-of-tree writes needs `write_roots` before it upgrades.** Its workers write
+  `C:/Users/me/out/` routinely, and a worker's denial has no approval.
 - **The reading is new and heuristic.** It differs from `split_segments` and from ADR-0005's heredoc handling on
   purpose and only for this check. The destructive and protected checks still read every heredoc body, as ADR-0005
   says. A false positive found later is fixed by a pin and a narrower reading, never by dropping the check.

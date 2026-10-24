@@ -23,7 +23,7 @@ PowerShell parameter abbreviations (`-Dest`), arrays (`-Path a,b`), `Join-Path` 
 before a PowerShell command (read as bash's escaped `;`, so no cut); a stray quote outside a comment, read as a plain
 character (the text is still cut, but a second stray quote can pair with it and hide the cuts between them); a
 positional PowerShell value read as a target (failing closed), except the value of an option this module knows takes
-one (`-ErrorAction Stop`, `-Filter *.xpl`: see `_POWERSHELL_VALUE_OPTIONS`; for a PowerShell command only, since in
+one (`-ErrorAction Stop`, `-Filter *.dll`: see `_POWERSHELL_VALUE_OPTIONS`; for a PowerShell command only, since in
 bash `-pv` is `-p -v`), which is skipped, so an option it does not know (`-Dest`, an abbreviation) can still hide the
 destination; `mv` and `Move-Item`, which count only the destination, so removing a source in another checkout is not
 seen; a `#` right after an escaped blank (`a\\ #b`), read as a comment; PowerShell backtick escapes, which are not
@@ -102,7 +102,7 @@ def command_segments(text: str) -> list[str]:
 
 def _joined(text: str, powershell: bool) -> str:
     """`text` with its continued lines joined. PowerShell has no `\\` escape and no `\\` continuation: there a `\\`
-    at the end of a line is a path's last separator (`Copy-Item a C:\\vab\\`), so it is read as `/` and the newline
+    at the end of a line is a path's last separator (`Copy-Item a C:\\out\\`), so it is read as `/` and the newline
     after it still cuts; only an odd run of backticks joins lines."""
     if not powershell:
         return join_continuations(text)
