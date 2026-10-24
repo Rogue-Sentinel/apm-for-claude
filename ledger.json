@@ -536,10 +536,10 @@
         },
         {
           "attempts": 2,
-          "evidence": "Task 5 review must-fix M1: the PowerShell reading must apply to PowerShell-tool events only. See the plan's Task 5 review ruling.",
+          "evidence": "2047 passed in the worktree; targeted set on the branch after merge e727864 all pass; fix round 1 (de3c7c4) re-reviewed clean with transcript replays; debt check nothing worse.",
           "id": "5",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Deny shell writes outside; ADR 0007",
           "worker": "implementer"
         },
@@ -2152,6 +2152,11 @@
     {
       "at": "2026-10-24T15:08:34.250109+00:00",
       "event": "task 20/5r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:08:36.818022+00:00",
+      "event": "task 20/5 done",
       "issue": 20
     }
   ]
