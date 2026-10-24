@@ -575,6 +575,30 @@ subagent:** 9 of 9 chose the expected skill; 8 high confidence. Request 5 now ch
 but it never mentions technical debt in the description"). Every medium in the baseline (2, 4, 6, 7)
 is now high. Pass.
 
+## Final review
+
+*Final review, 2026-10-24 (opus): 0 must-fix, 7 suggestions, ready to merge. Ruling by the manager,
+re-grading by effect on a person using the result: S1 (duplicated test helpers, against Ruling 1's
+intent), S2 (the tutorial contradicts itself about which commands you type), S3 (a regression test
+that passes before the fix could be deleted under the restored Red rule), S4 ("the one size signal"
+is false: parameter counts are not measured either), S5 (the new command does not tell the manager to
+give the reviewer its brief, so the scorecard may lack `metrics` and `debt check`) and S7 (a test
+fragile to re-wrapping, folded into S1) are fixed before merge, in one fix round. Cost if wrong: one
+small fix round. S6 and the line-width note are deferred (below).*
+
+## Deferred findings
+
+- Final review S6: `skills/solid/references/examples-by-language.md` "not implemented" row has no
+  pointer beside the ISP signs (`skills/solid/SKILL.md:211`).
+- Final review, cosmetic: `skills/code-smells/SKILL.md:70` and `skills/branch-review/SKILL.md:146`
+  are not reflowed to the files' usual width.
+- Final review, recommendation: future retrieval runs should probe the neighbors directly ("audit the
+  code quality of the whole codebase" → clean-code-audit; "apply the open-closed principle to this
+  module" → solid; "review the code quality of this PR"), with several samples each.
+- Final review, recommendation: original trigger words not in the issue's lists ("polymorphism",
+  "replace conditionals", "refactor switch statements", "extending behavior without modifying code",
+  "subtype behavior", "structure tests"); most are covered by existing wording. For the user.
+
 ## Pre-flight scan
 
 | Pair or task | Shared file or interface | Found |
