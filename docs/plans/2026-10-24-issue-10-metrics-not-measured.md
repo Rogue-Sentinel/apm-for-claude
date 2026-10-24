@@ -390,3 +390,18 @@ The full plan: docs/plans/2026-10-24-issue-10-metrics-not-measured.md
 Reply "approved" to start. After that I will send one plain line after each task and come back
 when it is merged, unless something comes up the plan did not settle.
 ```
+
+## Pre-flight scan
+| Check | Finding |
+|---|---|
+| Task 1 → Task 5 | Task 1 produces `LANGUAGE_NAMES`; Task 5 consumes it through `debt_languages` and the snapshot. Consistent. |
+| Task 2 → Task 4 | Task 2 produces `measure_files(names, read)` and `_in_scope`; Task 4 extends `measure_files` with `candidates=()` and uses `_in_scope`. Both edit `metrics.py` and `metrics_ref.py`, so they run in order. |
+| Task 3 → Task 4 | Task 3 produces `named_as_not_code`, `holds_text` and `file_kind`; Task 4 consumes all three. Consistent. |
+| Task 4 and Task 5: shared files | `docs/adr/README.md` and `docs/tutorial.md` §8, so they run in order (the plan already says so). |
+| Task 1 self-consistency | At ea0e5e7, `language_for` gives None for `.qml`, `.iss`, `.cmake`, `CMakeLists.txt`, `notes.txt`. The CMake and QML line counts assume that a line holding only `)` or `}` is not logic, which the QML case (expected 3) relies on too. |
+| Task 3/4 self-consistency | `Makefile`, `.qrc`, `Dockerfile`, `.css`, `bin/run` and `config.h.in` have no language at ea0e5e7, so the not-measured cases hold. |
+| Task 4: existing test | `tests/test_metrics.py:223` expects exactly five lines; the plan's single added line matches it. |
+| ADR numbers | #27 adds ADR 0008 and merges first; 0009 and 0010 stand. The README rows will conflict when main is merged in; the manager resolves it. |
+| Rubric conflicts | None. |
+
+*Ruling before Task 1: `.ts` files read as Qt translations are out of scope; filed as #29. Cost if wrong: none to this plan.*
