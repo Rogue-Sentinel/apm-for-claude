@@ -21,9 +21,9 @@ a Bash command keeps bash's reading of `\\`.
 
 The profile's `write_roots` add folders for both sessions. The profile loader has already refused any entry that
 would open more than one folder (a filesystem or share root, Git Bash's `/c`, the bare home folder, a path made only
-of `.` and `..`, each read with `\\` as `/` and the dots folded) and any `%...%` variable. `Reach` reads each entry with
-`\\` as `/`, like a shell word: a home spelling is the home folder, a relative entry is read from the main checkout.
-An entry that resolves to the main checkout or to a folder holding it is ignored, which fails closed.
+of `.` and `..`, each read with `\\` as `/` and the dots folded) and any `%...%` variable. `Reach` reads each entry
+with `\\` as `/`, like a shell word: a home spelling is the home folder, a relative entry is read from the main
+checkout. An entry that resolves to the main checkout or to a folder holding it is ignored, which fails closed.
 
 Known limits: every limit `guard_targets` names (writes a program makes itself, script blocks, `bash -c`, `eval`,
 `$(...)` and the rest); a target built from any other variable (`> "$OUT/x"`) is read as a relative name inside the
@@ -32,7 +32,9 @@ the project comes from the event's `cwd`; a trailing separator is read as "into 
 so the main session's `mkdir -p <memory>/`, `touch "<memory>/"` and `rmdir "<memory>/"` are allowed where the same
 word without the separator is denied (the folder normally exists, and a recursive delete of it is still denied as
 destructive); a PowerShell drive switch (a segment `D:` followed by a write) is not tracked, so the write is read
-from the directory before it; with no home folder known, a home spelling is read as a relative name.
+from the directory before it; with no home folder known, a home spelling is read as a relative name; a
+`write_roots` entry in device-namespace spelling (`\\\\.\\C:\\`) passes the loader's root check. Here it is ignored
+because it holds the main checkout, but for a project on another drive it would open all of C:.
 """
 from __future__ import annotations
 
@@ -100,7 +102,8 @@ def _lands_outside(word: str, cwd: Path, reach: Reach) -> Path | None:
 
 
 def _first_outside(segment: str, cwd: Path, reach: Reach) -> Path | None:
-    targets = (_lands_outside(word, cwd, reach) for word in write_targets(segment, reach.powershell) if not is_device(word))
+    words = (word for word in write_targets(segment, reach.powershell) if not is_device(word))
+    targets = (_lands_outside(word, cwd, reach) for word in words)
     return next((target for target in targets if target is not None), None)
 
 
