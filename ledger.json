@@ -29,9 +29,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker a0daafb merged into issue-10 branch: tests/test_metrics_not_measured.py + test_own_limits.py 41 passed in worktree and on branch; RED was ModuleNotFoundError; debt check clean; probes match the plan's cases.",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Which language-less files are not measured",
           "worker": "implementer"
         },
@@ -2752,6 +2753,11 @@
     {
       "at": "2026-10-24T18:33:24.597882+00:00",
       "event": "task 10/6 updated",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:35:12.812778+00:00",
+      "event": "task 10/3 done",
       "issue": 10
     }
   ]
