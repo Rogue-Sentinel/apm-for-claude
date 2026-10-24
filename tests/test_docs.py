@@ -209,3 +209,11 @@ def test_the_branch_review_command_takes_an_optional_branch():
 @pytest.mark.parametrize("path", DOCS, ids=lambda p: p.name)
 def test_the_docs_name_the_optional_branch_review_command(path):
     assert "/apm:branch-review" in _text(path)
+
+
+def test_the_branch_review_command_briefs_the_reviewer_with_the_code_review_brief():
+    body = _front_and_body(ROOT / "commands" / "branch-review.md")[1]
+    flat = " ".join(body.split())
+    assert "apm:code-review" in flat and "references/reviewer-checklist.md" in flat
+    for needed in ("exact CLI line", "its base", "limits", "`standard.ui`"):
+        assert needed in flat, needed
