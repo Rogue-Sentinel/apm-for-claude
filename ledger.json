@@ -38,7 +38,8 @@
         {
           "attempts": 0,
           "id": "4",
-          "status": "pending"
+          "status": "pending",
+          "title": "Report lists files not measured"
         },
         {
           "attempts": 0,
@@ -2734,6 +2735,11 @@
     {
       "at": "2026-10-24T18:33:17.482491+00:00",
       "event": "task 10/6 pending",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:33:19.899500+00:00",
+      "event": "task 10/4 updated",
       "issue": 10
     }
   ]
