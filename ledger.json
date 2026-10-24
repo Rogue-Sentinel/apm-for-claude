@@ -628,6 +628,14 @@
           "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Final review fix",
+          "worker": "implementer"
         }
       ],
       "title": "Shell commands that write outside the project are never checked by the guard",
@@ -2244,6 +2252,11 @@
     {
       "at": "2026-10-24T16:34:48.612826+00:00",
       "event": "task 20/review failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:34:51.017589+00:00",
+      "event": "task 20/fix running",
       "issue": 20
     }
   ]
