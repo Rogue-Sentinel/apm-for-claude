@@ -510,6 +510,13 @@
           "text": "Older files already on main name VirtualAirline/X-Plane: the design spec, earlier plans, platform notes, coverage record (docs/coverage.md, standard/coverage.json), ADRs 0003/0006, three tests and one code comment. Strip those too, as their own small issue after #20?"
         }
       ],
+      "review": {
+        "at": "2026-10-24T17:39:16.486022+00:00",
+        "criteria_met": true,
+        "evidence": "Whole-branch final review (opus) plus scoped re-reviews through 294a603: 0 open, every structural criterion met. a5a08ba only rewraps a docstring (the reviewer's nit); 158 targeted tests pass after it.",
+        "head": "a5a08baf479aa6ca599e741dc618d73d1c70989d",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -2381,6 +2388,11 @@
     {
       "at": "2026-10-24T17:39:13.971917+00:00",
       "event": "task 20/review done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:39:16.486164+00:00",
+      "event": "review 20 0 open at a5a08ba",
       "issue": 20
     }
   ]
