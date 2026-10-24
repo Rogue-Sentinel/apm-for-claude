@@ -502,6 +502,12 @@
           "blocks": [],
           "resolved": true,
           "text": "Does the main session get the outside-write rule for shell commands (B, recommended), only workers (A), or only other checkouts and the config dir (C)?"
+        },
+        {
+          "answer": null,
+          "blocks": [],
+          "resolved": false,
+          "text": "Older files already on main name VirtualAirline/X-Plane: the design spec, earlier plans, platform notes, coverage record (docs/coverage.md, standard/coverage.json), ADRs 0003/0006, three tests and one code comment. Strip those too, as their own small issue after #20?"
         }
       ],
       "status": "building",
@@ -2304,6 +2310,11 @@
     {
       "at": "2026-10-24T16:56:59.389675+00:00",
       "event": "task 20/neutral running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:57:29.795181+00:00",
+      "event": "question 20 #1",
       "issue": 20
     }
   ]
