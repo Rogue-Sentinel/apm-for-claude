@@ -530,22 +530,37 @@ is a test edit, not a protected path, and is approved by that ruling.)
   the one `Also use when` sentence this plan gives, and is at most 1024 characters
   (`tests/test_skills.py`).
 - `skills/refactoring/`, `skills/solid/`, `skills/object-design/`, `skills/clean-architecture/` and
-  `skills/functional-core/` each have `references/examples-by-language.md`, linked from their
-  `SKILL.md`; no original library or language name appears in their other files (Tasks 2 and 3 tests;
+  `skills/functional-core/` each have a `references/examples-by-language.md`
+  (`skills/refactoring/references/examples-by-language.md`,
+  `skills/solid/references/examples-by-language.md`,
+  `skills/object-design/references/examples-by-language.md`,
+  `skills/clean-architecture/references/examples-by-language.md`,
+  `skills/functional-core/references/examples-by-language.md`), linked from their
+  SKILL.md; no original library or language name appears in their other files (Tasks 2 and 3 tests;
   the banned-term test).
-- The class-size signal appears in `code-smells/SKILL.md`, `code-smells/references/smell-catalog.md`,
-  `solid/references/srp-indicators.md` and `branch-review/SKILL.md`; `<CLI> metrics` output and
+- The class-size signal appears in `skills/code-smells/SKILL.md`,
+  `skills/code-smells/references/smell-catalog.md`, `skills/solid/references/srp-indicators.md` and
+  `skills/branch-review/SKILL.md`; `<CLI> metrics` output and
   `standard.limits` are unchanged (no file under `scripts/` changes).
 - No heading under `skills/` is renamed or removed; `<CLI> coverage` reports `Gaps: 0`.
-- `test-first/SKILL.md` and `test-first/references/cycle-steps.md` agree: a test that passes at once
+- `skills/test-first/SKILL.md` and `skills/test-first/references/cycle-steps.md` agree: a test that passes at once
   is redundant and deleted.
 - Every touched test file is at most 200 lines of logic and every function at most 15 (`<CLI> metrics`);
   `<CLI> debt check` passes; no existing test is weakened (the only assertion that may change is the
   one named in option E2, and only under that ruling).
 - No file changes in `scripts/`, `hooks/`, `agents/`, `.apm/`, `tests/test_guard.py`, `tests/test_cli.py`,
   or the VirtualAirline repository; no version bump.
-- If option B2 is ruled: `docs/adr/0011-boy-scout-cleanups-may-share-a-commit.md` exists and is listed
+- If option B2 is ruled: docs/adr/0011-boy-scout-cleanups-may-share-a-commit.md exists and is listed
   in `docs/adr/README.md`.
+
+*Ruling at the merge gate, 2026-10-24: the gate reads every backticked path in these criteria as a
+document that must exist, from the repository root. The criteria named skill files relative to
+`skills/` (`code-smells/SKILL.md` and the like), and named the B2 ADR in backticks although the user
+ruled B1, so `<CLI> gate 34` failed criterion 4 on paths, not on missing work. The skill paths above
+now carry their `skills/` prefix and the five by-language files are listed one by one; the B2 ADR path
+lost its backticks (the criterion is unchanged and does not apply under ruling B1). Every criterion
+means what it meant before, and the final review walked each one. Cost if wrong: none; the files
+exist.*
 
 ## Retrieval check
 
