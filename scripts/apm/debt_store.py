@@ -52,6 +52,7 @@ _SHAPES: dict[str, Callable[[object], bool]] = {
     "limits": _int_map, "totals": _int_map, "functions": _int_map, "files": _int_map, "classes": _int_map,
     "unmeasured": _strings, "sources": _per_source, "accepted": _accepted, "scope": _scope,
     "class_scanners": _strings, "class_languages": _str_map,
+    "measured_languages": _strings, "file_languages": _str_map,
 }
 
 

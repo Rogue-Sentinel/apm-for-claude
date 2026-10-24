@@ -10,3 +10,4 @@
 | [0006](0006-the-main-session-writes-its-memory-folder.md) | The main session may write Claude Code's memory folder for its project, and a file-tool write outside the project cannot be approved | Accepted, 2026-10-18. Amended by ADR-0007 |
 | [0007](0007-shell-commands-write-only-where-the-session-may.md) | A shell command may write only where its session may: the project, its worktree, the temp folders, the profile's write roots, and for the main session its memory folder | Accepted, 2026-10-22 |
 | [0009](0009-files-with-no-scanner-are-counted-as-not-measured.md) | A file with no scanner is counted as not measured, so an empty report never reads as clean | Accepted, 2026-10-24. Builds on ADR-0003 |
+| [0010](0010-a-newly-measured-languages-file-sizes-are-not-new-debt.md) | A newly measured language's file sizes are not new debt, so an upgrade does not fail on code nobody touched | Accepted, 2026-10-24. Builds on ADR-0003 |

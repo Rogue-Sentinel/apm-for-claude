@@ -24,7 +24,9 @@ from apm.debt_compare import (
     KINDS, Findings, compare_items, compare_limits, compare_sources, compare_scope, compare_totals, compare_unmeasured, merge,
 )
 from apm.debt_classes import class_path, project_classes
+from apm.debt_languages import project_languages
 from apm.metrics import Report
+from apm.metrics_lang import LANGUAGE_NAMES
 from apm.metrics_model import CLASS_LANGUAGES
 from apm.standard_config import Limits, MetricsConfig
 
@@ -84,6 +86,12 @@ def _class_fields(report: Report, classes: Mapping) -> dict:
             "class_languages": {f.path: f.language for f in report.files if f.path in paths}}
 
 
+def _language_fields(report: Report, files: Mapping) -> dict:
+    """The languages that were measured, and the language of each over-limit file."""
+    return {"measured_languages": list(LANGUAGE_NAMES),
+            "file_languages": {f.path: f.language for f in report.files if f.path in files}}
+
+
 def snapshot(report: Report, limits: Limits, sources: Mapping[str, Mapping[str, int]] | None = None,
              scope: MetricsConfig | None = None) -> dict:
     functions, classes = _functions(report, limits), _classes(report, limits)
@@ -96,6 +104,7 @@ def snapshot(report: Report, limits: Limits, sources: Mapping[str, Mapping[str, 
         "scope": _scope(scope),
         "unmeasured": unmeasured,
         "functions": functions, "files": files, "classes": classes, **_class_fields(report, classes),
+        **_language_fields(report, files),
         "sources": {name: dict(numbers) for name, numbers in (sources or {}).items()},
         "accepted": [],
     }
@@ -106,7 +115,7 @@ class Comparison:
     regressions: tuple[str, ...]
     improvements: tuple[str, ...]
     moves: tuple[str, ...] = ()  # neutral notes: an over-limit item that only changed place
-    newly_measured: tuple[str, ...] = ()  # neutral notes: a wide class in a language the base never scanned
+    newly_measured: tuple[str, ...] = ()  # neutral notes: a class or file in a language the base never measured
 
     @property
     def worse(self) -> bool:
@@ -153,12 +162,14 @@ def compare(base: dict, current: dict) -> Comparison:
     """Everything in `current` that is worse than `base`, and everything that got better."""
     if _unsupported(base, current):
         return Comparison(_unsupported(base, current), ())
-    current, scanners, newly_measured = project_classes(base, current)
+    current, scanners, newly_classes = project_classes(base, current)
+    current, languages, newly_files = project_languages(base, current)
     current = project_onto(base, current)
-    parts = [Findings(scanners, [], []), compare_limits(base, current), compare_scope(base, current), compare_totals(base, current),
+    parts = [Findings([*scanners, *languages], [], []),
+             compare_limits(base, current), compare_scope(base, current), compare_totals(base, current),
              compare_unmeasured(base, current), compare_sources(base, current),
              *(compare_items(base, current, kind) for kind in KINDS)]
-    return Comparison(*(tuple(lines) for lines in merge(parts)), tuple(newly_measured))
+    return Comparison(*(tuple(lines) for lines in merge(parts)), tuple([*newly_classes, *newly_files]))
 
 
 def accept(new: dict, previous: dict | None, reason: str, now: datetime) -> dict:
