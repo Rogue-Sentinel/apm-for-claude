@@ -405,3 +405,5 @@ when it is merged, unless something comes up the plan did not settle.
 | Rubric conflicts | None. |
 
 *Ruling before Task 1: `.ts` files read as Qt translations are out of scope; filed as #29. Cost if wrong: none to this plan.*
+
+*Ruling during Task 4 (2026-10-24): `not_measured_kinds` is a module-level function, `not_measured_kinds(report)` in `metrics.py`, not a `Report` method. As a method it made `Report` a class with 7 public methods, which `debt check` reports as a new wide class. Task 4 also adds `choose_files(files, config, paths)`, shared by `measure_tree` and `measure_at_ref`, so the two cannot drift apart. Task 5 consumes neither. Cost if wrong: one call site moves if the method is wanted later.*
