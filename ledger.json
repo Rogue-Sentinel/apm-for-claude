@@ -792,9 +792,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 5cd8041 merged: ADR 0008 read by manager, row in README; tests/test_docs.py within the 302 passed.",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "ADR 0008: the guard is frozen",
           "worker": "implementer"
         },
@@ -2560,6 +2561,11 @@
     {
       "at": "2026-10-24T18:27:41.487641+00:00",
       "event": "task 27/1 done",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:27:44.190941+00:00",
+      "event": "task 27/2 done",
       "issue": 27
     }
   ]
