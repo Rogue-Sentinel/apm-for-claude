@@ -599,11 +599,11 @@
           "worker": "reviewer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Stopped for the night at the user's request mid-review; rerun the Task 5 review from scratch (package: scratchpad r20-t5.diff, range 9f5306d..a51e3fc).",
           "id": "5r",
           "model": "opus",
-          "status": "pending",
+          "status": "running",
           "title": "Task 5 review",
           "worker": "reviewer"
         }
@@ -2122,6 +2122,11 @@
     {
       "at": "2026-10-23T01:15:06.064603+00:00",
       "event": "decision 20 Paused for the night by the user (2026-10-22). On issue-20-shell-outside (local, not pushed): Tasks 1, 2, 3, 4 and 6b merged and reviewed. Task 5 built in its worktree, review to run. Then Task 6 (write_roots), the final review, gate 20, PR and merge; then #13.",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T14:07:41.177679+00:00",
+      "event": "task 20/5r running",
       "issue": 20
     }
   ]
