@@ -104,7 +104,7 @@ def access_label(head: str) -> str | None:
 
     Text before the word is dropped with it: Qt macros such as `Q_OBJECT` or `Q_PROPERTY(...)`
     end with no `;`, so they run into the label's head. `signals:` and `public slots:` are not
-    labels, and their members keep the access before them, as XP12's checker reads them.
+    labels, and their members keep the access before them, as a typical C++ access checker reads them.
     """
     match = _ACCESS_LABEL.search(head)
     return match.group(1) if match else None

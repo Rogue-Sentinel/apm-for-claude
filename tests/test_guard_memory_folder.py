@@ -14,8 +14,8 @@ def test_a_windows_root_gives_the_folder_claude_code_uses() -> None:
 
 
 def test_a_hyphenated_root_keeps_its_hyphens() -> None:
-    root = Path(r"C:\Users\darby\source\repos\VirtualAirline-Plugin-for-XP12")
-    assert _slug(root) == "C--Users-darby-source-repos-VirtualAirline-Plugin-for-XP12"
+    root = Path(r"C:\Users\me\source\repos\Sample-App")
+    assert _slug(root) == "C--Users-me-source-repos-Sample-App"
 
 
 def test_a_posix_root_with_dots_and_underscores() -> None:
