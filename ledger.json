@@ -1048,6 +1048,14 @@
           "status": "running",
           "title": "Code skills",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "4",
+          "model": "sonnet",
+          "status": "running",
+          "title": "branch-review",
+          "worker": "implementer"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3139,6 +3147,11 @@
     {
       "at": "2026-10-24T20:13:18.522739+00:00",
       "event": "task 34/2 running",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:13:20.766326+00:00",
+      "event": "task 34/4 running",
       "issue": 34
     }
   ]
