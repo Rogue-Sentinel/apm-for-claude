@@ -63,11 +63,11 @@
           "title": "Merge gate"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Final review (opus) at a841cfc: 0 must-fix; SF1 naming, SF2 guidance, SF3 audit drops not-measured files; suggestions 1-4 folded in. Ruling: see the plan, final-review amendment.",
           "id": "review",
           "model": "opus",
-          "status": "failed",
+          "status": "running",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -2861,6 +2861,11 @@
     {
       "at": "2026-10-24T18:58:09.515608+00:00",
       "event": "task 10/fix done",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:58:12.580735+00:00",
+      "event": "task 10/review running",
       "issue": 10
     }
   ]
