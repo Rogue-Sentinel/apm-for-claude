@@ -983,7 +983,12 @@
       "allowlist": [],
       "branch": "issue-34-restore-skill-gaps",
       "concerns": [],
-      "decisions": [],
+      "decisions": [
+        {
+          "at": "2026-10-24T20:13:00.358560+00:00",
+          "text": "User rulings at approval: A1 B1 C1 D1 E1 keep ours; F2 add /apm:branch-review [branch]. Tasks 6-10 dropped."
+        }
+      ],
       "kind": "feature",
       "plan": "docs/plans/2026-10-24-restore-skill-gaps.md",
       "questions": [],
@@ -3033,6 +3038,11 @@
     {
       "at": "2026-10-24T20:12:58.043280+00:00",
       "event": "issue 34 status building",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:13:00.358582+00:00",
+      "event": "decision 34 User rulings at approval: A1 B1 C1 D1 E1 keep ours; F2 add /apm:branch-review [branch]. Tasks 6-10 dropped.",
       "issue": 34
     }
   ]
