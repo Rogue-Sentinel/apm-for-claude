@@ -938,6 +938,13 @@
       "kind": "feature",
       "plan": "docs/plans/2026-10-24-issue-30-release-0.3.3.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-24T19:11:40.961306+00:00",
+        "criteria_met": true,
+        "evidence": "Final whole-branch review (sonnet): 0 open, structural criteria met.",
+        "head": "2fefcd768a99d4d77fce444e2e0ababfe37b8c59",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -2964,6 +2971,11 @@
     {
       "at": "2026-10-24T19:11:38.388527+00:00",
       "event": "task 30/review done",
+      "issue": 30
+    },
+    {
+      "at": "2026-10-24T19:11:40.961327+00:00",
+      "event": "review 30 0 open at 2fefcd7",
       "issue": 30
     }
   ]
