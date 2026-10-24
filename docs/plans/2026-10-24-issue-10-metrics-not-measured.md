@@ -418,3 +418,5 @@ when it is merged, unless something comes up the plan did not settle.
 
 ## Deferred findings
 - Final review: a not-measured candidate is read whole for the 8000-byte binary check; reading only the first 8000 bytes would be cheaper for large files.
+
+*Ruling during the final-review fix round (2026-10-24): SF3 adds the key `files_not_measured` to `audit --json`, so the two existing tests that pin its exact key set gain that one key: `tests/test_audit_report.py::test_json_has_exactly_the_consumed_keys` and `tests/test_cli_audit.py::test_cli_audit_json_and_not_a_repo`. Both are stricter, not weaker, and nothing else in them changed. This adds to the Global Constraint's single planned test edit. Cost if wrong: none.*
