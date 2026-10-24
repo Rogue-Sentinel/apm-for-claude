@@ -780,7 +780,16 @@
       "plan": "docs/plans/2026-10-24-issue-27-generic-examples.md",
       "questions": [],
       "status": "building",
-      "tasks": [],
+      "tasks": [
+        {
+          "attempts": 1,
+          "id": "1",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Generic names in tests, ADRs, comment",
+          "worker": "implementer"
+        }
+      ],
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/27"
     },
@@ -2516,6 +2525,11 @@
     {
       "at": "2026-10-24T18:25:04.470183+00:00",
       "event": "issue 27 status building",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:25:06.701432+00:00",
+      "event": "task 27/1 running",
       "issue": 27
     }
   ]
