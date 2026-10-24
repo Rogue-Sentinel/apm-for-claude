@@ -1,7 +1,10 @@
 """The design and architecture skills carry every heading the coverage inventory anchors to."""
 import pytest
 
-from skill_helpers import SKILLS_DIR, assert_sections, names_term, parse_skill, section as _section
+from skill_helpers import (
+    SKILLS_DIR, assert_description_names, assert_sections, flat_section, names_term, parse_skill,
+    skill_text, trigger_cases,
+)
 
 REQUIRED = {
     "solid": (
@@ -100,19 +103,6 @@ POINTERS = (
 CLASS_SIZE_SIGNAL = ("about 200 lines", "judged by the reviewer, not measured")
 
 
-def _text(name: str, *path: str) -> str:
-    return (SKILLS_DIR / name).joinpath(*path).read_text(encoding="utf-8")
-
-
-def section(text: str, heading: str) -> str:
-    """A section's text on one line, so a phrase wrapped across lines is still found."""
-    return " ".join(_section(text, heading).split())
-
-
-def _trigger_cases():
-    return [(name, term) for name, terms in sorted(TRIGGERS.items()) for term in terms]
-
-
 @pytest.mark.parametrize("name", sorted(REQUIRED))
 def test_skill_has_its_required_headings(name):
     assert_sections(name, REQUIRED[name])
@@ -147,14 +137,14 @@ def test_credits_name_the_skill(name):
     assert f"| `{name}` |" in credits, f"CREDITS.md has no row for {name}"
 
 
-@pytest.mark.parametrize(("name", "term"), _trigger_cases())
+@pytest.mark.parametrize(("name", "term"), trigger_cases(TRIGGERS))
 def test_description_names_the_original_triggers(name, term):
-    assert names_term(parse_skill(name)[0]["description"], term), f"{name}: {term}"
+    assert_description_names(name, term)
 
 
 @pytest.mark.parametrize("name", sorted(EXAMPLE_NAMES))
 def test_examples_by_language_keep_the_original_names(name):
-    text = _text(name, "references", "examples-by-language.md")
+    text = skill_text(name, "references", "examples-by-language.md")
     assert [term for term in EXAMPLE_NAMES[name] if term not in text] == []
 
 
@@ -168,7 +158,7 @@ def test_original_names_stay_in_the_by_language_files(name):
 
 @pytest.mark.parametrize(("name", "path", "heading"), POINTERS)
 def test_generic_wording_points_at_its_examples(name, path, heading):
-    assert "examples-by-language.md" in section(_text(name, *path.split("/")), heading)
+    assert "examples-by-language.md" in flat_section(skill_text(name, *path.split("/")), heading)
 
 
 def test_hot_path_pitfall_names_performance_critical_paths():
@@ -178,7 +168,7 @@ def test_hot_path_pitfall_names_performance_critical_paths():
 
 
 def test_srp_indicators_carry_the_class_size_signal():
-    structure = section(_text("solid", "references", "srp-indicators.md"), "### In the structure")
+    structure = flat_section(skill_text("solid", "references", "srp-indicators.md"), "### In the structure")
     for phrase in CLASS_SIZE_SIGNAL:
         assert phrase in structure
 
