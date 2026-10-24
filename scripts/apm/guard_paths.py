@@ -58,9 +58,28 @@ def is_unlinked(path: Path | str) -> bool:
     return _real(path) == os.path.normcase(os.path.normpath(str(path)))
 
 
-def _in_scope(target: Path, project: Project, temp_roots: Sequence[Path]) -> bool:
+def in_scope(target: Path, project: Project, temp_roots: Sequence[Path]) -> bool:
     roots = [project.main_root, project.worktree_root, *temp_roots]
     return any(is_under(target, root) for root in roots)
+
+
+def allowed_roots(
+    project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
+) -> list[Path]:
+    """The temp roots, plus this project's memory folder for the main session. The config dir may
+    sit behind a link, so it is resolved first; the folder opens only when nothing below it is a link."""
+    if worker or config_dir is None:
+        return list(temp_roots)
+    folder = memory_folder(project.main_root, Path(os.path.realpath(config_dir)))
+    return [*temp_roots, *([folder] if is_unlinked(folder) else [])]
+
+
+def roots_for(
+    target: Path, project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
+) -> list[Path]:
+    """The write roots for `target`; the memory folder opens only for paths strictly under it."""
+    roots = allowed_roots(project, temp_roots, config_dir, worker)
+    return [*temp_roots, *(root for root in roots[len(temp_roots):] if not same_path(target, root))]
 
 
 def _protected(relative: str, globs: Sequence[str], allowed_globs: Sequence[str]) -> str | None:
@@ -79,7 +98,7 @@ def write_denial(
     """Return which check blocks writing `target` and why, or None when it may proceed."""
     if is_under(target, project.state_dir):
         return "state", f"{target} is inside the APM state directory"
-    if not _in_scope(target, project, temp_roots):
+    if not in_scope(target, project, temp_roots):
         return "outside", f"{target} is outside the project"
     found = worktree_relative(Path(os.path.realpath(str(target))))
     reason = _protected(found[1], globs, allowed_globs) if found else None

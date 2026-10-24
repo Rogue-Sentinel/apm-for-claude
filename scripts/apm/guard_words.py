@@ -2,7 +2,12 @@
 from __future__ import annotations
 
 import re
+import shlex
 
+# A `\` before one of these is a path separator, as PowerShell and Windows paths use it; any other `\` is bash's escape.
+_SEPARATOR = re.compile(r"\\(?=[\w.~-])")
+# PowerShell has no backslash escape, so there a `\` before a blank or at the end of the text also ends a folder.
+_POWERSHELL_SEPARATOR = re.compile(r"\\(?=[\w.~-]|\s|\Z)")
 # Whitespace and the characters that end a word in a shell: groups, redirects, substitutions, separators,
 # and the comma that separates the pieces of a brace expansion (`{gh,issue,create}`).
 _BREAK = re.compile(r"[\s()<>{}`;|&$,]+")
@@ -54,3 +59,18 @@ def shell_words(text: str) -> list[str]:
 
     Redirections are dropped."""
     return [word for word in _BREAK.split(_REDIRECT.sub(" ", text)) if word]
+
+
+def path_words(text: str, powershell: bool = False) -> list[str]:
+    """The shell words of `text` read as paths: quotes removed, a `\\` before a letter, digit, `_`, `.`, `~` or `-`
+    a path separator (`C:\\Users\\me`), every other `\\` bash's escape (`My\\ Repo` is one word). With `powershell`,
+    a `\\` before a blank or at the end of the text is a separator too (`C:\\out\\ -Path a` names `C:/out/`).
+
+    On an unterminated quote every `\\` is a separator, the text is split on blanks and the quote characters are
+    removed from each word, so a trailing `\\"` (`"C:\\Users\\me\\out\\"`) still names its folder. Known limit: a word built
+    from a variable or a substitution is returned as written; the caller decides what that means."""
+    read = (_POWERSHELL_SEPARATOR if powershell else _SEPARATOR).sub("/", text)
+    try:
+        return shlex.split(read)
+    except ValueError:
+        return [word.replace('"', "").replace("'", "") for word in read.replace("\\", "/").split()]

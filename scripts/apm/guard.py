@@ -1,7 +1,6 @@
 """The guard's decision: allow or deny a tool call."""
 from __future__ import annotations
 
-import os
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,7 +8,8 @@ from typing import Any, Literal
 
 from .guard_cli import is_cli_call
 from .guard_commands import all_read_only, check_command
-from .guard_paths import is_under, is_unlinked, memory_folder, same_path, write_denial
+from .guard_outside import SHELL_TEMP_ROOTS, Reach, outside_write
+from .guard_paths import is_under, roots_for, same_path, write_denial
 from .guard_workers import worker_command_violation, worker_file_violation
 from .paths import PLUGIN_ROOT, Project, cli_command, to_native_path
 from .profile import Profile
@@ -36,6 +36,9 @@ _REMEDIES = {
         "never by editing its files."
     ),
 }
+_REMEDIES["shell_outside"] = _REMEDIES["command"] + (
+    " If the project writes there routinely, the user can list the folder under write_roots in .apm/profile.json."
+)
 
 
 @dataclass(frozen=True)
@@ -57,25 +60,6 @@ def _split_allowlist(allowlist: Sequence[Any]) -> tuple[list[str], list[str]]:
     return globs, prefixes
 
 
-def _write_roots(
-    project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
-) -> list[Path]:
-    """The temp roots, plus this project's memory folder for the main session. The config dir may
-    sit behind a link, so it is resolved first; the folder opens only when nothing below it is a link."""
-    if worker or config_dir is None:
-        return list(temp_roots)
-    folder = memory_folder(project.main_root, Path(os.path.realpath(config_dir)))
-    return [*temp_roots, *([folder] if is_unlinked(folder) else [])]
-
-
-def _roots_for(
-    target: Path, project: Project, temp_roots: Sequence[Path], config_dir: Path | None, worker: bool
-) -> list[Path]:
-    """The write roots for `target`; the memory folder opens only for paths strictly under it."""
-    roots = _write_roots(project, temp_roots, config_dir, worker)
-    return [*temp_roots, *(root for root in roots[len(temp_roots):] if not same_path(target, root))]
-
-
 def _file_violation(
     event: Mapping[str, Any],
     project: Project,
@@ -91,7 +75,7 @@ def _file_violation(
     target = to_native_path(raw, Path(event.get("cwd") or project.worktree_root), windows)
     if reason := worker_file_violation(target, event):
         return reason, ""
-    roots = _roots_for(target, project, temp_roots, config_dir, bool(event.get("agent_id")))
+    roots = roots_for(target, project, temp_roots, config_dir, bool(event.get("agent_id")))
     denial = write_denial(target, project, profile.protected_globs(), allowed_globs, roots)
     return (denial[1], _REMEDIES[denial[0]]) if denial else None
 
@@ -107,16 +91,19 @@ def _cwd(event: Mapping[str, Any], project: Project, windows: bool) -> Path:
 
 
 def _command_violation(
-    command: str, event: Mapping[str, Any], project: Project, profile: Profile,
-    prefixes: Sequence[str], windows: bool,
+    command: str, event: Mapping[str, Any], profile: Profile, prefixes: Sequence[str], reach: Reach
 ) -> tuple[str, str] | None:
-    cwd = _cwd(event, project, windows)
+    """The worker rules, the state directory and `check_command` first, so their reasons stay; then outside writes."""
+    project = reach.project
+    cwd = _cwd(event, project, reach.windows)
     if reason := worker_command_violation(command, event, cwd, project.worktree_root):
         return f"{reason}: {command.strip()}", _REMEDIES["command"]
     if reason := _state_dir_write(command, cwd, project):
         return f"{reason}: {command.strip()}", _REMEDIES["state"]
-    reason = check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root)
-    return (f"{reason}: {command.strip()}", _REMEDIES["command"]) if reason else None
+    if reason := check_command(command, profile.protected_globs(), prefixes, cwd=cwd, root=project.worktree_root):
+        return f"{reason}: {command.strip()}", _REMEDIES["command"]
+    reason = outside_write(command, cwd, prefixes, reach)
+    return (f"{reason}: {command.strip()}", _REMEDIES["shell_outside"]) if reason else None
 
 
 def _violation(
@@ -127,12 +114,21 @@ def _violation(
     temp_roots: Sequence[Path],
     windows: bool,
     config_dir: Path | None,
+    *,
+    home: Path | None,
+    shell_temp: Sequence[Path],
 ) -> tuple[str, str] | None:
-    """Return (reason, remedy) for a denied call, or None. The remedy offers only an approval that works."""
+    """Return (reason, remedy) for a denied call, or None. The remedy offers only an approval that works.
+    The shell temp roots (`/tmp`) and the home folder reach only the command check, never the file tools, and the
+    shell temp roots only a Bash command: to PowerShell, `/tmp` is a real folder (`C:\\tmp`)."""
     globs, prefixes = _split_allowlist(allowlist)
     command = (event.get("tool_input") or {}).get("command")
     if event.get("tool_name") in _COMMAND_TOOLS and isinstance(command, str):
-        return _command_violation(command, event, project, profile, prefixes, windows)
+        powershell = event.get("tool_name") == "PowerShell"
+        roots = (*temp_roots, *(() if powershell else shell_temp))
+        worker = bool(event.get("agent_id"))
+        reach = Reach(project, roots, config_dir, home, worker, windows, powershell, profile.write_roots)
+        return _command_violation(command, event, profile, prefixes, reach)
     return _file_violation(event, project, profile, globs, temp_roots, windows, config_dir)
 
 
@@ -170,9 +166,12 @@ def decide(
     windows: bool,
     approvals: Sequence[Any] = (),
     config_dir: Path | None = None,
+    home: Path | None = None,
+    shell_temp: Sequence[Path] = SHELL_TEMP_ROOTS,
 ) -> Decision:
     """Return none or deny for a tool call. Live one-off `approvals` count only in the main session,
-    and so does the memory folder under `config_dir`."""
+    and so does the memory folder under `config_dir`. `home` and `shell_temp` serve shell commands only;
+    `shell_temp` defaults to the roots the hook passes, so a direct caller gets the hook's verdict."""
     if project is None or profile is None:
         return Decision("none")
     worker = bool(event.get("agent_id"))
@@ -180,7 +179,8 @@ def decide(
         return Decision("none")
     globs = [] if worker else _split_allowlist(approvals)[0]
     rules = [*allowlist, *({"path": glob} for glob in globs)]
-    violation = _violation(event, project, profile, rules, temp_roots, windows, config_dir)
+    violation = _violation(event, project, profile, rules, temp_roots, windows, config_dir,
+                           home=home, shell_temp=shell_temp)
     if violation is None:
         return Decision("none")
     reason, remedy = violation
