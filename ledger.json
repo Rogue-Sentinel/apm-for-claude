@@ -22,7 +22,7 @@
         },
         {
           "attempts": 1,
-          "evidence": "Worker 9023106 merged: pure move, no test edited; 85 passed before and after in worktree; on branch combined metrics tests pass; debt clean.",
+          "evidence": "Worker 9023106 merged: pure move, no test edited; 85 passed before and after in worktree; on branch 8346c47 combined metrics tests 225 passed; debt clean.",
           "id": "2",
           "model": "sonnet",
           "status": "done",
@@ -2775,6 +2775,11 @@
     {
       "at": "2026-10-24T18:36:34.949334+00:00",
       "event": "task 10/1 updated",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:36:37.221299+00:00",
+      "event": "task 10/2 updated",
       "issue": 10
     }
   ]
