@@ -229,6 +229,7 @@ def test_render_text_for_a_clean_report_lists_nothing_under_the_counts() -> None
         "Review flags -- classes with 7+ public methods: 0",
         "Files whose functions could not be measured: 0",
         "Files measured for size only (no function scanner for the language): 0",
+        "Files not measured: 0",
     ]
 
 

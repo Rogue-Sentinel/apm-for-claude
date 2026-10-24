@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import posixpath
 import subprocess
+from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -14,6 +15,7 @@ from apm.metrics_lang import language_for, language_of, measure_plain
 from apm.metrics_model import (
     CLASS_LANGUAGES, CLASSLESS_LANGUAGES, ClassMetric, FileMetric, FunctionMetric, classes_measured,
 )
+from apm.metrics_not_measured import file_kind, holds_text, named_as_not_code
 from apm.metrics_python import measure_python
 from apm.standard_config import Limits, MetricsConfig
 
@@ -65,9 +67,15 @@ def _is_brace(metric: FileMetric) -> bool:
     return language is not None and language.family == "brace"
 
 
+def not_measured_candidates(paths: Sequence[str], config: MetricsConfig) -> list[str]:
+    """The in-scope paths with no language that their names do not already mark as docs, data or binaries."""
+    return [p for p in paths if language_for(p) is None and _in_scope(p, config) and not named_as_not_code(p)]
+
+
 @dataclass(frozen=True)
 class Report:
     files: tuple[FileMetric, ...]
+    not_measured: tuple[str, ...] = ()
 
     def over_functions(self, limits: Limits) -> list[tuple[str, FunctionMetric]]:
         found = [(f.path, fn) for f in self.files for fn in f.functions if fn.lines > limits.function]
@@ -96,6 +104,15 @@ class Report:
         return {name: names.count(name) for name in sorted(set(names))}
 
 
+def not_measured_kinds(report: Report) -> dict[str, int]:
+    """The files not measured, counted by kind: most files first, then by kind.
+
+    A function, not a `Report` method, so `Report` stays under the public-method review flag.
+    """
+    counts = Counter(file_kind(path) for path in report.not_measured)
+    return dict(sorted(counts.items(), key=lambda item: (-item[1], item[0])))
+
+
 def under_paths(names: Sequence[str], paths: Sequence[str] | None) -> list[str]:
     """The names at or under any of `paths`; all of them when `paths` is empty."""
     prefixes = [posixpath.normpath(p) for p in paths or ()]
@@ -117,17 +134,26 @@ def _read(path: Path) -> bytes | None:
         return None
 
 
-def measure_files(names: Sequence[str], read: Read) -> Report:
-    """Read each name's bytes, skip the unreadable, then decode and measure the rest."""
+def choose_files(
+    files: Sequence[str], config: MetricsConfig, paths: Sequence[str] | None,
+) -> tuple[list[str], list[str]]:
+    """The files to measure and the not-measured candidates, both in scope and under `paths`."""
+    return (under_paths(select_files(files, config), paths),
+            under_paths(not_measured_candidates(files, config), paths))
+
+
+def measure_files(names: Sequence[str], read: Read, candidates: Sequence[str] = ()) -> Report:
+    """Measure the readable names; the candidates that hold text are the files not measured."""
     datas = ((name, read(name)) for name in names)
     measured = (measure_text(name, decode_text(data)) for name, data in datas if data is not None)
-    return Report(tuple(metric for metric in measured if metric is not None))
+    unmeasured = tuple(name for name in candidates if holds_text(read(name)))
+    return Report(tuple(metric for metric in measured if metric is not None), unmeasured)
 
 
 def measure_tree(root: Path, config: MetricsConfig, paths: Sequence[str] | None = None) -> Report:
     """Measure the selected files of the git tree at `root`, optionally only under `paths`."""
-    names = under_paths(select_files(tracked_files(root), config), paths)
-    return measure_files(names, lambda name: _read(root / name))
+    names, candidates = choose_files(tracked_files(root), config, paths)
+    return measure_files(names, lambda name: _read(root / name), candidates)
 
 
 def _section(title: str, rows: list[str]) -> list[str]:
@@ -183,12 +209,17 @@ def _plain_section(report: Report) -> list[str]:
                     [f"{f.path} -- {f.lines} lines" for f in plain])
 
 
+def _not_measured_section(report: Report) -> list[str]:
+    return _section(f"Files not measured: {len(report.not_measured)}",
+                    [f"{kind}: {count}" for kind, count in not_measured_kinds(report).items()])
+
+
 def render_text(report: Report, limits: Limits) -> str:
     """Counts of what is over the limits, each item on a line, then the review flags."""
     sections = (
         _function_section(report, limits), _file_section(report, limits),
         _class_section(report, limits), _class_unscanned_section(report),
-        _unmeasured_section(report), _plain_section(report),
+        _unmeasured_section(report), _plain_section(report), _not_measured_section(report),
     )
     return "\n".join(line for section in sections for line in section)
 
@@ -205,4 +236,7 @@ def _file_json(metric: FileMetric) -> dict:
 
 def report_json(report: Report, limits: Limits) -> dict:
     """Every measured number, as plain JSON-ready data."""
-    return {"limits": asdict(limits), "files": [_file_json(f) for f in report.files]}
+    return {
+        "limits": asdict(limits), "files": [_file_json(f) for f in report.files],
+        "files_not_measured": len(report.not_measured), "not_measured": list(report.not_measured),
+    }

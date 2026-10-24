@@ -157,7 +157,7 @@ Produce the report in this shape:
 ### Measurements
 - Limits: function F, file L, public methods P (from the profile, or the defaults)
 - <CLI> metrics: N functions over the limit (largest: path:line name -- N lines),
-  N files over the limit, N wide classes, N files unmeasured
+  N files over the limit, N wide classes, N files unmeasured, N files not measured
 - Project checkers: name -> numbers (declared, or a candidate for standard.debt_sources)
 - <CLI> debt check: exit 0 / 1 (each regression) / 2 (no baseline yet)
 - Proposed standard.ui: true / false (the evidence), or the contradiction with the profile's value
