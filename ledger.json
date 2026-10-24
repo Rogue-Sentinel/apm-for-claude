@@ -1150,9 +1150,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Final review (opus) at e06bce0: 0 findings, criteria 1-2 met, debt check passes vs main and 652e344",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         }
@@ -3386,6 +3387,11 @@
     {
       "at": "2026-10-24T20:53:57.688407+00:00",
       "event": "task 36/review running",
+      "issue": 36
+    },
+    {
+      "at": "2026-10-24T20:55:08.988096+00:00",
+      "event": "task 36/review done",
       "issue": 36
     }
   ]
