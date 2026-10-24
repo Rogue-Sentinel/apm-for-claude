@@ -995,6 +995,7 @@
       ],
       "kind": "feature",
       "plan": "docs/plans/2026-10-24-restore-skill-gaps.md",
+      "pr": "https://github.com/Rogue-Sentinel/apm-for-claude/pull/35",
       "questions": [],
       "review": {
         "at": "2026-10-24T20:42:34.908435+00:00",
@@ -1003,7 +1004,7 @@
         "head": "c888dcc885e7dc3c380b188004671fff73389ff9",
         "open": 0
       },
-      "status": "integrating",
+      "status": "merged",
       "tasks": [
         {
           "attempts": 0,
@@ -3314,6 +3315,11 @@
     {
       "at": "2026-10-24T20:48:48.533446+00:00",
       "event": "task 34/12 done",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:49:45.173072+00:00",
+      "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/35",
       "issue": 34
     }
   ]
