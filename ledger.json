@@ -504,9 +504,9 @@
           "text": "Does the main session get the outside-write rule for shell commands (B, recommended), only workers (A), or only other checkouts and the config dir (C)?"
         },
         {
-          "answer": null,
+          "answer": "Keep docs/plans, docs/specs, docs/platform-notes.md, docs/coverage.md and standard/coverage.json as history. Strip VirtualAirline/X-Plane references from the tests, the ADRs and the code comment, as its own issue.",
           "blocks": [],
-          "resolved": false,
+          "resolved": true,
           "text": "Older files already on main name VirtualAirline/X-Plane: the design spec, earlier plans, platform notes, coverage record (docs/coverage.md, standard/coverage.json), ADRs 0003/0006, three tests and one code comment. Strip those too, as their own small issue after #20?"
         }
       ],
@@ -2326,6 +2326,11 @@
     {
       "at": "2026-10-24T17:08:54.674112+00:00",
       "event": "task 20/review running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:13:36.126247+00:00",
+      "event": "resolve 20 #1",
       "issue": 20
     }
   ]
