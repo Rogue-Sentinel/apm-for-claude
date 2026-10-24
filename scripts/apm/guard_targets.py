@@ -24,8 +24,9 @@ before a PowerShell command (read as bash's escaped `;`, so no cut); a stray quo
 character (the text is still cut, but a second stray quote can pair with it and hide the cuts between them); a
 positional PowerShell value read as a target (failing closed), except the value of an option this module knows takes
 one (`-ErrorAction Stop`, `-Filter *.dll`: see `_POWERSHELL_VALUE_OPTIONS`; for a PowerShell command only, since in
-bash `-pv` is `-p -v`), which is skipped, so an option it does not know (`-Dest`, an abbreviation) can still hide the
-destination; `mv` and `Move-Item`, which count only the destination, so removing a source in another checkout is not
+bash `-pv` is `-p -v`; a bash-named program such as `cp` or `rm` is read both ways, with the value skipped and not,
+and keeps the targets of both), which is skipped, so an option it does not know (`-Dest`, an abbreviation) can still
+hide the destination; `mv` and `Move-Item`, which count only the destination, so removing a source in another checkout is not
 seen; a `#` right after an escaped blank (`a\\ #b`), read as a comment; PowerShell backtick escapes, which are not
 read (only a backtick at the end of a line joins lines); a redirect target, which `split_redirects` reads the bash
 way for both tools, so in PowerShell's `> C:\\o\\ y` the `\\` before the blank is an escape and the target is
@@ -63,6 +64,7 @@ _EVERY_WORD = frozenset(
     "remove-item ri del erase rd".split()
 )
 _DESTINATION = frozenset("cp mv copy-item cpi copy move-item mi move".split())
+_BASH_NAMED = frozenset("cp mv rm rmdir mkdir touch tee unlink".split())
 _VALUE_OPTIONS = frozenset("-value -encoding -itemtype -type -inputobject -width -stream -delimiter -name".split())
 # PowerShell options whose next word is their value, not a path, dropped only for a PowerShell command: in bash
 # `-pv` is `-p -v` and `-iv` is `-i -v`, so there they hide nothing. The common parameters, then the cmdlets' own.
@@ -263,6 +265,18 @@ _FAMILIES: dict[str, Callable[[list[str]], list[str]]] = {
 }
 
 
+def _program_targets(name: str, args: list[str], powershell: bool) -> list[str]:
+    """What the program `name` writes. In the PowerShell reading its option values are skipped; a bash-named
+    program (`cp`, `rm`, `mkdir`) is read both ways, skipped and not, and keeps every target either gives."""
+    family = _FAMILIES.get(name)
+    if family is None:
+        return []
+    if not powershell or family not in (_every_word, _destination):
+        return family(args)
+    skipped = family(_without_option_values(args))
+    return list(dict.fromkeys(skipped + family(args))) if name in _BASH_NAMED else skipped
+
+
 def write_targets(segment: str, powershell: bool = False) -> list[str]:
     """The words one segment writes, as written: its redirect targets, then its program's targets.
 
@@ -270,9 +284,7 @@ def write_targets(segment: str, powershell: bool = False) -> list[str]:
     `path_words`, so quotes are gone and `\\` is a separator or an escape."""
     rest, redirects = split_redirects(segment)
     name, args = _program(path_words(rest, powershell))
-    if powershell and _FAMILIES.get(name) in (_every_word, _destination):
-        args = _without_option_values(args)
-    return redirects + _FAMILIES.get(name, lambda _: [])(args)
+    return redirects + _program_targets(name, args, powershell)
 
 
 def cd_target(segment: str, powershell: bool = False) -> str | None:
