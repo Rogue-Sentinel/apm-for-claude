@@ -1044,9 +1044,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worktree 236 passed; branch after merge (with tasks 4, 11 tests) all passed; debt check nothing worse; RED 35 failed seen by worker; commits bac2799 ecd77b4 f50ccc0",
           "id": "2",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Code skills",
           "worker": "implementer"
         },
@@ -3183,6 +3184,11 @@
     {
       "at": "2026-10-24T20:15:53.725885+00:00",
       "event": "task 34/11 done",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:16:54.814311+00:00",
+      "event": "task 34/2 done",
       "issue": 34
     }
   ]
