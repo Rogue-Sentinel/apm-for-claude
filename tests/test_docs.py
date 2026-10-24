@@ -189,3 +189,23 @@ def _cli_blocks_without_a_label(text: str) -> list[int]:
 
 def test_every_cli_block_in_the_tutorial_is_labeled_as_what_the_manager_runs():
     assert _cli_blocks_without_a_label(_text(TUTORIAL)) == []
+
+
+def _front_and_body(path: Path) -> tuple[list[str], str]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    end = lines.index("---", 1)
+    return lines[1:end], "\n".join(lines[end + 1:])
+
+
+def test_the_branch_review_command_takes_an_optional_branch():
+    path = ROOT / "commands" / "branch-review.md"
+    assert path.is_file(), f"{path} is missing"
+    front, body = _front_and_body(path)
+    assert any(re.match(r"description: \"[^\"]+\"$", line) for line in front), front
+    assert "argument-hint: \"[branch]\"" in front, front
+    assert "$ARGUMENTS" in body and "apm:branch-review" in body
+
+
+@pytest.mark.parametrize("path", DOCS, ids=lambda p: p.name)
+def test_the_docs_name_the_optional_branch_review_command(path):
+    assert "/apm:branch-review" in _text(path)

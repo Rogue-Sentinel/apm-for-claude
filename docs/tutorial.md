@@ -19,6 +19,7 @@ denial is written from what the code prints, because running them here would hav
 
 **What you say:** type the two install lines, then `/apm:setup`. These are the only commands you type,
 plus one more if you installed APM from a local folder before.
+The optional `/apm:branch-review [branch]` has a reviewer score a branch against its base.
 
 If you installed APM from a local folder before, remove that marketplace first. Uninstalling the plugin
 leaves it behind, and because it has the same name, adding the new one fails with only "Failed to add
