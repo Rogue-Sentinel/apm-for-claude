@@ -1098,9 +1098,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Fix round 1 (6 addressed: S1 S2 S3 S4 S5 S7; commits e86a5b9..04a1d17); worktree and branch 385 passed; debt nothing worse",
           "id": "fix1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix round",
           "worker": "implementer"
         }
@@ -3259,6 +3260,11 @@
     {
       "at": "2026-10-24T20:27:43.021411+00:00",
       "event": "task 34/fix1 running",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:31:14.709629+00:00",
+      "event": "task 34/fix1 done",
       "issue": 34
     }
   ]
