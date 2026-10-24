@@ -34,6 +34,11 @@
           "status": "running",
           "title": "Which language-less files are not measured",
           "worker": "implementer"
+        },
+        {
+          "attempts": 0,
+          "id": "4",
+          "status": "pending"
         }
       ],
       "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
@@ -2704,6 +2709,11 @@
     {
       "at": "2026-10-24T18:33:10.891206+00:00",
       "event": "task 10/3 running",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:33:13.131231+00:00",
+      "event": "task 10/4 pending",
       "issue": 10
     }
   ]
