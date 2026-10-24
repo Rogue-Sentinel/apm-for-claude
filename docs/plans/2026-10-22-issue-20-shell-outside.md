@@ -51,6 +51,9 @@ planner's recommendation.** Option A changes only what is listed under it.
     copying a session-diagnosis report "where the user asks" (`skills/session-diagnosis/SKILL.md`, step 4) needs
     an approval. Editing global config through the shell (`~/.claude/settings.json`, `~/.claude/CLAUDE.md`) needs
     an approval; the file tools already refuse it.
+    *Amended after the final review (2026-10-24): only the commands that name these folders as a literal path are
+    denied. A deploy that builds the path in a variable (`$dst = "D:\X-Plane 12\..."; Copy-Item $src $dst`, 51
+    writes in the XP12 sample) is a named limit and stays allowed.*
   - What it does not break: writes `gh`, `git`, `claude plugin ...`, `pip` or `npm` make on their own (the target
     is the program's, not a shell write target); `git config --global`; the scratchpad and the temp dir; `/tmp`;
     the memory folder; anything inside the project or its worktrees.
@@ -696,7 +699,8 @@ reviewed per task; they are not protected paths. The ADR 0002 and 0006 status-li
 ## Risks
 - **New denials on routine work in other projects.** The XP12 project writes `~/vab`, `C:/vaR` and two X-Plane folders
   routinely, from the manager and from workers. After this ships, those are denied until its profile lists them under
-  `write_roots` (or, in the main session, each is approved). The release notes and the plan summary must say so. This
+  `write_roots` (or, in the main session, each is approved); a path built in a variable is not seen, so those stay
+  allowed. The release notes and the plan summary must say so. This
   plan does not touch that repository.
 - **The reading is new and heuristic.** It differs from `split_segments` (quote-aware) and from ADR 0005's heredoc
   handling (bodies no shell runs are set aside), both on purpose and only for this check. The probe found no existing
@@ -858,3 +862,5 @@ The final whole-branch review (opus) covers 05f044c to the branch tip.
 - *The other deferred findings stay deferred, as the final reviewer decided, each for the reason given in its report.*
 
 *Cost if wrong: more denials of real outside writes.*
+
+*Final-review fix round 1, manager's verification (2026-10-24): it extended the shared value-option table, so the bash reading also skipped the word after `-pv`, `-iv`, `-ea` and the like. `mkdir -pv`, `rm -iv`, `cp -pv` and `mv -iv` to an outside path were no longer named, a loosening. Ruling: the new PowerShell options are skipped only in the PowerShell reading, and the bash reading stays as it was at 598c1fe. Round 2 goes to the same worker.*
