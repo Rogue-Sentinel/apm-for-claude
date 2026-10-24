@@ -1071,9 +1071,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worktree 271 passed; branch after merge 383-file-set targeted run passed; debt check nothing worse; coverage Gaps 0; RED 67 failed seen by worker; commits 2f52263 d50f8d4 271b488",
           "id": "3",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Design skills",
           "worker": "implementer"
         }
@@ -3202,6 +3203,11 @@
     {
       "at": "2026-10-24T20:16:57.288037+00:00",
       "event": "task 34/3 running",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:21:32.332407+00:00",
+      "event": "task 34/3 done",
       "issue": 34
     }
   ]
