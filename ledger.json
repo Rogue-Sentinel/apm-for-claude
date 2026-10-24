@@ -660,6 +660,14 @@
           "status": "done",
           "title": "Strip X-Plane examples from the branch",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix2",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Re-review fixes: sibling prefix, bash-named programs in PowerShell",
+          "worker": "implementer"
         }
       ],
       "title": "Shell commands that write outside the project are never checked by the guard",
@@ -2352,6 +2360,11 @@
     {
       "at": "2026-10-24T17:18:36.289018+00:00",
       "event": "task 20/review failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:18:38.798177+00:00",
+      "event": "task 20/fix2 running",
       "issue": 20
     }
   ]
