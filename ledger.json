@@ -1068,6 +1068,14 @@
           "status": "done",
           "title": "branch-review slash command",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "3",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Design skills",
+          "worker": "implementer"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3189,6 +3197,11 @@
     {
       "at": "2026-10-24T20:16:54.814311+00:00",
       "event": "task 34/2 done",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:16:57.288037+00:00",
+      "event": "task 34/3 running",
       "issue": 34
     }
   ]
