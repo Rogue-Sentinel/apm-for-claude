@@ -996,6 +996,13 @@
       "kind": "feature",
       "plan": "docs/plans/2026-10-24-restore-skill-gaps.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-24T20:33:05.432412+00:00",
+        "criteria_met": true,
+        "evidence": "Final whole-branch review (opus) at 3ea74ac: 0 must-fix, all 8 structural criteria met; 6 suggestions fixed in round 1 (e86a5b9..04a1d17), scoped re-review (opus) all addressed, no regression, 0 open; remaining suggestions deferred in the plan",
+        "head": "21ed065a39ea3b1ad09547f552f3e39c8587e928",
+        "open": 0
+      },
       "status": "integrating",
       "tasks": [
         {
@@ -3280,6 +3287,11 @@
     {
       "at": "2026-10-24T20:33:03.097484+00:00",
       "event": "issue 34 status integrating",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:33:05.432437+00:00",
+      "event": "review 34 0 open at 21ed065",
       "issue": 34
     }
   ]
