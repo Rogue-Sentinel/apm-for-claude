@@ -813,3 +813,11 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 - Task 5 re-review (nit): the `_HOME` line in `guard_outside.py` is about 120 characters.
 
 *Task 5 re-review: M1, S2 and S3 addressed; replays on base, a51e3fc and de3c7c4 (3,065 calls in this repo, 2,528 from XP12): 0 loosened, 0 reason changes; new denials are only the cross-repo incident and the expected X-Plane deploy and backup writes; open 0.*
+
+*Ruling during Task 6 (2026-10-24). Two changes are added to Task 6 in a fix round. Both change nothing the user approved.*
+
+*(1) The Task 4 review's S3 is now a real false deny. Under PowerShell, `path_words` reads `\` before a blank as a bash escape, so `Copy-Item -Destination C:\vab\ -Path a` names `C:/vab -Path` and is denied even when `write_roots` lists `C:/vab`. Fix: `path_words(text, powershell=False)`. When `powershell` is set, a `\` before a blank is a separator, not an escape. `guard_targets.write_targets` and `cd_target` take the same flag, and `outside_write` passes `reach.powershell`. Bash reading is unchanged. This extends the Task 6 worker's files to `guard_words.py` and `guard_targets.py` for this flag only.*
+
+*(2) The `write_roots` loader rejects entries that would open far more than one folder: an empty string, a filesystem root (`/`, `C:/`, `C:\`, `\\server\share`) and the bare home folder (`~`, `$HOME`, `%USERPROFILE%`). It raises `ProfileError` naming the entry. This tightens; manager.md still requires the user's yes for each folder.*
+
+*Cost if wrong: one more parameter, and a profile that tried to open a whole drive or home must name narrower folders.*
