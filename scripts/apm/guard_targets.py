@@ -56,7 +56,13 @@ _EVERY_WORD = frozenset(
     "remove-item ri del erase rd".split()
 )
 _DESTINATION = frozenset("cp mv copy-item cpi copy move-item mi move".split())
-_VALUE_OPTIONS = frozenset("-value -encoding -itemtype -type -inputobject -width -stream -delimiter -name".split())
+# PowerShell options whose next word is their value, not a path: the cmdlet's own, then the common parameters.
+_VALUE_OPTIONS = frozenset(
+    "-value -encoding -itemtype -type -inputobject -width -stream -delimiter -name -filter -include -exclude "
+    "-credential -tosession -fromsession -erroraction -ea -warningaction -wa -informationaction -infa "
+    "-errorvariable -ev -warningvariable -wv -informationvariable -iv -outvariable -ov -outbuffer -ob "
+    "-pipelinevariable -pv".split()
+)
 _DESTINATION_OPTION = re.compile(r"(?:-t|--target-directory|(?i:-destination))(?:[=:](?P<value>.*))?", re.DOTALL)
 _CD = frozenset("cd chdir pushd set-location sl push-location".split())
 _SED_IN_PLACE = re.compile(r"-i.*|-[A-Za-z]*i[A-Za-z]*|--in-place(=.*)?")
@@ -186,7 +192,7 @@ def _destination(args: list[str]) -> list[str]:
     option = _destination_option(args)
     if option is not None:
         return [option]
-    words = _non_options(args)
+    words = _every_word(args)
     return words[-1:] if len(words) >= 2 else []
 
 
