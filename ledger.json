@@ -13,9 +13,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Worker 347b07d merged: RED ImportError LANGUAGE_NAMES; targeted 145 passed in worktree; on branch with T2/T3 merged the combined metrics tests 230+ pass; debt clean.",
           "id": "1",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "QML, Inno Setup, CMake measured for size",
           "worker": "implementer"
         },
@@ -2758,6 +2759,11 @@
     {
       "at": "2026-10-24T18:35:12.812778+00:00",
       "event": "task 10/3 done",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:36:12.517447+00:00",
+      "event": "task 10/1 done",
       "issue": 10
     }
   ]
