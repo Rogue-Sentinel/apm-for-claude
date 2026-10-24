@@ -804,6 +804,14 @@
           "id": "3",
           "status": "pending",
           "title": "Merge gate"
+        },
+        {
+          "attempts": 1,
+          "id": "review",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Final whole-branch review",
+          "worker": "reviewer"
         }
       ],
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
@@ -2566,6 +2574,11 @@
     {
       "at": "2026-10-24T18:27:44.190941+00:00",
       "event": "task 27/2 done",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:27:46.815622+00:00",
+      "event": "task 27/review running",
       "issue": 27
     }
   ]
