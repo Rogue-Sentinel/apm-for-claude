@@ -551,6 +551,24 @@ is a test edit, not a protected path, and is approved by that ruling.)
 
 *(Filled in by the manager in Tasks 1 and 5.)*
 
+**Task 1 baseline, 2026-10-24, descriptions as on main (37785bf), one sonnet subagent, no tools:**
+
+| # | Request | Expected | Chosen | Confidence |
+|---|---|---|---|---|
+| 1 | SRP, several reasons to change | solid | solid | high |
+| 2 | composition over inheritance, fragile base class | object-design | object-design | medium (solid named as an alternative) |
+| 3 | hexagonal architecture, ports and adapters | clean-architecture | clean-architecture | high |
+| 4 | boy scout rule | clean-code | clean-code | medium (refactoring named as an alternative) |
+| 5 | systematic assessment of technical debt | code-smells | **clean-code-audit** | medium (code-smells named as an alternative) |
+| 6 | try-catch to a Result type | functional-core | functional-core | medium ("the description doesn't name Result types or exceptions") |
+| 7 | break up a long function | refactoring | refactoring | medium (clean-code named as an alternative) |
+| 8 | TDD, red-green-refactor | test-first | test-first | high |
+| 9 | code quality scorecard for a branch | branch-review | branch-review | high |
+
+One miss (5), five medium-confidence matches. Miss 5, verbatim: "A systematic assessment of technical
+debt fits a whole-codebase audit that ranks findings, and its trigger names 'before planning a debt
+paydown'. code-smells is a possible alternative."
+
 ## Pre-flight scan
 
 | Pair or task | Shared file or interface | Found |
