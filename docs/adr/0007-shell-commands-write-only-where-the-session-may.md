@@ -84,7 +84,19 @@ denied, like a file-tool write outside the project.**
 - **Write roots.** A project may list folders under the profile's `write_roots` that its shell commands write
   routinely (a deploy folder, an out-of-tree build). They apply to shell commands only, never to the file tools;
   they are folders the user approved; and they never lift another denial (a destructive command, a protected path,
-  the state directory, the worker rules).
+  the state directory, the worker rules). The loader refuses an entry that would open more than one folder: it
+  reads the entry with `\` as `/` and `.` and `..` folded, then refuses a filesystem root (`/`, `C:/`, Git Bash's
+  `/c`), a share root (`//server/share`), the bare home folder (`~`, `$HOME`, `~/.`) and a path made only of `.` and
+  `..`. It refuses a `%...%` variable too, which the guard does not expand, and points to `~`. A refused entry is a
+  profile error, so every guarded tool call is denied until the user fixes the profile by hand. The guard reads each
+  accepted entry like a shell word, with `\` as `/`: a leading home spelling is the home folder, an absolute path is
+  itself, and a relative path is read from the main checkout (not the worktree). An entry that resolves to the main
+  checkout or to a folder holding it (`..`, `~/source/repos`) is ignored, since it would open every repository beside
+  this one; ignoring fails closed.
+- **PowerShell's `\`.** PowerShell has no `\` escape and no `\` continuation. For a PowerShell command a `\` before a
+  blank or at the end of a line is a path's last separator (`Copy-Item -Destination C:\vab\ -Path a` names
+  `C:/vab/`), and only an odd run of backticks joins two lines. A Bash command keeps bash's reading: `\ ` is an
+  escaped blank and a `\` at the end of a line joins the next one.
 
 How ADR-0002 rule 2 is read: this change only adds denials, so it needs no reading of that rule. Every call allowed
 before is still allowed unless it writes outside, and `write_roots` only narrows the new denial back toward the

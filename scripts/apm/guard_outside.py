@@ -15,7 +15,15 @@ no file. The shell temp roots (`/tmp`) count only for a Bash command, because Gi
 folder while to PowerShell it is a real `C:\\tmp`; the caller leaves them out of `Reach.temp_roots` for PowerShell.
 A leading `~`, `$HOME`, `${HOME}`, `$USERPROFILE`, `${USERPROFILE}`, `$env:HOME`, `$env:USERPROFILE` or
 `${env:USERPROFILE}`, in any case, names the home folder. A word that ends in a separator (`cp notes.md <memory>/`)
-names a folder written into, and is judged as a path inside it.
+names a folder written into, and is judged as a path inside it. For a PowerShell command, which has no `\\` escape,
+a `\\` before a blank or at the end of a line is a path's last separator, and only backtick continuations join lines;
+a Bash command keeps bash's reading of `\\`.
+
+The profile's `write_roots` add folders for both sessions. The profile loader has already refused any entry that
+would open more than one folder (a filesystem or share root, Git Bash's `/c`, the bare home folder, a path made only
+of `.` and `..`, each read with `\\` as `/` and the dots folded) and any `%...%` variable. `Reach` reads each entry with
+`\\` as `/`, like a shell word: a home spelling is the home folder, a relative entry is read from the main checkout.
+An entry that resolves to the main checkout or to a folder holding it is ignored, which fails closed.
 
 Known limits: every limit `guard_targets` names (writes a program makes itself, script blocks, `bash -c`, `eval`,
 `$(...)` and the rest); a target built from any other variable (`> "$OUT/x"`) is read as a relative name inside the
@@ -35,7 +43,7 @@ from pathlib import Path
 
 from .guard_commands import is_exempt
 from .guard_data import mask_data, strip_heredoc_bodies
-from .guard_paths import in_scope, roots_for
+from .guard_paths import in_scope, is_under, roots_for
 from .guard_redirects import is_device
 from .guard_targets import cd_target, command_readings, write_targets
 from .paths import Project, to_native_path
@@ -52,7 +60,9 @@ _INSIDE = "file"
 
 @dataclass(frozen=True)
 class Reach:
-    """Where one session's shell may write, and which shell reads the command (`powershell` for the PowerShell tool)."""
+    """Where one session's shell may write, and which shell reads the command (`powershell` for the PowerShell tool).
+    `write_roots` are the profile's folders, read like any shell word: `~`, absolute, or relative to the main
+    checkout (`named_roots`)."""
 
     project: Project
     temp_roots: tuple[Path, ...]
@@ -61,6 +71,7 @@ class Reach:
     worker: bool
     windows: bool
     powershell: bool
+    write_roots: tuple[str, ...] = ()
 
     def resolve(self, word: str, cwd: Path) -> Path:
         """The path a shell word names, read from `cwd`; a leading home spelling becomes `home` when it is known."""
@@ -69,9 +80,15 @@ class Reach:
             word = self.home.as_posix() + word[found.end():]
         return to_native_path(word, cwd, self.windows)
 
+    def named_roots(self) -> list[Path]:
+        """The `write_roots` folders, each read with `\\` as `/` from the main checkout. An entry that is the main
+        checkout or holds it (`..`, `~/source/repos`) is ignored: it would open every repository beside this one."""
+        named = (self.resolve(entry.replace("\\", "/"), self.project.main_root) for entry in self.write_roots)
+        return [root for root in named if not is_under(self.project.main_root, root)]
+
     def writable(self, target: Path) -> bool:
         roots = roots_for(target, self.project, self.temp_roots, self.config_dir, self.worker)
-        return in_scope(target, self.project, roots)
+        return in_scope(target, self.project, [*roots, *self.named_roots()])
 
 
 def _lands_outside(word: str, cwd: Path, reach: Reach) -> Path | None:
@@ -83,7 +100,7 @@ def _lands_outside(word: str, cwd: Path, reach: Reach) -> Path | None:
 
 
 def _first_outside(segment: str, cwd: Path, reach: Reach) -> Path | None:
-    targets = (_lands_outside(word, cwd, reach) for word in write_targets(segment) if not is_device(word))
+    targets = (_lands_outside(word, cwd, reach) for word in write_targets(segment, reach.powershell) if not is_device(word))
     return next((target for target in targets if target is not None), None)
 
 
@@ -93,7 +110,7 @@ def _outside_in(reading: Sequence[str], cwd: Path, allowed_prefixes: Sequence[st
         target = None if is_exempt(segment, allowed_prefixes) else _first_outside(segment, cwd, reach)
         if target is not None:
             return target
-        place = cd_target(segment)
+        place = cd_target(segment, reach.powershell)
         cwd = cwd if place is None else reach.resolve(place, cwd)
     return None
 
@@ -101,7 +118,7 @@ def _outside_in(reading: Sequence[str], cwd: Path, allowed_prefixes: Sequence[st
 def outside_write(command: str, cwd: Path, allowed_prefixes: Sequence[str], reach: Reach) -> str | None:
     """The reason a command writes outside where its session may, or None. Each reading starts from `cwd`; the
     PowerShell reading is judged only for a PowerShell command, because bash reads `\\"` as an escaped quote."""
-    readings = command_readings(strip_heredoc_bodies(mask_data(command)))
+    readings = command_readings(strip_heredoc_bodies(mask_data(command)), reach.powershell)
     for reading in readings if reach.powershell else readings[:1]:
         target = _outside_in(reading, cwd, allowed_prefixes, reach)
         if target is not None:
