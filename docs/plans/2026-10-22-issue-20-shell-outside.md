@@ -840,3 +840,21 @@ Rubric check: Task 1 commits red tests on purpose. Task 2 is a pure move (verifi
 - Task 6 re-review (note): a `~/.claude` entry would open the config folder; it is user-named, and the tutorial could warn about it.
 - Task 6 re-review (nit): `_BACKTICK_CONTINUATION` in `guard_targets.py` copies the regex in `guard_commands`, so the two could drift; share one definition.
 - Task 6 re-review (note): the ancestor rule considers only the main checkout, so a worktree created outside it (`git worktree add ../wt`) is not covered. APM's worktrees live under `.claude/worktrees`.
+
+## Final review (2026-10-24)
+
+The final whole-branch review (opus) covers 05f044c to the branch tip.
+- Replays: 5,997 calls from the every-project corpus and 3,090 from this repo, against base. 0 loosened, 0 reason changes. Every new denial is a real outside write.
+- With XP12's `write_roots`, exactly 37 denials lift.
+- Every Review Focus line and every structural criterion is met, except for one must-fix.
+
+*Rulings on the final review:*
+- *M1 (must-fix): a PowerShell copy or move to a positional destination is missed when an option with a value follows it. `Copy-Item a "D:\X-Plane 12\..." -ErrorAction Stop` reads `Stop` as the destination. Fix: `_destination` skips the value of each PowerShell option that takes one. That covers the common parameters (`-ErrorAction`/`-EA`, `-WarningAction`/`-WA`, `-InformationAction`/`-INFA`, `-ErrorVariable`/`-EV`, `-WarningVariable`/`-WV`, `-InformationVariable`/`-IV`, `-OutVariable`/`-OV`, `-OutBuffer`/`-OB`, `-PipelineVariable`/`-PV`), plus `-Filter`, `-Include`, `-Exclude`, `-Credential`, `-ToSession` and `-FromSession`. This folds in Task 4's deferred S1.*
+- *Folded into the same fix round, since it edits these files anyway:*
+  - *the Task 4 nits;*
+  - *docstring lines naming these known limits: `mv` and `Move-Item` count only the destination; `\\.\C:\`; a `#` after an escaped blank; PowerShell backtick escapes;*
+  - *a correction to ADR 0007's Consequences and the plan's option B wording. Only literal-path XP12 deploys are denied. Deploys that build the path in a variable (51 in the XP12 sample) are a named limit and stay allowed.*
+- *Variable-path tracking (S2) is a scope question for the user, asked after merge.*
+- *The other deferred findings stay deferred, as the final reviewer decided, each for the reason given in its report.*
+
+*Cost if wrong: more denials of real outside writes.*
