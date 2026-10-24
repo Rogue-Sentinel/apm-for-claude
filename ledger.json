@@ -622,9 +622,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Final review (opus): replays of 9,087 calls: 0 loosened, 0 reason changes, no routine false denial; 1 must-fix (PowerShell positional destination followed by a value option, e.g. -ErrorAction Stop); docs to correct (variable-path deploys).",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         }
@@ -2238,6 +2239,11 @@
     {
       "at": "2026-10-24T16:20:37.467791+00:00",
       "event": "task 20/review running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:34:48.612826+00:00",
+      "event": "task 20/review failed",
       "issue": 20
     }
   ]
