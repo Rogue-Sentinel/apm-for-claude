@@ -1011,6 +1011,13 @@
           "id": "7",
           "status": "blocked",
           "title": "Dropped by ruling"
+        },
+        {
+          "attempts": 0,
+          "evidence": "Dropped: the user ruled to keep ours (see plan rulings)",
+          "id": "8",
+          "status": "blocked",
+          "title": "Dropped by ruling"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3077,6 +3084,11 @@
     {
       "at": "2026-10-24T20:13:07.506077+00:00",
       "event": "task 34/7 blocked",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:13:09.732275+00:00",
+      "event": "task 34/8 blocked",
       "issue": 34
     }
   ]
