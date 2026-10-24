@@ -987,6 +987,10 @@
         {
           "at": "2026-10-24T20:13:00.358560+00:00",
           "text": "User rulings at approval: A1 B1 C1 D1 E1 keep ours; F2 add /apm:branch-review [branch]. Tasks 6-10 dropped."
+        },
+        {
+          "at": "2026-10-24T20:13:02.600497+00:00",
+          "text": "Ruling 1 (pre-flight): shared names_term/term_pattern helper in tests/skill_helpers.py, owned by Task 2; Task 3 after Task 2. See the plan."
         }
       ],
       "kind": "feature",
@@ -3043,6 +3047,11 @@
     {
       "at": "2026-10-24T20:13:00.358582+00:00",
       "event": "decision 34 User rulings at approval: A1 B1 C1 D1 E1 keep ours; F2 add /apm:branch-review [branch]. Tasks 6-10 dropped.",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:13:02.600519+00:00",
+      "event": "decision 34 Ruling 1 (pre-flight): shared names_term/term_pattern helper in tests/skill_helpers.py, owned by Task 2; Task 3 after Task 2. See the plan.",
       "issue": 34
     }
   ]
