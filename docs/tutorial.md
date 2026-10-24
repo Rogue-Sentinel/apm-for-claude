@@ -402,7 +402,7 @@ explains each key. Every key shown exists. Leave out anything you do not need.
   work. File tools still write only inside the project. Add one only when you mean it: the guard then lets the
   manager and every worker write there. The profile refuses an entry that opens more than one folder (an empty
   entry, a drive or share root such as `C:/`, `/c` or `\\server\share`, your bare home folder, a path made only of
-  `.` and `..`) and a `%...%` variable, which the guard does not expand (write `~/vab`, not `%USERPROFILE%\vab`).
+  `.` and `..`) and a `%...%` variable, which the guard does not expand (write `~/out`, not `%USERPROFILE%\out`).
   An entry that is the main checkout or a folder holding it (`~/source/repos`) is ignored. A refused entry blocks
   every guarded tool call, the manager's and every worker's, until you fix `.apm/profile.json` by hand.
 - `standard.limits`: the size limits the ratchet uses.

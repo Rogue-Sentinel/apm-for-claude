@@ -64,10 +64,10 @@ def shell_words(text: str) -> list[str]:
 def path_words(text: str, powershell: bool = False) -> list[str]:
     """The shell words of `text` read as paths: quotes removed, a `\\` before a letter, digit, `_`, `.`, `~` or `-`
     a path separator (`C:\\Users\\me`), every other `\\` bash's escape (`My\\ Repo` is one word). With `powershell`,
-    a `\\` before a blank or at the end of the text is a separator too (`C:\\vab\\ -Path a` names `C:/vab/`).
+    a `\\` before a blank or at the end of the text is a separator too (`C:\\out\\ -Path a` names `C:/out/`).
 
     On an unterminated quote every `\\` is a separator, the text is split on blanks and the quote characters are
-    removed from each word, so a trailing `\\"` (`"C:\\Users\\me\\vab\\"`) still names its folder. Known limit: a word built
+    removed from each word, so a trailing `\\"` (`"C:\\Users\\me\\out\\"`) still names its folder. Known limit: a word built
     from a variable or a substitution is returned as written; the caller decides what that means."""
     read = (_POWERSHELL_SEPARATOR if powershell else _SEPARATOR).sub("/", text)
     try:

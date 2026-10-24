@@ -122,7 +122,7 @@ def _write_roots(value: object) -> tuple[str, ...]:
         if _PERCENT.search(entry):
             raise ProfileError(
                 f'write_roots entry "{entry}" uses a %...% variable, which the guard does not expand: write the home '
-                'folder as ~, such as "~/vab" rather than "%USERPROFILE%\\vab"'
+                'folder as ~, such as "~/out" rather than "%USERPROFILE%\\out"'
             )
         if _TOO_BROAD.fullmatch(_normal(entry)):
             raise ProfileError(f'write_roots entry "{entry}" opens too much: name one folder, such as "~/builds"')

@@ -28,13 +28,13 @@ def _decide(tmp_path: Path, command: str, extra: dict, tool: str = "PowerShell")
 
 @BOTH
 @pytest.mark.parametrize("template", [
-    'Copy-Item build\\x.xpl "{O}\\x.xpl" -Force -ErrorAction Stop',
-    'Copy-Item build\\x.xpl "{O}\\x.xpl" -Force -EA SilentlyContinue',
-    'Copy-Item build\\x.xpl "{O}\\x.xpl" -WarningAction SilentlyContinue',
-    'Copy-Item build\\x.xpl "{O}\\x.xpl" -ErrorVariable err',
+    'Copy-Item build\\x.dll "{O}\\x.dll" -Force -ErrorAction Stop',
+    'Copy-Item build\\x.dll "{O}\\x.dll" -Force -EA SilentlyContinue',
+    'Copy-Item build\\x.dll "{O}\\x.dll" -WarningAction SilentlyContinue',
+    'Copy-Item build\\x.dll "{O}\\x.dll" -ErrorVariable err',
     'Move-Item a.txt "{O}\\a.txt" -ErrorAction Stop',
     'Copy-Item build\\* "{O}" -Include *.dll',
-    'Copy-Item build\\* "{O}" -Filter *.xpl',
+    'Copy-Item build\\* "{O}" -Filter *.dll',
     'Move-Item a.txt "{O}" -Exclude b',
 ])
 def test_a_destination_outside_is_denied_before_an_option_with_a_value(
@@ -54,9 +54,9 @@ def test_a_destination_inside_stays_allowed_before_an_option_with_a_value(
 
 
 def test_write_targets_gives_the_destination_before_an_option_with_a_value() -> None:
-    segment = 'Copy-Item build\\x.xpl "D:\\X-Plane 12\\x.xpl" -Force -ErrorAction Stop'
+    segment = 'Copy-Item build\\x.dll "D:\\Shared Apps\\x.dll" -Force -ErrorAction Stop'
 
-    assert write_targets(segment, powershell=True) == ["D:/X-Plane 12/x.xpl"]
+    assert write_targets(segment, powershell=True) == ["D:/Shared Apps/x.dll"]
 
 
 @pytest.mark.parametrize("command, target", [

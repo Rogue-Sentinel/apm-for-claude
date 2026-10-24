@@ -22,9 +22,9 @@ def test_shell_words_read_as_paths(text, expected):
 
 
 def test_a_trailing_backslash_in_a_quoted_path_leaves_no_quote():
-    assert path_words(r'Copy-Item README.md "C:\Users\me\vab\"') == ["Copy-Item", "README.md", "C:/Users/me/vab/"]
+    assert path_words(r'Copy-Item README.md "C:\Users\me\out\"') == ["Copy-Item", "README.md", "C:/Users/me/out/"]
 
 
 def test_an_unterminated_quote_leaves_every_word_without_quotes():
-    words = path_words(r'Set-Content -Path "C:\Users\me\vab\a.md" -Value "C:\temp\"')
-    assert words == ["Set-Content", "-Path", "C:/Users/me/vab/a.md", "-Value", "C:/temp/"]
+    words = path_words(r'Set-Content -Path "C:\Users\me\out\a.md" -Value "C:\temp\"')
+    assert words == ["Set-Content", "-Path", "C:/Users/me/out/a.md", "-Value", "C:/temp/"]

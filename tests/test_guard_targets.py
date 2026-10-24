@@ -169,8 +169,8 @@ def _goes(command):
 
 
 RESERVED = [
-    ('for f in *.log; do cp "$f" ~/vab/; done', ["~/vab/"]),
-    ("if [ -d build ]; then mkdir -p ~/vab/x; fi", ["~/vab/x"]),
+    ('for f in *.log; do cp "$f" ~/out/; done', ["~/out/"]),
+    ("if [ -d build ]; then mkdir -p ~/out/x; fi", ["~/out/x"]),
     ("if [ -d b ]; then echo y; else cp b ../o/; fi", ["../o/"]),
     ('while read f; do mv "$f" ../o/; done', ["../o/"]),
     ("! cp a ../o/", ["../o/"]),
@@ -193,8 +193,8 @@ def test_a_cd_in_a_condition_is_still_a_cd():
 STRAY_QUOTES = [
     ("# don't forget\ncd ../o && git commit -am x", ["."], ["../o"]),
     (
-        "# Copy into X-Plane's plugin folder\ncp -r build/plugin \"D:/X-Plane 12/Resources/plugins/\"",
-        ["D:/X-Plane 12/Resources/plugins/"],
+        "# Copy into the app's plugin folder\ncp -r build/plugin \"D:/Shared Apps/plugins/\"",
+        ["D:/Shared Apps/plugins/"],
         [],
     ),
 ]
@@ -206,9 +206,9 @@ def test_a_stray_quote_does_not_stop_the_cutting(command, written, goes):
 
 
 QUOTED_BACKSLASH = [
-    ('Copy-Item -Path "build\\out\\" -Destination "C:\\Users\\darby\\vab\\" -Recurse', ["C:/Users/darby/vab/"]),
-    ('Copy-Item "docs\\" "C:\\vab\\"', ["C:/vab/"]),
-    ('Copy-Item a "docs\\"; Copy-Item c "C:\\vab\\"', ["docs/", "C:/vab/"]),
+    ('Copy-Item -Path "build\\out\\" -Destination "C:\\Users\\me\\out\\" -Recurse', ["C:/Users/me/out/"]),
+    ('Copy-Item "docs\\" "C:\\out\\"', ["C:/out/"]),
+    ('Copy-Item a "docs\\"; Copy-Item c "C:\\out\\"', ["docs/", "C:/out/"]),
 ]
 
 
@@ -228,8 +228,8 @@ def test_the_bash_reading_comes_first_and_the_powershell_reading_second():
 
 
 ASSIGNMENTS = [
-    ("$null = New-Item -ItemType Directory -Force C:\\Users\\darby\\vab\\x", ["C:/Users/darby/vab/x"]),
-    ("$f = New-Item -ItemType File -Path C:\\vab\\a.md", ["C:/vab/a.md"]),
+    ("$null = New-Item -ItemType Directory -Force C:\\Users\\me\\out\\x", ["C:/Users/me/out/x"]),
+    ("$f = New-Item -ItemType File -Path C:\\out\\a.md", ["C:/out/a.md"]),
     ("$f=New-Item -Path ../o/a.md", ["../o/a.md"]),
     ("$f =New-Item -Path ../o/a.md", ["../o/a.md"]),
     ("$f = (New-Item -Path ../o/a.md)", ["../o/a.md"]),
@@ -244,7 +244,7 @@ def test_a_powershell_assignment_does_not_hide_the_cmdlet(command, expected):
 
 COMMENTS = [
     ("cp a ../o/ # done", ["../o/"]),
-    ("mkdir -p ~/vab/x  # make the folder", ["~/vab/x"]),
+    ("mkdir -p ~/out/x  # make the folder", ["~/out/x"]),
     ("# it's done\necho 'z' > ../o/f", ["../o/f"]),
     ("git log --format='#%h' > out.txt", ["out.txt"]),
     ("echo ${#arr[@]} > n.txt", ["n.txt"]),
