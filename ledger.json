@@ -788,6 +788,14 @@
           "status": "running",
           "title": "Generic names in tests, ADRs, comment",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "2",
+          "model": "sonnet",
+          "status": "running",
+          "title": "ADR 0008: the guard is frozen",
+          "worker": "implementer"
         }
       ],
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
@@ -2530,6 +2538,11 @@
     {
       "at": "2026-10-24T18:25:06.701432+00:00",
       "event": "task 27/1 running",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:25:09.013223+00:00",
+      "event": "task 27/2 running",
       "issue": 27
     }
   ]
