@@ -9,3 +9,4 @@
 | [0005](0005-guard-reads-cli-calls-and-cat-heredocs-as-bash-does.md) | The guard reads an apm CLI call and a cat heredoc as data only where bash reads them literally | Accepted, 2026-10-18 |
 | [0006](0006-the-main-session-writes-its-memory-folder.md) | The main session may write Claude Code's memory folder for its project, and a file-tool write outside the project cannot be approved | Accepted, 2026-10-18. Amended by ADR-0007 |
 | [0007](0007-shell-commands-write-only-where-the-session-may.md) | A shell command may write only where its session may: the project, its worktree, the temp folders, the profile's write roots, and for the main session its memory folder | Accepted, 2026-10-22 |
+| [0008](0008-the-guard-is-frozen-at-issue-20.md) | The guard is frozen at issue 20: a false alarm with a workaround is accepted, not fixed | Accepted, 2026-10-24 |
