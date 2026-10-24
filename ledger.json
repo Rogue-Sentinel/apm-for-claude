@@ -3,11 +3,13 @@
   "issues": {
     "10": {
       "allowlist": [],
+      "branch": "issue-10-metrics-not-measured",
       "concerns": [],
       "decisions": [],
       "kind": "bug",
+      "plan": "docs/plans/2026-10-24-issue-10-metrics-not-measured.md",
       "questions": [],
-      "status": "planning",
+      "status": "awaiting-approval",
       "tasks": [],
       "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/10"
@@ -2500,6 +2502,11 @@
       "at": "2026-10-24T18:00:18.913299+00:00",
       "event": "filed 29 https://github.com/Rogue-Sentinel/apm-for-claude/issues/29",
       "issue": 29
+    },
+    {
+      "at": "2026-10-24T18:02:05.410209+00:00",
+      "event": "issue 10 status awaiting-approval",
+      "issue": 10
     }
   ]
 }
