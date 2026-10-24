@@ -987,7 +987,7 @@
       "kind": "feature",
       "plan": "docs/plans/2026-10-24-restore-skill-gaps.md",
       "questions": [],
-      "status": "awaiting-approval",
+      "status": "building",
       "tasks": [],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/34"
@@ -3028,6 +3028,11 @@
     {
       "at": "2026-10-24T20:08:50.171467+00:00",
       "event": "issue 34 status awaiting-approval",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:12:58.043280+00:00",
+      "event": "issue 34 status building",
       "issue": 34
     }
   ]
