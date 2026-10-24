@@ -1,6 +1,6 @@
 ---
 name: test-first
-description: "Use when you are about to write a new behavior, a bug fix, a refactoring or any behavior change, before the first line of production code, and whenever you write, change, structure or review a test."
+description: "Use when you are about to write a new behavior, a bug fix, a refactoring or any behavior change, before the first line of production code, and whenever you write, change, structure or review a test. Also use when the request mentions TDD, test-driven development, writing tests first, test-first development, code that is testable by design, red-green-refactor, building features incrementally with tests, arrange-act-assert (AAA), given-when-then, organizing test code, or test readability."
 ---
 
 # Test first
@@ -93,7 +93,8 @@ NEXT      the next behavior, back to RED
 
 - **Red.** One behavior, a clear name, real code (no mocks unless unavoidable). Run it. It must
   *fail*, not *error*, with the message you expected, because the feature is missing. If it passes
-  immediately, it tests behavior that already exists: fix or delete it.
+  immediately, it tests behavior that already exists: it is redundant, so delete it and pick a
+  different behavior.
 - **Green.** The least code that passes. Hard-coding a value is fine if it is the simplest path; the
   next test forces the generalization. Do not add options, features or "improvements" no test asks
   for, and do not refactor other code.

@@ -15,6 +15,7 @@ from skill_helpers import (
     sections,
     skill_files,
     skill_names,
+    term_pattern,
 )
 
 SKILLS = skill_names()
@@ -28,12 +29,6 @@ MIT_NOTICE = (
     "The above copyright notice and this permission notice shall be included in all",
     'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND',
 )
-
-
-def _term_pattern(term: str) -> re.Pattern[str]:
-    before = r"(?<!\w)" if re.match(r"\w", term[0]) else ""
-    after = r"(?!\w)" if re.match(r"\w", term[-1]) else ""
-    return re.compile(before + re.escape(term) + after)
 
 
 def _is_by_language_reference(path) -> bool:
@@ -66,6 +61,12 @@ def test_description_is_quoted_and_says_when(name):
     description = parse_skill(name)[0].get("description", "")
     assert description.startswith('"Use when'), f"{name}: {description[:40]}"
     assert description.endswith('"') and len(description) > len('"Use when"')
+
+
+@pytest.mark.parametrize("name", SKILLS)
+def test_description_fits_the_length_cap(name):
+    description = parse_skill(name)[0]["description"]
+    assert len(description) <= 1024, f"{name}: {len(description)} characters"
 
 
 @pytest.mark.parametrize("name", SKILLS)
@@ -104,7 +105,7 @@ def test_every_supporting_file_is_linked_from_its_skill(name):
 
 
 def test_no_banned_term_outside_by_language_references():
-    patterns = [(term, _term_pattern(term)) for term in BANNED_TERMS]
+    patterns = [(term, term_pattern(term)) for term in BANNED_TERMS]
     found = []
     for path in _markdown_files():
         if _is_by_language_reference(path):
