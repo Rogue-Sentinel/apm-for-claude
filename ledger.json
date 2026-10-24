@@ -496,6 +496,7 @@
       ],
       "kind": "bug",
       "plan": "docs/plans/2026-10-22-issue-20-shell-outside.md",
+      "pr": "https://github.com/Rogue-Sentinel/apm-for-claude/pull/28",
       "questions": [
         {
           "answer": "Option B: both sessions get the rule. Also fold the approve --path fix in (Task 6b); build #13 right after #20.",
@@ -517,7 +518,7 @@
         "head": "a5a08baf479aa6ca599e741dc618d73d1c70989d",
         "open": 0
       },
-      "status": "integrating",
+      "status": "merged",
       "tasks": [
         {
           "attempts": 2,
@@ -2410,6 +2411,11 @@
     {
       "at": "2026-10-24T17:43:49.702149+00:00",
       "event": "task 20/gate done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T17:44:11.408730+00:00",
+      "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/28",
       "issue": 20
     }
   ]
