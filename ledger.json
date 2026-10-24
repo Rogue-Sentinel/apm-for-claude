@@ -1124,6 +1124,17 @@
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/34"
     },
+    "36": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "feature",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "Release apm 0.3.4 with the #34 changes",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/36"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -3321,6 +3332,11 @@
       "at": "2026-10-24T20:49:45.173072+00:00",
       "event": "shipped in https://github.com/Rogue-Sentinel/apm-for-claude/pull/35",
       "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:50:46.158757+00:00",
+      "event": "filed 36 https://github.com/Rogue-Sentinel/apm-for-claude/issues/36",
+      "issue": 36
     }
   ]
 }
