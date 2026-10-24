@@ -779,7 +779,7 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-24-issue-27-generic-examples.md",
       "questions": [],
-      "status": "awaiting-approval",
+      "status": "building",
       "tasks": [],
       "title": "Tests, ADRs and a code comment use VirtualAirline and X-Plane names as examples",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/27"
@@ -2511,6 +2511,11 @@
     {
       "at": "2026-10-24T18:02:07.838102+00:00",
       "event": "issue 27 status awaiting-approval",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:25:04.470183+00:00",
+      "event": "issue 27 status building",
       "issue": 27
     }
   ]
