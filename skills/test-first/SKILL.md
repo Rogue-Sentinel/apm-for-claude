@@ -1,6 +1,6 @@
 ---
 name: test-first
-description: "Use when you are about to write a new behavior, a bug fix, a refactoring or any behavior change, before the first line of production code, and whenever you write, change, structure or review a test."
+description: "Use when you are about to write a new behavior, a bug fix, a refactoring or any behavior change, before the first line of production code, and whenever you write, change, structure or review a test. Also use when the request mentions TDD, test-driven development, writing tests first, test-first development, code that is testable by design, red-green-refactor, building features incrementally with tests, arrange-act-assert (AAA), given-when-then, organizing test code, or test readability."
 ---
 
 # Test first

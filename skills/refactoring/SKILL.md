@@ -1,6 +1,6 @@
 ---
 name: refactoring
-description: "Use when a function or file you need to change is over a limit, when a change touches existing debt, or when you are extracting a method, renaming, splitting a file or replacing a type-based conditional, so the structure changes without the behavior changing."
+description: "Use when a function or file you need to change is over a limit, when a change touches existing debt, or when you are extracting a method, renaming, splitting a file or replacing a type-based conditional, so the structure changes without the behavior changing. Also use when the request is to break up a long function, reduce method length, decompose complex logic or simplify a function, or mentions complex branching, long if-else or switch-case chains, or applying Open-Closed to branching."
 ---
 
 # Refactoring

@@ -1,6 +1,6 @@
 ---
 name: code-smells
-description: "Use when reviewing a change or auditing a codebase for design problems, when code feels hard to work with for no obvious reason, or when preparing a refactoring plan and you need to find, rank and report code smells."
+description: "Use when reviewing a change or auditing a codebase for design problems, when code feels hard to work with for no obvious reason, or when preparing a refactoring plan and you need to find, rank and report code smells. Also use when the request mentions code smells, technical debt, reviewing code quality, or a systematic code quality assessment."
 ---
 
 # Code smells
