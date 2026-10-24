@@ -64,6 +64,12 @@ def test_description_is_quoted_and_says_when(name):
 
 
 @pytest.mark.parametrize("name", SKILLS)
+def test_description_fits_the_length_cap(name):
+    description = parse_skill(name)[0]["description"]
+    assert len(description) <= 1024, f"{name}: {len(description)} characters"
+
+
+@pytest.mark.parametrize("name", SKILLS)
 def test_frontmatter_unquoted_values_hold_no_colon_space(name):
     for line in frontmatter_lines(name):
         value = line.partition(":")[2].strip()

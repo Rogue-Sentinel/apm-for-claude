@@ -12,8 +12,10 @@ that hold nothing else.
 
 - A function or file you need to change is already over its limit.
 - The change you are about to make touches existing debt.
-- A function is at or near the function limit (default 15 lines of logic), mixes levels of
-  abstraction, or has a comment explaining what its next block does.
+- A function is at or near the function limit (default 15 lines of logic; consider extracting from
+  about 10 lines of logic), mixes levels of abstraction, or has a comment explaining what its next
+  block does.
+- Someone asks to simplify or decompose a function.
 - A name is unclear, misleading or out of date.
 - A switch or if-else chain branches on a type, status or kind, especially the same chain in
   several places, or business rules that vary by type are tangled together in one function.
@@ -81,7 +83,8 @@ new file is not a refactoring that pays debt; it relocates it. See `apm:clean-ar
 ## Extract method
 
 If a block needs a comment to explain what it does, the block should be a function whose name
-replaces the comment. Extract until each function does one thing at one level of abstraction.
+replaces the comment. Short, focused functions with intention-revealing names make code read like
+prose. Extract until each function does one thing at one level of abstraction.
 
 1. **Find the candidate:** a block set off by a blank line or a comment, a body nested in a loop or
    conditional, or duplicated logic. It has one clear purpose.
@@ -157,7 +160,8 @@ is added without editing the existing ones (open for extension, closed for modif
    once, at construction, by a factory or a registry.
 5. **Verify:** run the suite, and add a test per variant confirming it matches the old branch.
 
-Signs: a switch with more than 3 cases; type checks or string comparisons on a kind; the same switch
+Signs: a switch with more than 3 cases; type checks or string comparisons on a kind (examples by language in
+[references/examples-by-language.md](references/examples-by-language.md)); the same switch
 in several places; adding a type means editing several files; comments like "if premium, do X; if
 basic, do Y".
 
@@ -215,6 +219,8 @@ A file over the limit is split by responsibility, as a pure move, in its own com
   extract, naming rules, parameter counts, and the extraction checklist.
 - [references/polymorphism-before-after.md](references/polymorphism-before-after.md): longer
   before-and-after examples, when not to use polymorphism, and the decision checklist.
+- [references/examples-by-language.md](references/examples-by-language.md): the names the original
+  skills used for a type check, each labeled with its language.
 
 ## Common mistakes
 

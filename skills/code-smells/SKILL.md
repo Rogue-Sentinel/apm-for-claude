@@ -33,7 +33,7 @@ Scan in four passes. The full catalog, with what each smell is, why it hurts and
    | Smell | Detection rule |
    |-------|----------------|
    | Long method | more than the function limit (default 15 lines of logic) |
-   | Large class | more than the file limit (default 200 lines of logic), or 7+ public methods |
+   | Large class | more than the file limit (default 200 lines of logic), or 7+ public methods; or a single type of about 200 lines, even in a file under the file limit (judged by the reviewer, not measured) |
    | Long parameter list | more than 3 parameters |
    | Data clumps | the same group of fields travels together in several places |
    | Primitive obsession | strings, numbers or booleans standing in for domain concepts |
@@ -66,7 +66,8 @@ Scan in four passes. The full catalog, with what each smell is, why it hurts and
    | Unnecessary comments | comments that restate the code, or no longer match it |
 
 Use the numbers, not impressions, for the bloaters: `<CLI> metrics` lists every over-limit function
-and file and every wide type. The judgment smells (couplers, change preventers, most dispensables)
+and file and every wide type. The one size signal it does not give is a single type of about 200
+lines in a file under the limit: that is judged by the reviewer, not measured. The judgment smells (couplers, change preventers, most dispensables)
 come from reading the code. `<CLI>` is the framework's command line, as the manager's prompt defines it.
 
 ## Severity

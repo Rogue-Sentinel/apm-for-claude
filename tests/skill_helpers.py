@@ -179,3 +179,8 @@ def term_pattern(term: str) -> re.Pattern[str]:
     before = r"(?<!\w)" if re.match(r"\w", term[0]) else ""
     after = r"(?!\w)" if re.match(r"\w", term[-1]) else ""
     return re.compile(before + re.escape(term) + after)
+
+
+def names_term(text: str, term: str) -> bool:
+    """Whether `text` names `term`, ignoring case and not matching inside a longer word."""
+    return bool(re.search(term_pattern(term).pattern, text, re.IGNORECASE))
