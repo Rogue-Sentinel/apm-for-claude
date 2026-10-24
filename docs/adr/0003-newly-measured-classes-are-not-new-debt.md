@@ -7,7 +7,7 @@ Accepted, 2026-10-18.
 ## Context
 
 Issue 9 made the class scan read C++ classes. A baseline recorded before that fix holds no C++ classes, so it
-lists 0 wide classes. After the fix, the unchanged XP12 tree measures 30 of them. Both `compare_items` and
+lists 0 wide classes. After the fix, an unchanged C++ project's tree measures 30 of them. Both `compare_items` and
 `compare_totals` would report those as regressions ("new wide class", "total rose: wide_classes") on code
 nobody touched. The ratchet would fail every project on its first check after the upgrade, for no change of
 its own.

@@ -6,7 +6,7 @@ import pytest
 import apm.guard_commands as gc
 from apm.guard_commands import check_command, destructive_reason
 
-SPACED = "C:/Users/darby/source/repos/VirtualAirline Plugin for XP12"
+SPACED = "C:/Users/me/source/repos/Sample App"
 GIT_DESTRUCTIVE = ("reset --hard", "clean -fdx", "push --force", "worktree remove ../wt", "checkout -- .")
 GIT_PREFIXES = (
     f'git -C "{SPACED}"',
