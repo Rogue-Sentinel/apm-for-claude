@@ -474,6 +474,10 @@
         {
           "at": "2026-10-22T23:07:22.469746+00:00",
           "text": "Release with #20 adds denials in XP12: its profile needs write_roots for ~/vab, C:/vaR and the X-Plane folders before upgrading; the user edits that repo."
+        },
+        {
+          "at": "2026-10-24T16:34:53.296603+00:00",
+          "text": "Variable-path deploys ($dst = ...; Copy-Item $src $dst) are a named limit: 51 XP12 outside writes still allowed vs 37 literal ones denied. Ask the user after merge whether to file a follow-up to track simple assignments within a command."
         }
       ],
       "decisions": [
@@ -2257,6 +2261,11 @@
     {
       "at": "2026-10-24T16:34:51.017589+00:00",
       "event": "task 20/fix running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:34:53.296625+00:00",
+      "event": "concern 20 Variable-path deploys ($dst = ...; Copy-Item $src $dst) are a named limit: 51 XP12 outside writes still allowed vs 37 literal ones denied. Ask the user after merge whether to file a follow-up to track simple assignments within a command.",
       "issue": 20
     }
   ]
