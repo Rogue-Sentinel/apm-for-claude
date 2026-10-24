@@ -49,9 +49,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 083ab23 merged (then main merged, ADR index conflict resolved a841cfc): RED 7 failed; GREEN 210 passed in worktree; on branch metrics/debt/audit/gate/docs/skills tests pass; debt check --base origin/main clean with both 0.3.2 and branch CLI.",
           "id": "5",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Newly measured language is not new debt",
           "worker": "implementer"
         },
@@ -2817,6 +2818,11 @@
     {
       "at": "2026-10-24T18:41:38.426101+00:00",
       "event": "task 10/5 running",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:46:23.683851+00:00",
+      "event": "task 10/5 done",
       "issue": 10
     }
   ]
