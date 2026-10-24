@@ -5,7 +5,7 @@ import subprocess
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-from apm.metrics import Report, measure_files, select_files, under_paths
+from apm.metrics import Report, choose_files, measure_files
 from apm.standard_config import MetricsConfig
 
 Run = Callable[..., subprocess.CompletedProcess]
@@ -34,5 +34,5 @@ def measure_at_ref(
     root: Path, ref: str, config: MetricsConfig, paths: Sequence[str] | None = None, run: Run = subprocess.run,
 ) -> Report:
     """Measure the selected files as committed at `ref`, optionally only under `paths`."""
-    names = under_paths(select_files(ref_files(root, ref, run), config), paths)
-    return measure_files(names, lambda name: _bytes_at(root, ref, name, run))
+    names, candidates = choose_files(ref_files(root, ref, run), config, paths)
+    return measure_files(names, lambda name: _bytes_at(root, ref, name, run), candidates)
