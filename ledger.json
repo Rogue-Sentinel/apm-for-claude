@@ -182,6 +182,10 @@
         {
           "at": "2026-10-22T23:07:20.177984+00:00",
           "text": "Planner (#20): build #13 after #20; _is_read_only can use split_redirects and is_device."
+        },
+        {
+          "at": "2026-10-24T17:49:06.085597+00:00",
+          "text": "Closed on GitHub as not planned (2026-10-24): user froze the guard after #20. Reopen only if it blocks real work with no workaround. Ledger has no closed status, so it is recorded as blocked."
         }
       ],
       "kind": "bug",
@@ -2427,6 +2431,11 @@
     {
       "at": "2026-10-24T17:49:03.800077+00:00",
       "event": "issue 13 status blocked",
+      "issue": 13
+    },
+    {
+      "at": "2026-10-24T17:49:06.085620+00:00",
+      "event": "decision 13 Closed on GitHub as not planned (2026-10-24): user froze the guard after #20. Reopen only if it blocks real work with no workaround. Ledger has no closed status, so it is recorded as blocked.",
       "issue": 13
     }
   ]
