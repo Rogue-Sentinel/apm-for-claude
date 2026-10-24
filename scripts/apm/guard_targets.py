@@ -27,10 +27,10 @@ one (`-ErrorAction Stop`, `-Filter *.dll`: see `_POWERSHELL_VALUE_OPTIONS`; for 
 bash `-pv` is `-p -v`; a bash-named program such as `cp` or `rm` is read both ways, with the value skipped and not,
 and keeps the targets of both), which is skipped, so an option it does not know (`-Dest`, an abbreviation) can still
 hide the destination; `mv` and `Move-Item`, which count only the destination, so removing a source in another
-checkout is not seen; a `#` right after an escaped blank (`a\\ #b`), read as a comment; PowerShell backtick escapes, which are not
-read (only a backtick at the end of a line joins lines); a redirect target, which `split_redirects` reads the bash
-way for both tools, so in PowerShell's `> C:\\o\\ y` the `\\` before the blank is an escape and the target is
-`C:/o y`, not `C:/o/` (a program's words, by contrast, take the `powershell` reading).
+checkout is not seen; a `#` right after an escaped blank (`a\\ #b`), read as a comment; PowerShell backtick
+escapes, which are not read (only a backtick at the end of a line joins lines); a redirect target, which
+`split_redirects` reads the bash way for both tools, so in PowerShell's `> C:\\o\\ y` the `\\` before the blank is
+an escape and the target is `C:/o y`, not `C:/o/` (a program's words, by contrast, take the `powershell` reading).
 """
 from __future__ import annotations
 
