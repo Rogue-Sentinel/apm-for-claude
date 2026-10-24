@@ -779,6 +779,13 @@
       "kind": "bug",
       "plan": "docs/plans/2026-10-24-issue-27-generic-examples.md",
       "questions": [],
+      "review": {
+        "at": "2026-10-24T18:32:45.922205+00:00",
+        "criteria_met": true,
+        "evidence": "Final whole-branch review and scoped re-review (opus): 0 open, every structural criterion met; 2 deferred suggestions in the plan's Deferred findings.",
+        "head": "a9a524a74e266cbf9b0cc7a124dc30158eb0e906",
+        "open": 0
+      },
       "status": "building",
       "tasks": [
         {
@@ -2635,6 +2642,11 @@
     {
       "at": "2026-10-24T18:32:43.527695+00:00",
       "event": "task 27/review done",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:32:45.922225+00:00",
+      "event": "review 27 0 open at a9a524a",
       "issue": 27
     }
   ]
