@@ -545,10 +545,10 @@
         },
         {
           "attempts": 3,
-          "evidence": "Retry rule: two failures on sonnet, so this round goes to a fresh opus worker, starting from 6f8bb3d.",
+          "evidence": "Escalated round (opus, 80ba05b): 620 targeted passed in the worktree; broad set on the branch after merge 2f89a71 all pass; re-reviewed clean with replays; debt check nothing worse.",
           "id": "6",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "write_roots profile key and remedy",
           "worker": "implementer"
         },
@@ -2220,6 +2220,11 @@
     {
       "at": "2026-10-24T16:20:32.598950+00:00",
       "event": "task 20/6r done",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:20:34.961723+00:00",
+      "event": "task 20/6 done",
       "issue": 20
     }
   ]
