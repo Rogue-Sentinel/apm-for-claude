@@ -545,9 +545,9 @@
         },
         {
           "attempts": 3,
-          "evidence": "Task 6 review must-fix: M1 backslash/%USERPROFILE% entries open nothing; S1 '..' and ancestors; S2 /c/ drive forms; PowerShell \\ continuation join. See the plan.",
+          "evidence": "Retry rule: two failures on sonnet, so this round goes to a fresh opus worker, starting from 6f8bb3d.",
           "id": "6",
-          "model": "sonnet",
+          "model": "opus",
           "status": "running",
           "title": "write_roots profile key and remedy",
           "worker": "implementer"
@@ -2204,6 +2204,11 @@
     },
     {
       "at": "2026-10-24T15:58:42.560990+00:00",
+      "event": "task 20/6 running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:59:23.982993+00:00",
       "event": "task 20/6 running",
       "issue": 20
     }
