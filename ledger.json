@@ -544,11 +544,11 @@
           "worker": "implementer"
         },
         {
-          "attempts": 2,
+          "attempts": 3,
           "evidence": "Task 6 review must-fix: M1 backslash/%USERPROFILE% entries open nothing; S1 '..' and ancestors; S2 /c/ drive forms; PowerShell \\ continuation join. See the plan.",
           "id": "6",
           "model": "sonnet",
-          "status": "failed",
+          "status": "running",
           "title": "write_roots profile key and remedy",
           "worker": "implementer"
         },
@@ -2200,6 +2200,11 @@
     {
       "at": "2026-10-24T15:58:40.244749+00:00",
       "event": "task 20/6 failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:58:42.560990+00:00",
+      "event": "task 20/6 running",
       "issue": 20
     }
   ]
