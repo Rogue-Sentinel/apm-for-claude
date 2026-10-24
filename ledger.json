@@ -816,9 +816,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Worker 0e2eace merged: only ADR 0008 changed (S1, G1, G2 per ruling); tests/test_docs.py tests/test_skills.py 181 passed on the branch; no line over 120.",
           "id": "fix",
           "model": "sonnet",
-          "status": "running",
+          "status": "done",
           "title": "Final review fix: ADR 0008 wording",
           "worker": "implementer"
         }
@@ -2619,6 +2620,11 @@
     {
       "at": "2026-10-24T18:30:50.635996+00:00",
       "event": "task 27/fix running",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:31:49.114041+00:00",
+      "event": "task 27/fix done",
       "issue": 27
     }
   ]
