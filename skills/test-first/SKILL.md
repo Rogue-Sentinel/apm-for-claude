@@ -194,7 +194,9 @@ More patterns (value, state change, error, interaction, table-driven) and anti-p
 
 **Reproduce the bug as a failing test before touching the fix.** The test must fail on the current
 code, proving it captures the real defect; only then make it pass. A bug fix without a regression
-test is not done.
+test is not done. If it passes on the current code, it has not reproduced the bug, and it is not
+redundant: rewrite it until it fails for the reported reason, or use `apm:systematic-debugging`
+when the bug will not reproduce.
 
 ```
 bug:      an empty email address is accepted

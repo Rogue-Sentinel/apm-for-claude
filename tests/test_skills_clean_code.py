@@ -156,3 +156,9 @@ def test_large_class_has_a_reviewer_judged_class_size_signal():
     for text in (flat_section(body, "## Finding smells"), flat_section(catalog, "### Large class")):
         for phrase in CLASS_SIZE_SIGNAL:
             assert phrase in text
+
+
+def test_a_regression_test_that_passes_on_the_current_code_has_not_reproduced_the_bug():
+    _, body = parse_skill("test-first")
+    fix = flat_section(body, "## A bug fix starts with a failing test")
+    assert "has not reproduced the bug" in fix
