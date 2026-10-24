@@ -186,7 +186,7 @@
       ],
       "kind": "bug",
       "questions": [],
-      "status": "planning",
+      "status": "blocked",
       "tasks": [],
       "title": "The guard denies a worker's read-only command that redirects stderr to /dev/null",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/13"
@@ -2422,6 +2422,11 @@
     {
       "at": "2026-10-24T17:44:24.970539+00:00",
       "event": "issue 13 status planning",
+      "issue": 13
+    },
+    {
+      "at": "2026-10-24T17:49:03.800077+00:00",
+      "event": "issue 13 status blocked",
       "issue": 13
     }
   ]
