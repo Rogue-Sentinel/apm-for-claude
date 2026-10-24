@@ -1086,6 +1086,14 @@
           "status": "done",
           "title": "Retrieval check after",
           "worker": "general-purpose"
+        },
+        {
+          "attempts": 1,
+          "id": "review",
+          "model": "opus",
+          "status": "running",
+          "title": "Final whole-branch review",
+          "worker": "reviewer"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3227,6 +3235,11 @@
     {
       "at": "2026-10-24T20:21:59.363624+00:00",
       "event": "task 34/5 done",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:22:09.158939+00:00",
+      "event": "task 34/review running",
       "issue": 34
     }
   ]
