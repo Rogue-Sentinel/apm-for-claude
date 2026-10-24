@@ -5,7 +5,7 @@ import subprocess
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-from apm.metrics import Report, decode_text, measure_text, select_files, under_paths
+from apm.metrics import Report, measure_files, select_files, under_paths
 from apm.standard_config import MetricsConfig
 
 Run = Callable[..., subprocess.CompletedProcess]
@@ -25,9 +25,9 @@ def ref_files(root: Path, ref: str, run: Run = subprocess.run) -> list[str]:
     return sorted(name for name in done.stdout.decode("utf-8", errors="replace").split("\0") if name)
 
 
-def _text_at(root: Path, ref: str, path: str, run: Run) -> str | None:
+def _bytes_at(root: Path, ref: str, path: str, run: Run) -> bytes | None:
     done = run(["git", "show", f"{ref}:{path}"], cwd=root, capture_output=True)
-    return decode_text(done.stdout) if done.returncode == 0 else None
+    return done.stdout if done.returncode == 0 else None
 
 
 def measure_at_ref(
@@ -35,6 +35,4 @@ def measure_at_ref(
 ) -> Report:
     """Measure the selected files as committed at `ref`, optionally only under `paths`."""
     names = under_paths(select_files(ref_files(root, ref, run), config), paths)
-    texts = ((name, _text_at(root, ref, name, run)) for name in names)
-    measured = (measure_text(name, text) for name, text in texts if text is not None)
-    return Report(tuple(metric for metric in measured if metric is not None))
+    return measure_files(names, lambda name: _bytes_at(root, ref, name, run))
