@@ -981,11 +981,12 @@
     },
     "34": {
       "allowlist": [],
+      "branch": "issue-34-restore-skill-gaps",
       "concerns": [],
       "decisions": [],
       "kind": "feature",
       "questions": [],
-      "status": "queued",
+      "status": "planning",
       "tasks": [],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/34"
@@ -3016,6 +3017,11 @@
     {
       "at": "2026-10-24T19:56:28.481525+00:00",
       "event": "filed 34 https://github.com/Rogue-Sentinel/apm-for-claude/issues/34",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T19:56:44.828170+00:00",
+      "event": "issue 34 status planning",
       "issue": 34
     }
   ]
