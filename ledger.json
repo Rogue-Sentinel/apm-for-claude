@@ -997,10 +997,10 @@
       "plan": "docs/plans/2026-10-24-restore-skill-gaps.md",
       "questions": [],
       "review": {
-        "at": "2026-10-24T20:33:05.432412+00:00",
+        "at": "2026-10-24T20:37:32.470411+00:00",
         "criteria_met": true,
-        "evidence": "Final whole-branch review (opus) at 3ea74ac: 0 must-fix, all 8 structural criteria met; 6 suggestions fixed in round 1 (e86a5b9..04a1d17), scoped re-review (opus) all addressed, no regression, 0 open; remaining suggestions deferred in the plan",
-        "head": "21ed065a39ea3b1ad09547f552f3e39c8587e928",
+        "evidence": "Final whole-branch review (opus) at 3ea74ac: 0 must-fix, all 8 structural criteria met; fix round 1 (e86a5b9..04a1d17) scoped re-review (opus) at d3057cc: all addressed, 0 open. Since d3057cc only the plan file changed (deferred observations; criteria paths made repo-relative, see the plan's merge-gate ruling)",
+        "head": "118d4d3232f1367d53d616e19ff15e24a3fce38b",
         "open": 0
       },
       "status": "integrating",
@@ -3292,6 +3292,11 @@
     {
       "at": "2026-10-24T20:33:05.432437+00:00",
       "event": "review 34 0 open at 21ed065",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:37:32.470428+00:00",
+      "event": "review 34 0 open at 118d4d3",
       "issue": 34
     }
   ]
