@@ -13,7 +13,7 @@
       "tasks": [
         {
           "attempts": 1,
-          "evidence": "Worker 347b07d merged: RED ImportError LANGUAGE_NAMES; targeted 145 passed in worktree; on branch with T2/T3 merged the combined metrics tests 230+ pass; debt clean.",
+          "evidence": "Worker 347b07d merged: RED ImportError LANGUAGE_NAMES; targeted 145 passed in worktree; on branch 8346c47 (T1-T3 merged) combined metrics tests 225 passed; debt clean.",
           "id": "1",
           "model": "sonnet",
           "status": "done",
@@ -2770,6 +2770,11 @@
     {
       "at": "2026-10-24T18:36:14.832536+00:00",
       "event": "task 10/2 done",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:36:34.949334+00:00",
+      "event": "task 10/1 updated",
       "issue": 10
     }
   ]
