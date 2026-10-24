@@ -828,6 +828,17 @@
       "title": "metrics reads Qt .ts translation files (XML) as TypeScript",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/29"
     },
+    "30": {
+      "allowlist": [],
+      "concerns": [],
+      "decisions": [],
+      "kind": "feature",
+      "questions": [],
+      "status": "queued",
+      "tasks": [],
+      "title": "Release apm 0.3.3 with the #20, #27 and #10 changes",
+      "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/30"
+    },
     "9": {
       "allowlist": [],
       "branch": "issue-9-brace-wide-classes",
@@ -2585,6 +2596,11 @@
       "at": "2026-10-24T18:27:57.315881+00:00",
       "event": "task 27/review updated",
       "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:29:57.851156+00:00",
+      "event": "filed 30 https://github.com/Rogue-Sentinel/apm-for-claude/issues/30",
+      "issue": 30
     }
   ]
 }
