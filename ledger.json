@@ -942,9 +942,10 @@
       "tasks": [
         {
           "attempts": 1,
+          "evidence": "Worker 1134fd5 merged: plugin.json, apm.VERSION, tutorial example at 0.3.3; manager's dacf91d sets .apm/profile.json 0.3.3; tests/test_setup.py test_docs.py test_cli.py 70 passed on the branch; no tracked file outside plans/specs/platform-notes/tests names 0.3.2; debt clean.",
           "id": "1",
           "model": "haiku",
-          "status": "running",
+          "status": "done",
           "title": "Bump the version to 0.3.3",
           "worker": "implementer"
         },
@@ -2939,6 +2940,11 @@
     {
       "at": "2026-10-24T19:07:23.087134+00:00",
       "event": "task 30/2 pending",
+      "issue": 30
+    },
+    {
+      "at": "2026-10-24T19:10:46.906368+00:00",
+      "event": "task 30/1 done",
       "issue": 30
     }
   ]
