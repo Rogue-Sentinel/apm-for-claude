@@ -613,9 +613,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Task 6 review (opus): replay of 5,997 calls: 0 changes without write_roots, 37 expected lifts with XP12 roots; 1 must-fix (M1) + S1, S2 and the PowerShell continuation gap upgraded; docs S3/S4/S6 folded in.",
           "id": "6r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 6 review",
           "worker": "reviewer"
         }
@@ -2189,6 +2190,11 @@
     {
       "at": "2026-10-24T15:25:46.979370+00:00",
       "event": "task 20/6r running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:58:37.968769+00:00",
+      "event": "task 20/6r done",
       "issue": 20
     }
   ]
