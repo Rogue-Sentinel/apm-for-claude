@@ -945,7 +945,7 @@
         "head": "2fefcd768a99d4d77fce444e2e0ababfe37b8c59",
         "open": 0
       },
-      "status": "building",
+      "status": "integrating",
       "tasks": [
         {
           "attempts": 1,
@@ -2976,6 +2976,11 @@
     {
       "at": "2026-10-24T19:11:40.961327+00:00",
       "event": "review 30 0 open at 2fefcd7",
+      "issue": 30
+    },
+    {
+      "at": "2026-10-24T19:11:43.328112+00:00",
+      "event": "issue 30 status integrating",
       "issue": 30
     }
   ]
