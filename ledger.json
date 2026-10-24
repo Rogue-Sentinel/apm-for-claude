@@ -808,7 +808,7 @@
         {
           "attempts": 1,
           "id": "review",
-          "model": "sonnet",
+          "model": "opus",
           "status": "running",
           "title": "Final whole-branch review",
           "worker": "reviewer"
@@ -2579,6 +2579,11 @@
     {
       "at": "2026-10-24T18:27:46.815622+00:00",
       "event": "task 27/review running",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:27:57.315881+00:00",
+      "event": "task 27/review updated",
       "issue": 27
     }
   ]
