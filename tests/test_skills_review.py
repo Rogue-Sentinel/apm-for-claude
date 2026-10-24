@@ -61,6 +61,20 @@ def test_skill_has_its_required_headings(name):
     assert_sections(name, REQUIRED[name])
 
 
+def test_branch_review_description_names_the_original_triggers():
+    fields, _ = parse_skill("branch-review")
+    description = fields["description"].lower()
+    for phrase in ("branch review", "code quality scorecard", "compare code quality"):
+        assert phrase in description, phrase
+
+
+def test_module_architecture_has_a_reviewer_judged_class_size_signal():
+    _, body = parse_skill("branch-review")
+    architecture = section(body, "### Module architecture")
+    assert "about 200 lines" in architecture
+    assert "judged by the reviewer, not measured" in architecture
+
+
 def test_branch_review_has_its_named_references():
     for file_name in ("scoring-evidence-guide.md", "evidence-by-language.md"):
         assert (SKILLS_DIR / "branch-review" / "references" / file_name).is_file(), file_name

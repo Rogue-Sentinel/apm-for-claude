@@ -1,6 +1,6 @@
 ---
 name: branch-review
-description: "Use when a branch needs a scored quality review against its base, when old code is being compared with its replacement, when deciding whether a branch is ready to merge, or when tracking how a branch's quality changed across repeated reviews."
+description: "Use when a branch needs a scored quality review against its base, when old code is being compared with its replacement, when deciding whether a branch is ready to merge, or when tracking how a branch's quality changed across repeated reviews. Also use when the request mentions a branch review or a code quality scorecard, or asks to compare code quality."
 ---
 
 # Branch review
@@ -141,8 +141,9 @@ How the code is divided into modules, files and types, and whether each has one 
 imports are checked against the profile's layer map when it declares one (see
 `apm:clean-architecture`).
 
-Look for: the over-limit files and functions from `<CLI> metrics`; the largest files; how many
-exported units each file holds; imports that point the wrong way across a layer; decisions living in
+Look for: the over-limit files and functions from `<CLI> metrics`; the largest files; any single
+type of about 200 lines, even in a file under the file limit (judged by the reviewer, not measured);
+how many exported units each file holds; imports that point the wrong way across a layer; decisions living in
 the entry points or the presentation layer instead of in tested logic.
 
 | Score | What it looks like |
