@@ -26,6 +26,8 @@ Adapted, in the framework's own words and with language-neutral examples, into:
 | `functional-core` | `fp-pure-functions` (and its purity rules), `fp-higher-order-functions` (and its patterns), `fp-error-handling` (and its result and option reference) |
 | `clean-architecture` | `hexagonal-ports-adapters` (and its anatomy), `hexagonal-domain-isolation` (and its anti-corruption layer patterns) |
 
+The library and language names the originals used as examples are kept in each skill's `references/examples-by-language.md`.
+
 ### obra/superpowers
 
 [obra/superpowers](https://github.com/obra/superpowers), version 7.0.0, by Jesse Vincent. MIT License

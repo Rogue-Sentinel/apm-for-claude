@@ -32,6 +32,8 @@ The function changes nothing outside its own scope. Side effects include:
 - throwing an exception;
 - reading mutable outside state.
 
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
+
 ## The purity test
 
 Replace the call with its return value. Does the program behave exactly the same?
@@ -42,6 +44,8 @@ y = saveUser(u)      // -> y = { id: 1 }   the user was never saved: impure
 ```
 
 ## Immutable updates
+
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
 
 ### Objects
 

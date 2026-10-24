@@ -88,6 +88,7 @@ Signs: domain types that import a web framework, a database driver or an HTTP cl
 logic inside controller or handler functions; a database query change that touches business rules;
 domain unit tests that need a database connection; no clear separation between what the system does
 and how it talks to the world.
+(Examples by language: [references/examples-by-language.md](references/examples-by-language.md).)
 
 Before:
 
@@ -326,6 +327,8 @@ for each file in changedFiles:
   the kinds of port and adapter, a directory layout, the dependency rules and the testing strategy.
 - [references/anti-corruption-layer.md](references/anti-corruption-layer.md): what an
   anti-corruption layer is, its three patterns, the mapping strategies and the boundary rules.
+- [references/examples-by-language.md](references/examples-by-language.md): the names the original
+  skills used as examples, by language.
 
 ## Common mistakes
 

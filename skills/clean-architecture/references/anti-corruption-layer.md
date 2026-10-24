@@ -100,6 +100,8 @@ type ShippingAdapter implements ShippingService:
 | A mapping library | many models with similar shapes, to cut boilerplate |
 | Mapping through the constructor | the target type validates as it is built |
 
+(Examples by language: [examples-by-language.md](examples-by-language.md).)
+
 ## Boundary rules
 
 1. **Outside types never cross into the domain.**

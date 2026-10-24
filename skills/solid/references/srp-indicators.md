@@ -23,6 +23,7 @@ Answer these about the type:
 
 - A file over the file limit (default 200 lines of logic; see `apm:clean-code`).
 - A type at or over the public-method limit (default 7; see `apm:object-design`).
+- A single type of about 200 lines, even in a file under the file limit (judged by the reviewer, not measured).
 - More than five dependencies passed to its constructor.
 - Methods that fall into clusters which never call each other or share fields.
 - Private helpers each used by only one public method: each cluster is a candidate for extraction.

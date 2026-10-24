@@ -190,13 +190,16 @@ for each type in changedTypes:
   behavior checks, design smells, tell-don't-ask, and when getters are fine.
 - [references/composition-patterns.md](references/composition-patterns.md): strategy, decorator,
   delegation and mixins, when inheritance is still right, and the decision steps.
+- [references/examples-by-language.md](references/examples-by-language.md): the names the original
+  skills used as examples, by language.
 
 ## Common mistakes
 
 - **Adding a getter and a setter for every field** by reflex.
 - **Returning a mutable collection** the type owns. Return a copy or a read-only view.
 - **Leaking the internal structure** through a string form (a debug or text representation),
-  whether or not anyone parses it. What it prints becomes something readers and logs rely on.
+  whether or not anyone parses it. What it prints becomes something readers and logs rely on
+  (examples by language: [references/examples-by-language.md](references/examples-by-language.md)).
 - **Breaking encapsulation "just for the tests."** A test that needs the internals is telling you to
   redesign: test through behavior, or extract the part it wants to reach.
 - **Over-encapsulating a simple value type.** Plain read access to a point's coordinates is fine.

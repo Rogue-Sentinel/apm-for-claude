@@ -86,7 +86,8 @@ log("Total: " + total)
 
 The two rules in detail, the list of side effects, the purity test, immutable updates of objects,
 lists and nested values, the pure-core-and-impure-shell pattern and the table of pure alternatives
-are in [references/purity-rules.md](references/purity-rules.md).
+are in [references/purity-rules.md](references/purity-rules.md). Examples by language:
+[references/examples-by-language.md](references/examples-by-language.md).
 
 ## Higher-order functions
 
@@ -241,6 +242,8 @@ assert isTrialOver(account(startedAt: day 0), now: day 30) == false
   operations, when to use which, and the anti-patterns.
 - [references/result-and-option-by-language.md](references/result-and-option-by-language.md): what
   each language offers for absence and failure.
+- [references/examples-by-language.md](references/examples-by-language.md): the names the original
+  skills used as examples, by language.
 
 ## Common mistakes
 
