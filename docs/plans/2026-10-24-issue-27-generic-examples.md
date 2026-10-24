@@ -76,3 +76,7 @@ Test: `python -B -m pytest -q tests/test_docs.py`.
 *Ruling before Task 1: the two tasks are small and of one kind (doc and example edits), so one worker builds both, as two commits. Cost if wrong: none.*
 
 *Ruling on the final review (2026-10-24): S1 is right; Task 2's own wording was wrong. APM state, a file-tool write outside the project, and a worker's denial have no approval (ADR-0006, ADR-0007). ADR 0008's first Decision bullet becomes "What stays blocked": the same list, then "where ADR-0006 and ADR-0007 allow an approval, the user gives it in chat; the rest stay unapprovable". G1 and G2 are folded into the same round: drop "They are not defects to be filed.", qualify "a dangerous action gets through" with ADR-0002's test (a command a cooperative worker would produce while following its brief), and in the Context say the issues "each refined the guard's rules" rather than claiming all four were about reading shell text. Cost if wrong: none; wording only.*
+
+## Deferred findings
+- Final re-review: ADR 0008 cites ADR-0006 in its first Decision bullet, but its Status names only ADR-0002 and ADR-0007.
+- Final re-review: ADR 0008's Context still says "Every refinement added parsing rules", which slightly overstates #19.
