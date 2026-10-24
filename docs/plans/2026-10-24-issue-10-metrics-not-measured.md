@@ -407,3 +407,14 @@ when it is merged, unless something comes up the plan did not settle.
 *Ruling before Task 1: `.ts` files read as Qt translations are out of scope; filed as #29. Cost if wrong: none to this plan.*
 
 *Ruling during Task 4 (2026-10-24): `not_measured_kinds` is a module-level function, `not_measured_kinds(report)` in `metrics.py`, not a `Report` method. As a method it made `Report` a class with 7 public methods, which `debt check` reports as a new wide class. Task 4 also adds `choose_files(files, config, paths)`, shared by `measure_tree` and `measure_at_ref`, so the two cannot drift apart. Task 5 consumes neither. Cost if wrong: one call site moves if the method is wanted later.*
+
+*Ruling on the final review (2026-10-24): no must-fix findings. One fix round takes these:*
+- *SF1: rename the local `unmeasured` in `measure_files` to `not_measured`.*
+- *SF2: the skill and ADR 0009 say "add an exclude under `standard.metrics`, or file an issue asking for the language". A profile cannot add a language.*
+- *SF3 (folded in, not a follow-up): `apm audit` drops the same files silently, so it is the bug #10 names, on the init path. `audit --json` gains `files_not_measured`, and the text report gains one line naming the count, so a "fresh" verdict for a project whose code is all unscanned also says how many files were not measured. Cost if wrong: one more line in the audit report.*
+- *Suggestion 1 (folded in): an empty or blank UTF-16 file, a byte-order mark only or whitespace only, holds no text, as Review Focus 4 says.*
+- *Suggestions 2, 3 and 4 (folded in, wording only): the `not_measured_kinds` docstring gives its design reason (a rendering helper), and the two module helpers used only inside `metrics.py` become private; the audit template reads "N files whose functions were not measured, N files not measured at all"; ADR 0009 cites ADR-0010 for the newly-measured rule, and no longer says "only" narrowing the scope fixes a not-measured file.*
+- *Suggestion 5 (reading a candidate whole for the 8000-byte check) is deferred: the plan's Risks section accepts it. Suggestion 6 is already a documented limit. Suggestion 7 is noted: the plan's generic-names grep matches the rule's own text in this plan file.*
+
+## Deferred findings
+- Final review: a not-measured candidate is read whole for the 8000-byte binary check; reading only the first 8000 bytes would be cheaper for large files.
