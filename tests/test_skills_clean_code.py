@@ -162,3 +162,10 @@ def test_a_regression_test_that_passes_on_the_current_code_has_not_reproduced_th
     _, body = parse_skill("test-first")
     fix = flat_section(body, "## A bug fix starts with a failing test")
     assert "has not reproduced the bug" in fix
+
+
+def test_finding_smells_does_not_claim_the_class_size_is_the_only_unmeasured_signal():
+    _, body = parse_skill("code-smells")
+    finding = flat_section(body, "## Finding smells")
+    assert "One size signal it does not give" in finding
+    assert "The one size signal" not in finding
