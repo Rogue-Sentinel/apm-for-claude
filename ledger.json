@@ -634,11 +634,11 @@
           "worker": "reviewer"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Verified in worker worktree at 206290f: shared _VALUE_OPTIONS now skips bash short clusters. write_targets('mkdir -pv /c/other/d') == [] (was ['/c/other/d'] at 598c1fe); same for 'rm -iv', 'cp -pv a /c/other/b', 'mv -iv a /c/other/b', 'touch -ea'. Loosens routine bash writes. Also guard_outside docstring misstates the device-namespace limit; ADR line over 120 chars.",
           "id": "fix",
           "model": "sonnet",
-          "status": "failed",
+          "status": "running",
           "title": "Final review fix",
           "worker": "implementer"
         }
@@ -2272,6 +2272,11 @@
     {
       "at": "2026-10-24T16:47:09.407747+00:00",
       "event": "task 20/fix failed",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T16:47:11.812640+00:00",
+      "event": "task 20/fix running",
       "issue": 20
     }
   ]
