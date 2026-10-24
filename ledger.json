@@ -39,6 +39,11 @@
           "attempts": 0,
           "id": "4",
           "status": "pending"
+        },
+        {
+          "attempts": 0,
+          "id": "5",
+          "status": "pending"
         }
       ],
       "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
@@ -2714,6 +2719,11 @@
     {
       "at": "2026-10-24T18:33:13.131231+00:00",
       "event": "task 10/4 pending",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:33:15.346817+00:00",
+      "event": "task 10/5 pending",
       "issue": 10
     }
   ]
