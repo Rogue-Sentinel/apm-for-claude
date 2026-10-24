@@ -806,11 +806,11 @@
           "title": "Merge gate"
         },
         {
-          "attempts": 1,
+          "attempts": 2,
           "evidence": "Final review (opus) at 42601ca: 0 must-fix, 1 should-fix (S1: ADR 0008 Decision implies state and outside file-tool writes are approvable), 2 suggestions (G1, G2). Ruling: see the plan, final-review amendment.",
           "id": "review",
           "model": "opus",
-          "status": "failed",
+          "status": "running",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         },
@@ -2625,6 +2625,11 @@
     {
       "at": "2026-10-24T18:31:49.114041+00:00",
       "event": "task 27/fix done",
+      "issue": 27
+    },
+    {
+      "at": "2026-10-24T18:31:51.648395+00:00",
+      "event": "task 27/review running",
       "issue": 27
     }
   ]
