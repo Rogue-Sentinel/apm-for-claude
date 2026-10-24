@@ -217,3 +217,7 @@ def test_the_branch_review_command_briefs_the_reviewer_with_the_code_review_brie
     assert "apm:code-review" in flat and "references/reviewer-checklist.md" in flat
     for needed in ("exact CLI line", "its base", "limits", "`standard.ui`"):
         assert needed in flat, needed
+
+
+def test_the_install_step_names_only_what_you_must_type():
+    assert "/apm:branch-review" not in section(_text(TUTORIAL), HEADINGS[0])
