@@ -705,7 +705,7 @@
       "decisions": [],
       "kind": "bug",
       "questions": [],
-      "status": "queued",
+      "status": "blocked",
       "tasks": [],
       "title": "The guard scans commit and PR heredoc bodies, and cat<<'EOF' bodies with no blank, as commands",
       "url": "https://github.com/Rogue-Sentinel/apm-for-claude/issues/21"
@@ -2452,6 +2452,11 @@
       "at": "2026-10-24T17:49:10.840361+00:00",
       "event": "decision 15 Closed on GitHub as not planned (2026-10-24): user froze the guard after #20. Reopen only if it blocks real work with no workaround. Ledger has no closed status, so it is recorded as blocked.",
       "issue": 15
+    },
+    {
+      "at": "2026-10-24T17:49:13.099510+00:00",
+      "event": "issue 21 status blocked",
+      "issue": 21
     }
   ]
 }
