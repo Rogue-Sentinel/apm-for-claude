@@ -1077,6 +1077,14 @@
           "status": "done",
           "title": "Design skills",
           "worker": "implementer"
+        },
+        {
+          "attempts": 1,
+          "id": "5",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Retrieval check after",
+          "worker": "general-purpose"
         }
       ],
       "title": "Restore the clean-code skills' trigger phrases, nuances and thresholds lost in the rewording",
@@ -3208,6 +3216,11 @@
     {
       "at": "2026-10-24T20:21:32.332407+00:00",
       "event": "task 34/3 done",
+      "issue": 34
+    },
+    {
+      "at": "2026-10-24T20:21:34.635818+00:00",
+      "event": "task 34/5 running",
       "issue": 34
     }
   ]
