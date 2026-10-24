@@ -598,6 +598,11 @@ small fix round. S6 and the line-width note are deferred (below).*
 - Final review, recommendation: original trigger words not in the issue's lists ("polymorphism",
   "replace conditionals", "refactor switch statements", "extending behavior without modifying code",
   "subtype behavior", "structure tests"); most are covered by existing wording. For the user.
+- Scoped re-review (all six addressed, 0 open): `docs/tutorial.md:21` still says "These are the only
+  commands you type"; "the only commands you must type" would match the intro.
+- Scoped re-review: `tests/test_skills_review.py:490` (rubric bands) now flattens whitespace, so
+  `"| 9-10 |"` would also match a row with extra padding; a negligible loosening.
+- Scoped re-review: `tests/test_skills_design.py:171` is 108 characters; no line-length limit applies.
 
 ## Pre-flight scan
 
