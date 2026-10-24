@@ -600,10 +600,10 @@
         },
         {
           "attempts": 3,
-          "evidence": "Task 5 review (opus): replay of 3,029 + 2,528 real calls: 0 loosened, 0 reason changes; 1 must-fix (PowerShell reading judged for Bash, false denial of a real read); S2/S3 folded in; rest deferred.",
+          "evidence": "Scoped re-review: M1, S2, S3 addressed; replays 0 loosened, 0 reason changes; 0 open.",
           "id": "5r",
           "model": "opus",
-          "status": "running",
+          "status": "done",
           "title": "Task 5 review",
           "worker": "reviewer"
         }
@@ -2147,6 +2147,11 @@
     {
       "at": "2026-10-24T14:49:43.078352+00:00",
       "event": "task 20/5r running",
+      "issue": 20
+    },
+    {
+      "at": "2026-10-24T15:08:34.250109+00:00",
+      "event": "task 20/5r done",
       "issue": 20
     }
   ]
