@@ -70,6 +70,14 @@
           "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
+        },
+        {
+          "attempts": 1,
+          "id": "fix",
+          "model": "sonnet",
+          "status": "running",
+          "title": "Final review fixes",
+          "worker": "implementer"
         }
       ],
       "title": "metrics silently skips files it has no scanner for: QML, Inno Setup .iss, CMake",
@@ -2842,6 +2850,11 @@
     {
       "at": "2026-10-24T18:52:30.459711+00:00",
       "event": "task 10/review failed",
+      "issue": 10
+    },
+    {
+      "at": "2026-10-24T18:52:32.789221+00:00",
+      "event": "task 10/fix running",
       "issue": 10
     }
   ]
