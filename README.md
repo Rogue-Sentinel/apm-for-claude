@@ -52,6 +52,9 @@ done, open a new Claude Code session in the project. That new session is the man
 
 You never type a command-line command. The manager runs them for you.
 
+One more command is optional: `/apm:branch-review [branch]` has a reviewer score a branch against its base.
+Leave the branch out to review the current one.
+
 ## Quick start
 
 1. Type `/apm:setup`, then open a new Claude Code session in the project. You are now talking to the manager.
