@@ -807,9 +807,10 @@
         },
         {
           "attempts": 1,
+          "evidence": "Final review (opus) at 42601ca: 0 must-fix, 1 should-fix (S1: ADR 0008 Decision implies state and outside file-tool writes are approvable), 2 suggestions (G1, G2). Ruling: see the plan, final-review amendment.",
           "id": "review",
           "model": "opus",
-          "status": "running",
+          "status": "failed",
           "title": "Final whole-branch review",
           "worker": "reviewer"
         }
@@ -2601,6 +2602,11 @@
       "at": "2026-10-24T18:29:57.851156+00:00",
       "event": "filed 30 https://github.com/Rogue-Sentinel/apm-for-claude/issues/30",
       "issue": 30
+    },
+    {
+      "at": "2026-10-24T18:30:48.299586+00:00",
+      "event": "task 27/review failed",
+      "issue": 27
     }
   ]
 }
