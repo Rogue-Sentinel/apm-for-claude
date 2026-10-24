@@ -11,7 +11,9 @@ Known limits. This is a scanner, not a compiler, and these cases are read wrongl
 - JavaScript regex literals that hold a quote or a comment marker;
 - a Rust lifetime or a digit separator that pairs with a later quote as a false char literal;
 - a block comment that starts on a preprocessor line and runs past it;
-- PHP #[Attr] lines, which are read as comments.
+- PHP #[Attr] lines, which are read as comments;
+- an Inno Setup `{` comment that opens after a `;` on the same line;
+- CMake `#[=[ ... ]=]` bracket comments, which are read as line comments.
 """
 from __future__ import annotations
 
@@ -58,13 +60,16 @@ def _plain(
     name: str,
     line: tuple[str, ...] = ("#",),
     block: tuple[tuple[str, str], ...] = (),
+    quotes: tuple[str, ...] = _PLAIN_QUOTES,
+    raw: tuple[str, ...] = (),
 ) -> Language:
-    return Language(name, "plain", line, block, _PLAIN_QUOTES)
+    return Language(name, "plain", line, block, quotes, False, raw)
 
 
 PYTHON = Language("Python", "python", ("#",), (), ('"""', "'''", '"', "'"))
 C = _brace("C", preprocessor=True)
 CPP = _brace("C++", preprocessor=True)
+_CMAKE = _plain("CMake", block=(("#[[", "]]"),), quotes=('"',))
 _LANGUAGE_EXTENSIONS: tuple[tuple[Language, str], ...] = (
     (C, "c h"),
     (CPP, "cc cpp cxx hpp hh"),
@@ -88,14 +93,20 @@ _LANGUAGE_EXTENSIONS: tuple[tuple[Language, str], ...] = (
     (_plain("SQL", ("--",), (("/*", "*/"),)), "sql"),
     (_plain("Perl"), "pl"),
     (_plain("R"), "r"),
+    (_plain("QML", ("//",), (("/*", "*/"),), _BACKTICK_QUOTES), "qml"),
+    (_plain("Inno Setup", (";", "//"), (("{", "}"), ("(*", "*)")), _PLAIN_QUOTES, _PLAIN_QUOTES), "iss"),
+    (_CMAKE, "cmake"),
 )
 _BY_EXTENSION = {
     f".{ext}": language for language, exts in _LANGUAGE_EXTENSIONS for ext in exts.split()
 }
+_BY_NAME = {"cmakelists.txt": _CMAKE}
+LANGUAGE_NAMES: tuple[str, ...] = tuple(sorted({language.name for language, _ in _LANGUAGE_EXTENSIONS}))
 
 
 def language_for(path: str) -> Language | None:
-    return _BY_EXTENSION.get(os.path.splitext(path)[1].lower())
+    by_name = _BY_NAME.get(os.path.basename(path).lower())
+    return by_name or _BY_EXTENSION.get(os.path.splitext(path)[1].lower())
 
 
 _CPP_MARKER = re.compile(
